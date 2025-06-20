@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "devlog": {
+      "command": "node",
+      "args": ["./build/index.js"],
+      "cwd": "."
+    }
+  }
+}

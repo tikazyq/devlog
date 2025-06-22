@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-import { DevlogManager } from "./devlog-manager.js";
+import { DevlogManager } from "@devlog/core";
 
 async function test() {
   console.log("Testing Devlog Manager...");
   
-  const manager = new DevlogManager("./test-workspace");
+  const manager = new DevlogManager({ workspaceRoot: "./test-workspace" });
   
   try {
     // Test creating a devlog
@@ -16,15 +16,9 @@ async function test() {
       description: "This is a test feature",
       priority: "medium"
     });
-    console.log(createResult.content[0].text);
+    console.log(`Created devlog: ${createResult.id} - ${createResult.title}`);
     
-    // Extract ID from the result
-    const idMatch = createResult.content[0].text.match(/Created devlog entry: (.+)/);
-    const devlogId = idMatch ? idMatch[1].split('\n')[0] : null;
-    
-    if (!devlogId) {
-      throw new Error("Could not extract devlog ID");
-    }
+    const devlogId = createResult.id;
     
     // Test updating the devlog
     console.log("\n2. Updating the devlog...");
@@ -33,31 +27,33 @@ async function test() {
       status: "in-progress",
       progress: "Started working on the feature"
     });
-    console.log(updateResult.content[0].text);
+    console.log(`Updated devlog status: ${updateResult.status}`);
     
     // Test adding a note
     console.log("\n3. Adding a note...");
-    const noteResult = await manager.addNote({
-      id: devlogId,
-      note: "This is a test note",
-      category: "progress"
+    const noteResult = await manager.addNote(devlogId, {
+      category: "progress",
+      content: "This is a test note"
     });
-    console.log(noteResult.content[0].text);
+    console.log(`Added note: ${noteResult.notes[noteResult.notes.length - 1].content}`);
     
     // Test getting the devlog
     console.log("\n4. Getting devlog details...");
     const getResult = await manager.getDevlog(devlogId);
-    console.log(getResult.content[0].text);
+    if (getResult) {
+      console.log(`Retrieved devlog: ${getResult.title} (${getResult.status})`);
+      console.log(`Notes: ${getResult.notes.length}`);
+    }
     
     // Test listing devlogs
     console.log("\n5. Listing all devlogs...");
     const listResult = await manager.listDevlogs();
-    console.log(listResult.content[0].text);
+    console.log(`Found ${listResult.length} devlog entries`);
     
     // Test active context
     console.log("\n6. Getting active context...");
     const contextResult = await manager.getActiveContext(5);
-    console.log(contextResult.content[0].text);
+    console.log(`Found ${contextResult.length} active devlog entries`);
     
     console.log("\n✅ All tests passed!");
     

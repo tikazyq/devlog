@@ -7,7 +7,7 @@ import {
   ListToolsRequestSchema,
   Tool,
 } from "@modelcontextprotocol/sdk/types.js";
-import { DevlogManager } from "./devlog-manager.js";
+import { MCPDevlogAdapter } from "./mcp-adapter.js";
 
 const server = new Server(
   {
@@ -21,7 +21,7 @@ const server = new Server(
   }
 );
 
-const devlogManager = new DevlogManager();
+const devlogAdapter = new MCPDevlogAdapter();
 
 // Define available tools
 const tools: Tool[] = [
@@ -329,53 +329,53 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         if (!args || typeof args !== 'object') {
           throw new Error("Missing or invalid arguments");
         }
-        return await devlogManager.createDevlog(args as any);
+        return await devlogAdapter.createDevlog(args as any);
 
       case "update_devlog":
-        return await devlogManager.updateDevlog(args);
+        return await devlogAdapter.updateDevlog(args);
 
       case "list_devlogs":
-        return await devlogManager.listDevlogs(args);
+        return await devlogAdapter.listDevlogs(args);
 
       case "get_devlog":
         if (!args || typeof args !== 'object' || !('id' in args)) {
           throw new Error("Missing required parameter: id");
         }
-        return await devlogManager.getDevlog(args.id as string);
+        return await devlogAdapter.getDevlog(args.id as string);
 
       case "search_devlogs":
         if (!args || typeof args !== 'object' || !('query' in args)) {
           throw new Error("Missing required parameter: query");
         }
-        return await devlogManager.searchDevlogs(args.query as string);
+        return await devlogAdapter.searchDevlogs(args.query as string);
 
       case "add_devlog_note":
-        return await devlogManager.addNote(args);
+        return await devlogAdapter.addNote(args);
 
       case "complete_devlog":
-        return await devlogManager.completeDevlog(args);
+        return await devlogAdapter.completeDevlog(args);
 
       case "get_active_context":
         const limit = args && typeof args === 'object' && 'limit' in args ? args.limit as number : undefined;
-        return await devlogManager.getActiveContext(limit);
+        return await devlogAdapter.getActiveContext(limit);
 
       case "update_ai_context":
         if (!args || typeof args !== 'object' || !('id' in args)) {
           throw new Error("Missing required parameter: id");
         }
-        return await devlogManager.updateAIContext(args as any);
+        return await devlogAdapter.updateAIContext(args as any);
 
       case "add_decision":
         if (!args || typeof args !== 'object') {
           throw new Error("Missing or invalid arguments");
         }
-        return await devlogManager.addDecision(args as any);
+        return await devlogAdapter.addDecision(args as any);
 
       case "get_context_for_ai":
         if (!args || typeof args !== 'object' || !('id' in args)) {
           throw new Error("Missing required parameter: id");
         }
-        return await devlogManager.getContextForAI(args as any);
+        return await devlogAdapter.getContextForAI(args as any);
 
       default:
         throw new Error(`Unknown tool: ${name}`);

@@ -38,6 +38,9 @@ pnpm build
 # Build only the MCP server
 pnpm build:mcp
 
+# Build only the core package  
+pnpm build:core
+
 # Build only the types package
 pnpm build:types
 
@@ -62,6 +65,10 @@ You can also work directly with individual packages using pnpm filters:
 # Work on the MCP server package
 pnpm --filter @devlog/mcp-server build
 pnpm --filter @devlog/mcp-server dev
+
+# Work on the core package
+pnpm --filter @devlog/core build
+pnpm --filter @devlog/core dev
 
 # Work on the types package
 pnpm --filter @devlog/types build
@@ -92,10 +99,11 @@ When adding a new package to the monorepo:
 
 ### Package Structure
 
-- `@devlog/mcp-server`: The main MCP server implementation
+- `@devlog/types`: Shared TypeScript types and interfaces
+- `@devlog/core`: Core devlog management functionality (file system operations, CRUD, etc.)
+- `@devlog/mcp-server`: MCP server implementation that wraps the core functionality
 - Future packages might include:
   - `@devlog/cli`: Command-line interface for devlog management
-  - `@devlog/types`: Shared TypeScript types
   - `@devlog/web`: Web interface for browsing devlogs
   - `@devlog/utils`: Shared utilities
 

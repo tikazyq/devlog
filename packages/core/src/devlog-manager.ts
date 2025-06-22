@@ -1,0 +1,455 @@
+import * as fs from "fs/promises";
+import * as path from "path";
+import { 
+  DevlogEntry, 
+  DevlogNote, 
+  AIContext, 
+  DevlogContext, 
+  CreateDevlogRequest,
+  UpdateDevlogRequest,
+  DevlogFilter,
+  DevlogStats,
+  DevlogStatus,
+  DevlogType,
+  DevlogPriority
+} from "@devlog/types";
+
+export interface DevlogManagerOptions {
+  workspaceRoot?: string;
+  devlogDir?: string;
+}
+
+export class DevlogManager {
+  private devlogDir: string;
+  private indexFile: string;
+
+  constructor(options: DevlogManagerOptions = {}) {
+    // If no workspace root provided, use current working directory
+    const root = options.workspaceRoot || process.cwd();
+    this.devlogDir = options.devlogDir || path.join(root, ".devlog");
+    this.indexFile = path.join(this.devlogDir, "index.json");
+  }
+
+  private async ensureDevlogDir(): Promise<void> {
+    try {
+      await fs.access(this.devlogDir);
+    } catch {
+      await fs.mkdir(this.devlogDir, { recursive: true });
+    }
+  }
+
+  private async loadIndex(): Promise<Record<string, string>> {
+    try {
+      await this.ensureDevlogDir();
+      const data = await fs.readFile(this.indexFile, "utf-8");
+      return JSON.parse(data);
+    } catch {
+      return {};
+    }
+  }
+
+  private async saveIndex(index: Record<string, string>): Promise<void> {
+    await this.ensureDevlogDir();
+    await fs.writeFile(this.indexFile, JSON.stringify(index, null, 2));
+  }
+
+  private async loadDevlog(id: string): Promise<DevlogEntry | null> {
+    try {
+      const index = await this.loadIndex();
+      const filename = index[id];
+      if (!filename) return null;
+
+      const filePath = path.join(this.devlogDir, filename);
+      const data = await fs.readFile(filePath, "utf-8");
+      return JSON.parse(data);
+    } catch {
+      return null;
+    }
+  }
+
+  private async saveDevlog(entry: DevlogEntry): Promise<void> {
+    await this.ensureDevlogDir();
+    
+    const filename = `${entry.id}.json`;
+    const filePath = path.join(this.devlogDir, filename);
+    
+    // Update the index
+    const index = await this.loadIndex();
+    index[entry.id] = filename;
+    await this.saveIndex(index);
+    
+    // Save the devlog entry
+    await fs.writeFile(filePath, JSON.stringify(entry, null, 2));
+  }
+
+  private generateId(title: string): string {
+    const timestamp = Date.now();
+    const slug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .substring(0, 30);
+    return `${slug}-${timestamp}`;
+  }
+
+  async createDevlog(request: CreateDevlogRequest): Promise<DevlogEntry> {
+    const id = request.id || this.generateId(request.title);
+    const now = new Date().toISOString();
+
+    // Check if ID already exists
+    const existing = await this.loadDevlog(id);
+    if (existing) {
+      throw new Error(`Devlog with ID '${id}' already exists`);
+    }
+
+    const entry: DevlogEntry = {
+      id,
+      title: request.title,
+      type: request.type,
+      description: request.description,
+      priority: request.priority || "medium",
+      status: "todo",
+      createdAt: now,
+      updatedAt: now,
+      assignee: request.assignee,
+      tags: request.tags || [],
+      notes: [],
+      files: [],
+      relatedDevlogs: [],
+      estimatedHours: request.estimatedHours,
+      actualHours: undefined,
+      
+      // Enhanced context for AI agents
+      context: {
+        businessContext: request.businessContext || "",
+        technicalContext: request.technicalContext || "",
+        dependencies: [],
+        decisions: [],
+        acceptanceCriteria: request.acceptanceCriteria || [],
+        risks: [],
+      },
+      
+      // AI-specific context
+      aiContext: {
+        currentSummary: `New ${request.type}: ${request.title}. ${request.description}`,
+        keyInsights: request.initialInsights || [],
+        openQuestions: [],
+        relatedPatterns: request.relatedPatterns || [],
+        suggestedNextSteps: [],
+        lastAIUpdate: now,
+        contextVersion: 1,
+      },
+      
+      // Enterprise references (optional for now)
+      externalReferences: [],
+    };
+
+    await this.saveDevlog(entry);
+    return entry;
+  }
+
+  async updateDevlog(request: UpdateDevlogRequest): Promise<DevlogEntry> {
+    const entry = await this.loadDevlog(request.id);
+    if (!entry) {
+      throw new Error(`Devlog entry '${request.id}' not found`);
+    }
+
+    // Update basic fields if provided
+    if (request.title) entry.title = request.title;
+    if (request.description) entry.description = request.description;
+    if (request.status) entry.status = request.status;
+    if (request.priority) entry.priority = request.priority;
+    if (request.estimatedHours !== undefined) entry.estimatedHours = request.estimatedHours;
+    if (request.actualHours !== undefined) entry.actualHours = request.actualHours;
+    if (request.assignee) entry.assignee = request.assignee;
+    if (request.tags) entry.tags = request.tags;
+    if (request.files) entry.files = request.files;
+
+    // Add notes for progress updates
+    if (request.progress || request.codeChanges) {
+      const now = new Date().toISOString();
+      
+      if (request.progress) {
+        entry.notes.push({
+          id: `note-${Date.now()}`,
+          timestamp: now,
+          category: request.noteCategory || "progress",
+          content: request.progress,
+          files: request.files,
+          codeChanges: request.codeChanges
+        });
+      }
+    }
+
+    entry.updatedAt = new Date().toISOString();
+    await this.saveDevlog(entry);
+    return entry;
+  }
+
+  async getDevlog(id: string): Promise<DevlogEntry | null> {
+    return await this.loadDevlog(id);
+  }
+
+  async listDevlogs(filters: DevlogFilter = {}): Promise<DevlogEntry[]> {
+    const index = await this.loadIndex();
+    const entries: DevlogEntry[] = [];
+
+    for (const id of Object.keys(index)) {
+      const entry = await this.loadDevlog(id);
+      if (entry) {
+        // Apply filters
+        if (filters.status && filters.status.length > 0) {
+          if (!filters.status.includes(entry.status)) continue;
+        }
+        if (filters.type && filters.type.length > 0) {
+          if (!filters.type.includes(entry.type)) continue;
+        }
+        if (filters.priority && filters.priority.length > 0) {
+          if (!filters.priority.includes(entry.priority)) continue;
+        }
+        if (filters.assignee && entry.assignee !== filters.assignee) continue;
+        if (filters.tags && filters.tags.length > 0) {
+          const hasTag = filters.tags.some((tag: string) => entry.tags.includes(tag));
+          if (!hasTag) continue;
+        }
+        if (filters.fromDate) {
+          if (new Date(entry.updatedAt) < new Date(filters.fromDate)) continue;
+        }
+        if (filters.toDate) {
+          if (new Date(entry.updatedAt) > new Date(filters.toDate)) continue;
+        }
+        
+        entries.push(entry);
+      }
+    }
+
+    // Sort by updatedAt descending
+    entries.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    return entries;
+  }
+
+  async searchDevlogs(query: string): Promise<DevlogEntry[]> {
+    const index = await this.loadIndex();
+    const matches: DevlogEntry[] = [];
+    const searchLower = query.toLowerCase();
+
+    for (const id of Object.keys(index)) {
+      const entry = await this.loadDevlog(id);
+      if (entry) {
+        const searchableText = [
+          entry.title,
+          entry.description,
+          entry.context.businessContext,
+          entry.context.technicalContext,
+          entry.aiContext.currentSummary,
+          ...entry.aiContext.keyInsights,
+          ...entry.notes.map((note: DevlogNote) => note.content),
+        ].join(" ").toLowerCase();
+
+        if (searchableText.includes(searchLower)) {
+          matches.push(entry);
+        }
+      }
+    }
+
+    return matches;
+  }
+
+  async addNote(id: string, note: Omit<DevlogNote, "id" | "timestamp">): Promise<DevlogEntry> {
+    const entry = await this.loadDevlog(id);
+    if (!entry) {
+      throw new Error(`Devlog entry '${id}' not found`);
+    }
+
+    const newNote: DevlogNote = {
+      id: `note-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      ...note,
+    };
+
+    entry.notes.push(newNote);
+    entry.updatedAt = new Date().toISOString();
+
+    await this.saveDevlog(entry);
+    return entry;
+  }
+
+  async completeDevlog(id: string, summary?: string): Promise<DevlogEntry> {
+    const entry = await this.loadDevlog(id);
+    if (!entry) {
+      throw new Error(`Devlog entry '${id}' not found`);
+    }
+
+    const now = new Date().toISOString();
+    entry.status = "done";
+    entry.updatedAt = now;
+
+    if (summary) {
+      const completionNote: DevlogNote = {
+        id: `note-${Date.now()}`,
+        timestamp: now,
+        category: "progress",
+        content: `Completed: ${summary}`,
+      };
+      entry.notes.push(completionNote);
+    }
+
+    await this.saveDevlog(entry);
+    return entry;
+  }
+
+  async getActiveContext(limit: number = 10): Promise<DevlogEntry[]> {
+    const index = await this.loadIndex();
+    const activeEntries: DevlogEntry[] = [];
+
+    for (const id of Object.keys(index)) {
+      const entry = await this.loadDevlog(id);
+      if (entry && entry.status !== "done") {
+        activeEntries.push(entry);
+      }
+    }
+
+    // Sort by priority and updated date
+    const priorityWeight: Record<DevlogPriority, number> = { 
+      critical: 4, 
+      high: 3, 
+      medium: 2, 
+      low: 1 
+    };
+    
+    activeEntries.sort((a, b) => {
+      const aPriority = priorityWeight[a.priority];
+      const bPriority = priorityWeight[b.priority];
+      if (aPriority !== bPriority) return bPriority - aPriority;
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    });
+
+    return activeEntries.slice(0, limit);
+  }
+
+  async updateAIContext(args: {
+    id: string;
+    summary?: string;
+    insights?: string[];
+    questions?: string[];
+    patterns?: string[];
+    nextSteps?: string[];
+  }): Promise<DevlogEntry> {
+    const entry = await this.loadDevlog(args.id);
+    if (!entry) {
+      throw new Error(`Devlog entry '${args.id}' not found`);
+    }
+
+    const now = new Date().toISOString();
+    
+    // Update AI context
+    if (args.summary) entry.aiContext.currentSummary = args.summary;
+    if (args.insights) entry.aiContext.keyInsights = [...entry.aiContext.keyInsights, ...args.insights];
+    if (args.questions) entry.aiContext.openQuestions = args.questions;
+    if (args.patterns) entry.aiContext.relatedPatterns = [...entry.aiContext.relatedPatterns, ...args.patterns];
+    if (args.nextSteps) entry.aiContext.suggestedNextSteps = args.nextSteps;
+    
+    entry.aiContext.lastAIUpdate = now;
+    entry.aiContext.contextVersion += 1;
+    entry.updatedAt = now;
+
+    await this.saveDevlog(entry);
+    return entry;
+  }
+
+  async addDecision(args: {
+    id: string;
+    decision: string;
+    rationale: string;
+    alternatives?: string[];
+    decisionMaker: string;
+  }): Promise<DevlogEntry> {
+    const entry = await this.loadDevlog(args.id);
+    if (!entry) {
+      throw new Error(`Devlog entry '${args.id}' not found`);
+    }
+
+    const now = new Date().toISOString();
+    const decision = {
+      id: `decision-${Date.now()}`,
+      timestamp: now,
+      decision: args.decision,
+      rationale: args.rationale,
+      alternatives: args.alternatives || [],
+      decisionMaker: args.decisionMaker,
+    };
+
+    entry.context.decisions.push(decision);
+    entry.updatedAt = now;
+
+    await this.saveDevlog(entry);
+    return entry;
+  }
+
+  async getStats(): Promise<DevlogStats> {
+    const entries = await this.listDevlogs();
+    
+    const stats: DevlogStats = {
+      totalEntries: entries.length,
+      byStatus: {} as Record<DevlogStatus, number>,
+      byType: {} as Record<DevlogType, number>,
+      byPriority: {} as Record<DevlogPriority, number>,
+    };
+
+    // Initialize counters
+    const statuses: DevlogStatus[] = ["todo", "in-progress", "review", "testing", "done", "archived"];
+    const types: DevlogType[] = ["feature", "bugfix", "task", "refactor", "docs"];
+    const priorities: DevlogPriority[] = ["low", "medium", "high", "critical"];
+
+    statuses.forEach(status => stats.byStatus[status] = 0);
+    types.forEach(type => stats.byType[type] = 0);
+    priorities.forEach(priority => stats.byPriority[priority] = 0);
+
+    // Count entries
+    entries.forEach(entry => {
+      stats.byStatus[entry.status]++;
+      stats.byType[entry.type]++;
+      stats.byPriority[entry.priority]++;
+    });
+
+    // Calculate average completion time for completed items
+    const completedEntries = entries.filter(entry => entry.status === "done");
+    if (completedEntries.length > 0) {
+      const totalTime = completedEntries.reduce((sum, entry) => {
+        const created = new Date(entry.createdAt).getTime();
+        const completed = new Date(entry.updatedAt).getTime();
+        return sum + (completed - created);
+      }, 0);
+      stats.averageCompletionTime = totalTime / completedEntries.length / (1000 * 60 * 60 * 24); // in days
+    }
+
+    return stats;
+  }
+
+  async deleteDevlog(id: string): Promise<void> {
+    const entry = await this.loadDevlog(id);
+    if (!entry) {
+      throw new Error(`Devlog entry '${id}' not found`);
+    }
+
+    // Remove from index
+    const index = await this.loadIndex();
+    const filename = index[id];
+    delete index[id];
+    await this.saveIndex(index);
+
+    // Delete the file
+    if (filename) {
+      const filePath = path.join(this.devlogDir, filename);
+      try {
+        await fs.unlink(filePath);
+      } catch {
+        // File might not exist, continue
+      }
+    }
+  }
+
+  async getDevlogDir(): Promise<string> {
+    return this.devlogDir;
+  }
+}

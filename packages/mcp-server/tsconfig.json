@@ -17,5 +17,13 @@
     "composite": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "build", "src/**/*.test.ts", "src/__tests__"]
+  "exclude": ["node_modules", "build", "src/**/*.test.ts", "src/__tests__"],
+  "references": [
+    {
+      "path": "../types"
+    },
+    {
+      "path": "../core"
+    }
+  ]
 }

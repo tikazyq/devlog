@@ -19,8 +19,9 @@
     "skipLibCheck": true
   },
   "references": [
-    { "path": "./packages/mcp-server" },
-    { "path": "./packages/types" }
+    { "path": "./packages/types" },
+    { "path": "./packages/core" },
+    { "path": "./packages/mcp-server" }
   ],
   "files": [],
   "exclude": ["node_modules", "**/build", "**/dist"]

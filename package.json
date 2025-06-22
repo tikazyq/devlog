@@ -15,7 +15,8 @@
     "clean": "pnpm -r clean",
     "install-all": "pnpm install",
     "build:mcp": "pnpm --filter @devlog/mcp-server build",
-    "build:types": "pnpm --filter @devlog/types build"
+    "build:types": "pnpm --filter @devlog/types build",
+    "build:core": "pnpm --filter @devlog/core build"
   },
   "keywords": [
     "monorepo",

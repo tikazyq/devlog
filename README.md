@@ -4,8 +4,14 @@ A monorepo containing development logging tools and utilities, including a Model
 
 ## Packages
 
+### `@devlog/types`
+Shared TypeScript types and interfaces used across all packages.
+
+### `@devlog/core` 
+Core devlog management functionality including file system operations, CRUD operations, filtering, and search. This package provides the foundation that other packages build upon.
+
 ### `@devlog/mcp-server`
-The main MCP server for development logging functionality.
+MCP (Model Context Protocol) server that wraps the core functionality for AI assistant integration.
 
 ## Features
 
@@ -42,9 +48,52 @@ pnpm dev
 pnpm build
 
 # Build specific packages
-pnpm build:mcp
 pnpm build:types
+pnpm build:core  
+pnpm build:mcp
 ```
+
+### Using the Core Package
+
+The `@devlog/core` package can be used directly in your own applications:
+
+```typescript
+import { DevlogManager } from '@devlog/core';
+
+// Initialize the manager
+const devlog = new DevlogManager({
+  workspaceRoot: '/path/to/your/project',
+  // devlogDir: '/custom/path/.devlog' // optional custom directory
+});
+
+// Create a new devlog entry
+const entry = await devlog.createDevlog({
+  title: 'Implement user authentication',
+  type: 'feature',
+  description: 'Add JWT-based authentication system',
+  priority: 'high',
+  businessContext: 'Users need secure login to access protected features',
+  technicalContext: 'Using JWT tokens with refresh mechanism'
+});
+
+// Update the devlog
+await devlog.updateDevlog({
+  id: entry.id,
+  status: 'in-progress',
+  progress: 'Completed user registration endpoint'
+});
+
+// List all devlogs
+const allDevlogs = await devlog.listDevlogs();
+
+// Search devlogs
+const authDevlogs = await devlog.searchDevlogs('authentication');
+
+// Get active context for AI assistants
+const activeContext = await devlog.getActiveContext(5);
+```
+
+This makes it easy to build additional tools like CLI interfaces, web dashboards, or integrations with other development tools.
 
 ### Available Tools
 

@@ -1,6 +1,11 @@
-# Devlog MCP Server
+# Devlog Development Tools - Monorepo
 
-A Model Context Protocol (MCP) server for managing development logs and working notes. This tool helps AI assistants maintain context about ongoing tasks, features, and bugfixes by storing structured notes in a local `.devlog` directory.
+A monorepo containing development logging tools and utilities, including a Model Context Protocol (MCP) server for managing development logs and working notes. These tools help AI assistants maintain context about ongoing tasks, features, and bugfixes by storing structured notes in a local `.devlog` directory.
+
+## Packages
+
+### `@devlog/mcp-server`
+The main MCP server for development logging functionality.
 
 ## Features
 
@@ -17,13 +22,29 @@ A Model Context Protocol (MCP) server for managing development logs and working 
 
 ```bash
 # Clone or download this repository
-npm install
-npm run build
+pnpm install
+pnpm build
 ```
 
 ## Usage
 
+### MCP Server
 The devlog MCP server is designed to be used with MCP-compatible AI clients. It stores all data locally in a `.devlog` directory within your project.
+
+```bash
+# Start the MCP server
+pnpm start
+
+# Start in development mode
+pnpm dev
+
+# Build all packages
+pnpm build
+
+# Build specific packages
+pnpm build:mcp
+pnpm build:types
+```
 
 ### Available Tools
 

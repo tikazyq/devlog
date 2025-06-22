@@ -2,7 +2,7 @@
   "mcpServers": {
     "devlog": {
       "command": "node",
-      "args": ["./build/index.js"],
+      "args": ["./packages/mcp-server/build/index.js"],
       "cwd": "."
     }
   }

@@ -2,9 +2,9 @@
   "mcpServers": {
     "devlog": {
       "command": "node",
-      "args": ["/path/to/devlog-mcp/build/index.js"],
+      "args": ["/path/to/devlog-monorepo/packages/mcp-server/build/index.js"],
       "env": {
-        "NODE_PATH": "/path/to/devlog-mcp/node_modules"
+        "NODE_PATH": "/path/to/devlog-monorepo/node_modules"
       }
     }
   }

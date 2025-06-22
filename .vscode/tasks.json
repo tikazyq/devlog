@@ -2,17 +2,69 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Build Devlog MCP",
+			"label": "Build All Packages",
 			"type": "shell",
-			"command": "npm",
+			"command": "pnpm",
 			"args": [
-				"run",
 				"build"
 			],
 			"group": "build",
 			"problemMatcher": [
 				"$tsc"
 			]
+		},
+		{
+			"label": "Build MCP Server",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"build:mcp"
+			],
+			"group": "build",
+			"problemMatcher": [
+				"$tsc"
+			]
+		},
+		{
+			"label": "Build Types",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"build:types"
+			],
+			"group": "build",
+			"problemMatcher": [
+				"$tsc"
+			]
+		},
+		{
+			"label": "Start MCP Server",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"start"
+			],
+			"group": "test",
+			"isBackground": true
+		},
+		{
+			"label": "Dev MCP Server",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"dev"
+			],
+			"group": "test",
+			"isBackground": true
+		},
+		{
+			"label": "Clean All",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"clean"
+			],
+			"group": "build"
 		}
 	]
 }

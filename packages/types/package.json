@@ -1,0 +1,26 @@
+{
+  "name": "@devlog/types",
+  "version": "1.0.0",
+  "description": "Shared TypeScript types for devlog tools",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf build",
+    "dev": "tsc --watch"
+  },
+  "keywords": [
+    "typescript",
+    "types",
+    "devlog"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

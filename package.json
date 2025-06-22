@@ -1,5 +1,5 @@
 {
-  "name": "devlog-monorepo",
+  "name": "devlog",
   "version": "1.0.0",
   "description": "Monorepo for development logging tools and MCP server",
   "private": true,
@@ -36,5 +36,5 @@
     "node": ">=18",
     "pnpm": ">=8.0.0"
   },
-  "packageManager": "pnpm@9.9.0"
+  "packageManager": "pnpm@10.12.1"
 }

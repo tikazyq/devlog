@@ -12,12 +12,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/devlog-monorepo.git",
+    "url": "https://github.com/tikazyq/devlog.git",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/your-username/devlog-monorepo#readme",
+  "homepage": "https://github.com/tikazyq/devlog#readme",
   "bugs": {
-    "url": "https://github.com/your-username/devlog-monorepo/issues"
+    "url": "https://github.com/tikazyq/devlog/issues"
   },
   "scripts": {
     "build": "tsc",

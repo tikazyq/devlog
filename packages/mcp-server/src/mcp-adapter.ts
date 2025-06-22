@@ -399,4 +399,30 @@ export class MCPDevlogAdapter {
       };
     }
   }
+
+  async findOrCreateDevlog(args: any): Promise<CallToolResult> {
+    try {
+      const result = await this.devlogManager.findOrCreateDevlog(args as any);
+      const action = result.created ? "Created" : "Found existing";
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: `${action} devlog entry: ${result.entry.id}\nTitle: ${result.entry.title}\nType: ${result.entry.type}\nPriority: ${result.entry.priority}\nStatus: ${result.entry.status}\n\nBusiness Context: ${result.entry.context.businessContext}\nTechnical Context: ${result.entry.context.technicalContext}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to find or create devlog: ${error}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
 }

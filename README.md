@@ -26,6 +26,8 @@ MCP (Model Context Protocol) server that wraps the core functionality for AI ass
 - **Enterprise Integrations**: Sync with Jira, Azure DevOps, and GitHub Issues
 - **AI Memory Persistence**: Maintain context across development sessions
 - **Decision Tracking**: Record architectural decisions with rationale
+- **Duplicate Prevention**: Standardized ID generation prevents duplicate entries
+- **Deterministic IDs**: Hash-based IDs ensure consistency across AI sessions
 
 ## Installation
 
@@ -98,6 +100,44 @@ const activeContext = await devlog.getActiveContext(5);
 
 This makes it easy to build additional tools like CLI interfaces, web dashboards, or integrations with other development tools.
 
+## Duplicate Prevention & ID Generation
+
+Devlog uses a sophisticated standardized ID generation system to prevent duplicate entries and ensure consistency across AI sessions:
+
+### Key Features
+- **Deterministic IDs**: Same title + type always generates the same ID
+- **Hash-based**: Uses SHA-256 hash for collision resistance
+- **Human-readable**: Format is `{slug}-{8-char-hash}`
+- **Type-aware**: Different types can have the same title with different IDs
+- **Collision handling**: Automatic counter suffixes for true hash collisions
+
+### Example
+```typescript
+// These requests will generate different IDs because they have different types:
+const bug = await devlog.findOrCreateDevlog({
+  title: "Fix authentication bug",
+  type: "bug"  // → fix-authentication-bug-7f14a073
+});
+
+const feature = await devlog.findOrCreateDevlog({
+  title: "Fix authentication bug", 
+  type: "feature"  // → fix-authentication-bug-12cb64b8
+});
+
+// But these will generate the same ID (case-insensitive):
+const entry1 = await devlog.findOrCreateDevlog({
+  title: "Add user login",
+  type: "feature"  // → add-user-login-a1b2c3d4
+});
+
+const entry2 = await devlog.findOrCreateDevlog({
+  title: "ADD USER LOGIN",  // Same ID due to normalization
+  type: "feature"  // → add-user-login-a1b2c3d4 (found existing)
+});
+```
+
+This prevents the common issue where AI assistants create duplicate entries when processing the same request multiple times or in rapid succession.
+
 ## Enterprise Integrations
 
 Devlog supports synchronization with popular enterprise project management platforms:
@@ -140,7 +180,7 @@ For complete setup instructions, see [INTEGRATIONS.md](./INTEGRATIONS.md).
 ### Available Tools
 
 #### `create_devlog`
-Create a new devlog entry for a task, feature, or bugfix.
+Create a new devlog entry for a task, feature, or bugfix. Will fail if an entry with the same title already exists.
 
 ```json
 {
@@ -149,6 +189,20 @@ Create a new devlog entry for a task, feature, or bugfix.
   "type": "feature",
   "description": "Implement JWT-based authentication system",
   "priority": "high"
+}
+```
+
+#### `find_or_create_devlog`
+Find an existing devlog entry by title or create a new one if it doesn't exist. This is the recommended way to create devlog entries as it prevents duplicates.
+
+```json
+{
+  "title": "Add user authentication",
+  "type": "feature", 
+  "description": "Implement JWT-based authentication system",
+  "priority": "high",
+  "businessContext": "Users need secure login to access protected features",
+  "technicalContext": "Using JWT tokens with refresh mechanism"
 }
 ```
 

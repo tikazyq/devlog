@@ -397,6 +397,62 @@ const tools: Tool[] = [
       required: ["id"],
     },
   },
+  {
+    name: "find_or_create_devlog",
+    description: "Find an existing devlog entry by title or create a new one if it doesn't exist",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: {
+          type: "string",
+          description: "Unique identifier for the devlog entry",
+        },
+        title: {
+          type: "string",
+          description: "Title of the task/feature/bugfix",
+        },
+        type: {
+          type: "string",
+          enum: ["feature", "bugfix", "task", "refactor", "docs"],
+          description: "Type of work being done",
+        },
+        description: {
+          type: "string",
+          description: "Detailed description of the work",
+        },
+        priority: {
+          type: "string",
+          enum: ["low", "medium", "high", "critical"],
+          description: "Priority level",
+          default: "medium",
+        },
+        businessContext: {
+          type: "string",
+          description: "Business context - why this work matters and what problem it solves",
+        },
+        technicalContext: {
+          type: "string",
+          description: "Technical context - architecture decisions, constraints, assumptions",
+        },
+        acceptanceCriteria: {
+          type: "array",
+          items: { type: "string" },
+          description: "Acceptance criteria or definition of done",
+        },
+        initialInsights: {
+          type: "array",
+          items: { type: "string" },
+          description: "Initial insights or knowledge about this work",
+        },
+        relatedPatterns: {
+          type: "array",
+          items: { type: "string" },
+          description: "Related patterns or examples from other projects",
+        },
+      },
+      required: ["title", "type", "description"],
+    },
+  },
 ];
 
 // List tools handler
@@ -485,6 +541,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           throw new Error("Missing required parameter: id");
         }
         return await devlogAdapter.syncAllIntegrations(args.id as string);
+
+      case "find_or_create_devlog":
+        if (!args || typeof args !== 'object') {
+          throw new Error("Missing or invalid arguments");
+        }
+        return await devlogAdapter.findOrCreateDevlog(args as any);
 
       default:
         throw new Error(`Unknown tool: ${name}`);

@@ -1,5 +1,6 @@
 import * as fs from "fs/promises";
 import * as path from "path";
+import * as crypto from "crypto";
 import { 
   DevlogEntry, 
   DevlogNote, 
@@ -91,24 +92,80 @@ export class DevlogManager {
     await fs.writeFile(filePath, JSON.stringify(entry, null, 2));
   }
 
-  private generateId(title: string): string {
-    const timestamp = Date.now();
+  private generateId(title: string, type?: DevlogType): string {
+    // Create a clean slug from the title
     const slug = title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "")
       .substring(0, 30);
-    return `${slug}-${timestamp}`;
+    
+    // Create a deterministic hash based on title + type
+    const content = `${title.toLowerCase().trim()}|${type || 'feature'}`;
+    const hash = crypto.createHash('sha256').update(content).digest('hex').substring(0, 8);
+    
+    return `${slug}-${hash}`;
+  }
+
+  private async generateUniqueId(title: string, type?: DevlogType): Promise<string> {
+    const baseId = this.generateId(title, type);
+    
+    // Check if this ID already exists
+    const existing = await this.loadDevlog(baseId);
+    if (!existing) {
+      return baseId;
+    }
+    
+    // If it exists, add a counter suffix
+    let counter = 1;
+    let uniqueId: string;
+    
+    do {
+      uniqueId = `${baseId}-${counter}`;
+      const existingWithCounter = await this.loadDevlog(uniqueId);
+      if (!existingWithCounter) {
+        return uniqueId;
+      }
+      counter++;
+    } while (counter < 100); // Prevent infinite loop
+    
+    // Fallback to timestamp if we can't find a unique ID
+    return `${baseId}-${Date.now()}`;
+  }
+
+  private async checkForDuplicateTitle(title: string, type?: DevlogType, excludeId?: string): Promise<DevlogEntry | null> {
+    const entries = await this.listDevlogs();
+    const normalizedTitle = title.toLowerCase().trim();
+    
+    for (const entry of entries) {
+      if (excludeId && entry.id === excludeId) continue;
+      
+      const entryNormalizedTitle = entry.title.toLowerCase().trim();
+      // Only consider it a duplicate if both title AND type match
+      if (entryNormalizedTitle === normalizedTitle && (!type || entry.type === type)) {
+        return entry;
+      }
+    }
+    
+    return null;
   }
 
   async createDevlog(request: CreateDevlogRequest): Promise<DevlogEntry> {
-    const id = request.id || this.generateId(request.title);
+    const id = request.id || await this.generateUniqueId(request.title, request.type);
     const now = new Date().toISOString();
 
-    // Check if ID already exists
-    const existing = await this.loadDevlog(id);
-    if (existing) {
-      throw new Error(`Devlog with ID '${id}' already exists`);
+    // Check if ID already exists (in case a custom ID was provided)
+    if (request.id) {
+      const existing = await this.loadDevlog(id);
+      if (existing) {
+        throw new Error(`Devlog with ID '${id}' already exists`);
+      }
+    }
+
+    // Check for duplicate titles with same type
+    const duplicateTitle = await this.checkForDuplicateTitle(request.title, request.type);
+    if (duplicateTitle) {
+      throw new Error(`A devlog entry with title '${request.title}' and type '${request.type}' already exists (ID: ${duplicateTitle.id}). Consider updating the existing entry instead.`);
     }
 
     const entry: DevlogEntry = {
@@ -456,6 +513,27 @@ export class DevlogManager {
         // File might not exist, continue
       }
     }
+  }
+
+  async findOrCreateDevlog(request: CreateDevlogRequest): Promise<{entry: DevlogEntry, created: boolean}> {
+    // First, check if we would generate the same ID for this request
+    const expectedId = await this.generateUniqueId(request.title, request.type);
+    const existingById = await this.loadDevlog(expectedId);
+    
+    if (existingById) {
+      return { entry: existingById, created: false };
+    }
+    
+    // Check if a similar entry already exists by title and type
+    const existing = await this.checkForDuplicateTitle(request.title, request.type);
+    
+    if (existing) {
+      return { entry: existing, created: false };
+    }
+    
+    // Create new entry
+    const entry = await this.createDevlog(request);
+    return { entry, created: true };
   }
 
   async getDevlogDir(): Promise<string> {

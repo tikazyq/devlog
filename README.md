@@ -23,6 +23,9 @@ MCP (Model Context Protocol) server that wraps the core functionality for AI ass
 - **Active Context**: Get a summary of current work for AI context
 - **File Tracking**: Keep track of which files were modified
 - **Code Change Summaries**: Document what code changes were made
+- **Enterprise Integrations**: Sync with Jira, Azure DevOps, and GitHub Issues
+- **AI Memory Persistence**: Maintain context across development sessions
+- **Decision Tracking**: Record architectural decisions with rationale
 
 ## Installation
 
@@ -94,6 +97,45 @@ const activeContext = await devlog.getActiveContext(5);
 ```
 
 This makes it easy to build additional tools like CLI interfaces, web dashboards, or integrations with other development tools.
+
+## Enterprise Integrations
+
+Devlog supports synchronization with popular enterprise project management platforms:
+
+### Supported Platforms
+
+- **Jira** - Create and update issues
+- **Azure DevOps** - Create and update work items  
+- **GitHub** - Create and update issues
+
+### Quick Setup
+
+1. Copy the integration config template:
+   ```bash
+   cp devlog-integrations.config.template.json devlog-integrations.config.json
+   ```
+
+2. Fill in your platform credentials (see [INTEGRATIONS.md](./INTEGRATIONS.md) for detailed setup)
+
+3. Use the sync tools:
+   ```typescript
+   // Sync with all configured platforms
+   await devlog.syncAllIntegrations(entryId);
+   
+   // Or sync with specific platforms
+   await devlog.syncWithJira(entryId);
+   await devlog.syncWithGitHub(entryId);
+   await devlog.syncWithADO(entryId);
+   ```
+
+### MCP Integration Tools
+
+- `sync_with_jira` - Sync devlog entry with Jira
+- `sync_with_ado` - Sync devlog entry with Azure DevOps
+- `sync_with_github` - Sync devlog entry with GitHub
+- `sync_all_integrations` - Sync with all configured platforms
+
+For complete setup instructions, see [INTEGRATIONS.md](./INTEGRATIONS.md).
 
 ### Available Tools
 

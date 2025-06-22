@@ -8,6 +8,34 @@ import {
   Tool,
 } from "@modelcontextprotocol/sdk/types.js";
 import { MCPDevlogAdapter } from "./mcp-adapter.js";
+import { EnterpriseIntegration } from "@devlog/types";
+import * as fs from "fs";
+import * as path from "path";
+
+// Load integrations config if available
+function loadIntegrationsConfig(): EnterpriseIntegration | undefined {
+  const configPaths = [
+    "devlog-integrations.config.json",
+    ".devlog/integrations.config.json",
+    path.join(process.env.HOME || "~", ".devlog-integrations.config.json")
+  ];
+
+  for (const configPath of configPaths) {
+    try {
+      if (fs.existsSync(configPath)) {
+        const configContent = fs.readFileSync(configPath, "utf-8");
+        const config = JSON.parse(configContent);
+        console.error(`Loaded integrations config from: ${configPath}`);
+        return config.integrations;
+      }
+    } catch (error) {
+      console.error(`Failed to load config from ${configPath}:`, error);
+    }
+  }
+
+  console.error("No integrations config found. External sync features disabled.");
+  return undefined;
+}
 
 const server = new Server(
   {
@@ -21,7 +49,8 @@ const server = new Server(
   }
 );
 
-const devlogAdapter = new MCPDevlogAdapter();
+const integrations = loadIntegrationsConfig();
+const devlogAdapter = new MCPDevlogAdapter(undefined, integrations);
 
 // Define available tools
 const tools: Tool[] = [
@@ -312,6 +341,62 @@ const tools: Tool[] = [
       required: ["id"],
     },
   },
+  {
+    name: "sync_with_jira",
+    description: "Sync a devlog entry with Jira (create or update issue)",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: {
+          type: "string",
+          description: "ID of the devlog entry to sync",
+        },
+      },
+      required: ["id"],
+    },
+  },
+  {
+    name: "sync_with_ado",
+    description: "Sync a devlog entry with Azure DevOps (create or update work item)",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: {
+          type: "string",
+          description: "ID of the devlog entry to sync",
+        },
+      },
+      required: ["id"],
+    },
+  },
+  {
+    name: "sync_with_github",
+    description: "Sync a devlog entry with GitHub (create or update issue)",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: {
+          type: "string",
+          description: "ID of the devlog entry to sync",
+        },
+      },
+      required: ["id"],
+    },
+  },
+  {
+    name: "sync_all_integrations",
+    description: "Sync a devlog entry with all configured integrations",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: {
+          type: "string",
+          description: "ID of the devlog entry to sync",
+        },
+      },
+      required: ["id"],
+    },
+  },
 ];
 
 // List tools handler
@@ -376,6 +461,30 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           throw new Error("Missing required parameter: id");
         }
         return await devlogAdapter.getContextForAI(args as any);
+
+      case "sync_with_jira":
+        if (!args || typeof args !== 'object' || !('id' in args)) {
+          throw new Error("Missing required parameter: id");
+        }
+        return await devlogAdapter.syncWithJira(args.id as string);
+
+      case "sync_with_ado":
+        if (!args || typeof args !== 'object' || !('id' in args)) {
+          throw new Error("Missing required parameter: id");
+        }
+        return await devlogAdapter.syncWithADO(args.id as string);
+
+      case "sync_with_github":
+        if (!args || typeof args !== 'object' || !('id' in args)) {
+          throw new Error("Missing required parameter: id");
+        }
+        return await devlogAdapter.syncWithGitHub(args.id as string);
+
+      case "sync_all_integrations":
+        if (!args || typeof args !== 'object' || !('id' in args)) {
+          throw new Error("Missing required parameter: id");
+        }
+        return await devlogAdapter.syncAllIntegrations(args.id as string);
 
       default:
         throw new Error(`Unknown tool: ${name}`);

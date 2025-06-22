@@ -1,5 +1,5 @@
 import { DevlogManager, DevlogEntry } from "@devlog/core";
-import { CreateDevlogRequest, UpdateDevlogRequest } from "@devlog/types";
+import { CreateDevlogRequest, UpdateDevlogRequest, EnterpriseIntegration } from "@devlog/types";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 
 /**
@@ -8,8 +8,8 @@ import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 export class MCPDevlogAdapter {
   private devlogManager: DevlogManager;
 
-  constructor(workspaceRoot?: string) {
-    this.devlogManager = new DevlogManager({ workspaceRoot });
+  constructor(workspaceRoot?: string, integrations?: EnterpriseIntegration) {
+    this.devlogManager = new DevlogManager({ workspaceRoot, integrations });
   }
 
   async createDevlog(args: CreateDevlogRequest): Promise<CallToolResult> {
@@ -292,5 +292,111 @@ export class MCPDevlogAdapter {
         },
       ],
     };
+  }
+
+  // Enterprise Integration Methods
+
+  async syncWithJira(id: string): Promise<CallToolResult> {
+    try {
+      const entry = await this.devlogManager.syncWithJira(id);
+      const jiraRef = entry.externalReferences?.find(ref => ref.system === "jira");
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Successfully synced devlog ${entry.id} with Jira.\n\nJira Issue: ${jiraRef?.id}\nURL: ${jiraRef?.url}\nStatus: ${jiraRef?.status}\nLast Sync: ${jiraRef?.lastSync}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to sync with Jira: ${error}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+
+  async syncWithADO(id: string): Promise<CallToolResult> {
+    try {
+      const entry = await this.devlogManager.syncWithADO(id);
+      const adoRef = entry.externalReferences?.find(ref => ref.system === "ado");
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Successfully synced devlog ${entry.id} with Azure DevOps.\n\nWork Item: ${adoRef?.id}\nURL: ${adoRef?.url}\nStatus: ${adoRef?.status}\nLast Sync: ${adoRef?.lastSync}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to sync with Azure DevOps: ${error}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+
+  async syncWithGitHub(id: string): Promise<CallToolResult> {
+    try {
+      const entry = await this.devlogManager.syncWithGitHub(id);
+      const githubRef = entry.externalReferences?.find(ref => ref.system === "github");
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Successfully synced devlog ${entry.id} with GitHub.\n\nIssue: #${githubRef?.id}\nURL: ${githubRef?.url}\nStatus: ${githubRef?.status}\nLast Sync: ${githubRef?.lastSync}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to sync with GitHub: ${error}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+
+  async syncAllIntegrations(id: string): Promise<CallToolResult> {
+    try {
+      const entry = await this.devlogManager.syncAllIntegrations(id);
+      const syncedSystems = entry.externalReferences?.map(ref => `${ref.system}: ${ref.id}`).join(", ") || "none";
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Successfully synced devlog ${entry.id} with all configured integrations.\n\nSynced Systems: ${syncedSystems}\nLast Updated: ${entry.updatedAt}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to sync with integrations: ${error}`,
+          },
+        ],
+        isError: true,
+      };
+    }
   }
 }

@@ -1,0 +1,24 @@
+{
+  "integrations": {
+    "jira": {
+      "baseUrl": "https://your-company.atlassian.net",
+      "projectKey": "PROJ",
+      "apiToken": "your-jira-api-token",
+      "userEmail": "your-email@company.com"
+    },
+    "ado": {
+      "organization": "your-organization",
+      "project": "your-project",
+      "personalAccessToken": "your-ado-pat"
+    },
+    "github": {
+      "owner": "your-github-username",
+      "repo": "your-repository",
+      "token": "your-github-token"
+    },
+    "slack": {
+      "botToken": "xoxb-your-slack-bot-token",
+      "channelId": "C1234567890"
+    }
+  }
+}

@@ -27,7 +27,7 @@ const devlogManager = new DevlogManager();
 const tools: Tool[] = [
   {
     name: "create_devlog",
-    description: "Create a new devlog entry for a task, feature, or bugfix",
+    description: "Create a new devlog entry for a task, feature, or bugfix with rich context",
     inputSchema: {
       type: "object",
       properties: {
@@ -54,8 +54,31 @@ const tools: Tool[] = [
           description: "Priority level",
           default: "medium",
         },
+        businessContext: {
+          type: "string",
+          description: "Business context - why this work matters and what problem it solves",
+        },
+        technicalContext: {
+          type: "string",
+          description: "Technical context - architecture decisions, constraints, assumptions",
+        },
+        acceptanceCriteria: {
+          type: "array",
+          items: { type: "string" },
+          description: "Acceptance criteria or definition of done",
+        },
+        initialInsights: {
+          type: "array",
+          items: { type: "string" },
+          description: "Initial insights or knowledge about this work",
+        },
+        relatedPatterns: {
+          type: "array",
+          items: { type: "string" },
+          description: "Related patterns or examples from other projects",
+        },
       },
-      required: ["id", "title", "type", "description"],
+      required: ["title", "type", "description"],
     },
   },
   {
@@ -206,6 +229,89 @@ const tools: Tool[] = [
       },
     },
   },
+  {
+    name: "update_ai_context",
+    description: "Update AI context for a devlog entry with insights, questions, and next steps",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: {
+          type: "string",
+          description: "ID of the devlog entry to update",
+        },
+        summary: {
+          type: "string",
+          description: "Updated summary of current understanding",
+        },
+        insights: {
+          type: "array",
+          items: { type: "string" },
+          description: "New insights or key learnings",
+        },
+        questions: {
+          type: "array",
+          items: { type: "string" },
+          description: "Open questions that need resolution",
+        },
+        patterns: {
+          type: "array",
+          items: { type: "string" },
+          description: "Related patterns discovered from other projects",
+        },
+        nextSteps: {
+          type: "array",
+          items: { type: "string" },
+          description: "Suggested next steps based on current progress",
+        },
+      },
+      required: ["id"],
+    },
+  },
+  {
+    name: "add_decision",
+    description: "Record a decision with rationale for a devlog entry",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: {
+          type: "string",
+          description: "ID of the devlog entry",
+        },
+        decision: {
+          type: "string",
+          description: "The decision that was made",
+        },
+        rationale: {
+          type: "string",
+          description: "Why this decision was made",
+        },
+        alternatives: {
+          type: "array",
+          items: { type: "string" },
+          description: "Other options that were considered",
+        },
+        decisionMaker: {
+          type: "string",
+          description: "Who made the decision (human name or 'ai-agent')",
+        },
+      },
+      required: ["id", "decision", "rationale", "decisionMaker"],
+    },
+  },
+  {
+    name: "get_context_for_ai",
+    description: "Get comprehensive AI-optimized context for a devlog entry",
+    inputSchema: {
+      type: "object",
+      properties: {
+        id: {
+          type: "string",
+          description: "ID of the devlog entry to get context for",
+        },
+      },
+      required: ["id"],
+    },
+  },
 ];
 
 // List tools handler
@@ -220,7 +326,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     switch (name) {
       case "create_devlog":
-        return await devlogManager.createDevlog(args);
+        if (!args || typeof args !== 'object') {
+          throw new Error("Missing or invalid arguments");
+        }
+        return await devlogManager.createDevlog(args as any);
 
       case "update_devlog":
         return await devlogManager.updateDevlog(args);
@@ -249,6 +358,24 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case "get_active_context":
         const limit = args && typeof args === 'object' && 'limit' in args ? args.limit as number : undefined;
         return await devlogManager.getActiveContext(limit);
+
+      case "update_ai_context":
+        if (!args || typeof args !== 'object' || !('id' in args)) {
+          throw new Error("Missing required parameter: id");
+        }
+        return await devlogManager.updateAIContext(args as any);
+
+      case "add_decision":
+        if (!args || typeof args !== 'object') {
+          throw new Error("Missing or invalid arguments");
+        }
+        return await devlogManager.addDecision(args as any);
+
+      case "get_context_for_ai":
+        if (!args || typeof args !== 'object' || !('id' in args)) {
+          throw new Error("Missing required parameter: id");
+        }
+        return await devlogManager.getContextForAI(args as any);
 
       default:
         throw new Error(`Unknown tool: ${name}`);

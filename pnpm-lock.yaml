@@ -17,6 +17,9 @@ importers:
 
   packages/mcp-server:
     dependencies:
+      '@devlog/types':
+        specifier: workspace:*
+        version: link:../types
       '@modelcontextprotocol/sdk':
         specifier: ^1.0.0
         version: 1.13.0

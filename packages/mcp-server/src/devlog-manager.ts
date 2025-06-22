@@ -1,32 +1,7 @@
 import * as fs from "fs/promises";
 import * as path from "path";
 import { fileURLToPath } from "url";
-
-export interface DevlogEntry {
-  id: string;
-  title: string;
-  type: "feature" | "bugfix" | "task" | "refactor" | "docs";
-  description: string;
-  priority: "low" | "medium" | "high" | "critical";
-  status: "todo" | "in-progress" | "blocked" | "review" | "testing" | "done";
-  created_at: string;
-  updated_at: string;
-  completed_at?: string;
-  progress?: string;
-  blockers?: string;
-  next_steps?: string;
-  files_changed?: string[];
-  code_changes?: string;
-  notes: DevlogNote[];
-  tags?: string[];
-}
-
-export interface DevlogNote {
-  timestamp: string;
-  category: "progress" | "issue" | "solution" | "idea" | "reminder";
-  content: string;
-  files?: string[];
-}
+import { DevlogEntry, DevlogNote, AIContext, DevlogContext, CreateDevlogRequest } from "@devlog/types";
 
 export class DevlogManager {
   private devlogDir: string;
@@ -101,7 +76,7 @@ export class DevlogManager {
     return `${slug}-${timestamp}`;
   }
 
-  async createDevlog(args: any): Promise<any> {
+  async createDevlog(args: CreateDevlogRequest): Promise<any> {
     const id = args.id || this.generateId(args.title);
     const now = new Date().toISOString();
 
@@ -118,9 +93,39 @@ export class DevlogManager {
       description: args.description,
       priority: args.priority || "medium",
       status: "todo",
-      created_at: now,
-      updated_at: now,
+      createdAt: now,
+      updatedAt: now,
+      assignee: args.assignee,
+      tags: args.tags || [],
       notes: [],
+      files: [],
+      relatedDevlogs: [],
+      estimatedHours: args.estimatedHours,
+      actualHours: undefined,
+      
+      // Enhanced context for AI agents
+      context: {
+        businessContext: args.businessContext || "",
+        technicalContext: args.technicalContext || "",
+        dependencies: [],
+        decisions: [],
+        acceptanceCriteria: args.acceptanceCriteria || [],
+        risks: [],
+      },
+      
+      // AI-specific context
+      aiContext: {
+        currentSummary: `New ${args.type}: ${args.title}. ${args.description}`,
+        keyInsights: args.initialInsights || [],
+        openQuestions: [],
+        relatedPatterns: args.relatedPatterns || [],
+        suggestedNextSteps: [],
+        lastAIUpdate: now,
+        contextVersion: 1,
+      },
+      
+      // Enterprise references (optional for now)
+      externalReferences: [],
     };
 
     await this.saveDevlog(entry);
@@ -129,7 +134,7 @@ export class DevlogManager {
       content: [
         {
           type: "text",
-          text: `Created devlog entry: ${id}\nTitle: ${entry.title}\nType: ${entry.type}\nPriority: ${entry.priority}\nStatus: ${entry.status}`,
+          text: `Created devlog entry: ${id}\nTitle: ${entry.title}\nType: ${entry.type}\nPriority: ${entry.priority}\nStatus: ${entry.status}\n\nBusiness Context: ${entry.context.businessContext}\nTechnical Context: ${entry.context.technicalContext}`,
         },
       ],
     };
@@ -143,13 +148,45 @@ export class DevlogManager {
 
     // Update fields if provided
     if (args.status) entry.status = args.status;
-    if (args.progress) entry.progress = args.progress;
-    if (args.blockers) entry.blockers = args.blockers;
-    if (args.next_steps) entry.next_steps = args.next_steps;
-    if (args.files_changed) entry.files_changed = args.files_changed;
-    if (args.code_changes) entry.code_changes = args.code_changes;
+    if (args.files_changed) entry.files = args.files_changed;
+    
+    // Add notes for progress updates
+    if (args.progress || args.blockers || args.next_steps || args.code_changes) {
+      const now = new Date().toISOString();
+      
+      if (args.progress) {
+        entry.notes.push({
+          id: `note-${Date.now()}`,
+          timestamp: now,
+          category: "progress",
+          content: args.progress
+        });
+      }
+      
+      if (args.blockers) {
+        entry.notes.push({
+          id: `note-${Date.now() + 1}`,
+          timestamp: now,
+          category: "issue",
+          content: `Blockers: ${args.blockers}`
+        });
+      }
+      
+      if (args.next_steps) {
+        entry.aiContext.suggestedNextSteps = args.next_steps.split('\n').filter((step: string) => step.trim());
+      }
+      
+      if (args.code_changes) {
+        entry.notes.push({
+          id: `note-${Date.now() + 2}`,
+          timestamp: now,
+          category: "solution",
+          content: `Code changes: ${args.code_changes}`
+        });
+      }
+    }
 
-    entry.updated_at = new Date().toISOString();
+    entry.updatedAt = new Date().toISOString();
 
     await this.saveDevlog(entry);
 
@@ -157,7 +194,7 @@ export class DevlogManager {
       content: [
         {
           type: "text",
-          text: `Updated devlog entry: ${entry.id}\nStatus: ${entry.status}\nLast updated: ${entry.updated_at}`,
+          text: `Updated devlog entry: ${entry.id}\nStatus: ${entry.status}\nLast updated: ${entry.updatedAt}`,
         },
       ],
     };
@@ -188,11 +225,11 @@ export class DevlogManager {
       }
     }
 
-    // Sort by updated_at descending
-    entries.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+    // Sort by updatedAt descending
+    entries.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 
     const summary = entries.map(entry => 
-      `ID: ${entry.id}\nTitle: ${entry.title}\nType: ${entry.type}\nStatus: ${entry.status}\nPriority: ${entry.priority}\nUpdated: ${entry.updated_at}\n`
+      `ID: ${entry.id}\nTitle: ${entry.title}\nType: ${entry.type}\nStatus: ${entry.status}\nPriority: ${entry.priority}\nUpdated: ${entry.updatedAt}\n`
     ).join("\n");
 
     return {
@@ -217,15 +254,13 @@ export class DevlogManager {
       `Type: ${entry.type}`,
       `Priority: ${entry.priority}`,
       `Status: ${entry.status}`,
-      `Created: ${entry.created_at}`,
-      `Updated: ${entry.updated_at}`,
-      entry.completed_at ? `Completed: ${entry.completed_at}` : null,
+      `Created: ${entry.createdAt}`,
+      `Updated: ${entry.updatedAt}`,
       `\nDescription:\n${entry.description}`,
-      entry.progress ? `\nProgress:\n${entry.progress}` : null,
-      entry.blockers ? `\nBlockers:\n${entry.blockers}` : null,
-      entry.next_steps ? `\nNext Steps:\n${entry.next_steps}` : null,
-      entry.files_changed?.length ? `\nFiles Changed:\n${entry.files_changed.join(", ")}` : null,
-      entry.code_changes ? `\nCode Changes:\n${entry.code_changes}` : null,
+      `\nBusiness Context:\n${entry.context.businessContext}`,
+      `\nTechnical Context:\n${entry.context.technicalContext}`,
+      entry.context.acceptanceCriteria.length ? `\nAcceptance Criteria:\n${entry.context.acceptanceCriteria.map(c => `- ${c}`).join('\n')}` : null,
+      entry.files.length ? `\nFiles Changed:\n${entry.files.join(", ")}` : null,
     ].filter(Boolean).join("\n");
 
     let notesText = "";
@@ -256,11 +291,11 @@ export class DevlogManager {
         const searchableText = [
           entry.title,
           entry.description,
-          entry.progress || "",
-          entry.blockers || "",
-          entry.next_steps || "",
-          entry.code_changes || "",
-          ...entry.notes.map(note => note.content),
+          entry.context.businessContext,
+          entry.context.technicalContext,
+          entry.aiContext.currentSummary,
+          ...entry.aiContext.keyInsights,
+          ...entry.notes.map((note: DevlogNote) => note.content),
         ].join(" ").toLowerCase();
 
         if (searchableText.includes(searchLower)) {
@@ -290,6 +325,7 @@ export class DevlogManager {
     }
 
     const note: DevlogNote = {
+      id: `note-${Date.now()}`,
       timestamp: new Date().toISOString(),
       category: args.category || "progress",
       content: args.note,
@@ -301,7 +337,7 @@ export class DevlogManager {
     }
 
     entry.notes.push(note);
-    entry.updated_at = new Date().toISOString();
+    entry.updatedAt = new Date().toISOString();
 
     await this.saveDevlog(entry);
 
@@ -329,13 +365,14 @@ export class DevlogManager {
       throw new Error(`Devlog entry '${args.id}' not found`);
     }
 
+    const now = new Date().toISOString();
     entry.status = "done";
-    entry.completed_at = new Date().toISOString();
-    entry.updated_at = entry.completed_at;
+    entry.updatedAt = now;
 
     if (args.summary) {
       const completionNote: DevlogNote = {
-        timestamp: entry.completed_at,
+        id: `note-${Date.now()}`,
+        timestamp: now,
         category: "progress",
         content: `Completed: ${args.summary}`,
       };
@@ -348,7 +385,7 @@ export class DevlogManager {
       content: [
         {
           type: "text",
-          text: `Completed devlog entry: ${entry.id}\nTitle: ${entry.title}\nCompleted at: ${entry.completed_at}`,
+          text: `Completed devlog entry: ${entry.id}\nTitle: ${entry.title}\nCompleted at: ${now}`,
         },
       ],
     };
@@ -371,13 +408,13 @@ export class DevlogManager {
       const aPriority = priorityWeight[a.priority];
       const bPriority = priorityWeight[b.priority];
       if (aPriority !== bPriority) return bPriority - aPriority;
-      return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     });
 
     const contextEntries = activeEntries.slice(0, limit);
     
     const context = contextEntries.map(entry => {
-      const recentNotes = entry.notes.slice(-2).map(note => 
+      const recentNotes = entry.notes.slice(-2).map((note: DevlogNote) => 
         `  - [${note.category}] ${note.content}`
       ).join("\n");
 
@@ -385,10 +422,10 @@ export class DevlogManager {
         `## ${entry.title} (${entry.id})`,
         `**Type:** ${entry.type} | **Priority:** ${entry.priority} | **Status:** ${entry.status}`,
         `**Description:** ${entry.description}`,
-        entry.progress ? `**Progress:** ${entry.progress}` : null,
-        entry.blockers ? `**Blockers:** ${entry.blockers}` : null,
-        entry.next_steps ? `**Next Steps:** ${entry.next_steps}` : null,
-        entry.files_changed?.length ? `**Files:** ${entry.files_changed.join(", ")}` : null,
+        `**Business Context:** ${entry.context.businessContext}`,
+        `**AI Summary:** ${entry.aiContext.currentSummary}`,
+        entry.aiContext.suggestedNextSteps.length ? `**Next Steps:** ${entry.aiContext.suggestedNextSteps.join(', ')}` : null,
+        entry.files.length ? `**Files:** ${entry.files.join(", ")}` : null,
         recentNotes ? `**Recent Notes:**\n${recentNotes}` : null,
       ].filter(Boolean).join("\n");
     }).join("\n\n---\n\n");
@@ -398,6 +435,132 @@ export class DevlogManager {
         {
           type: "text",
           text: `# Active Development Context\n\nShowing ${contextEntries.length} active devlog entries:\n\n${context}`,
+        },
+      ],
+    };
+  }
+
+  async updateAIContext(args: {
+    id: string;
+    summary?: string;
+    insights?: string[];
+    questions?: string[];
+    patterns?: string[];
+    nextSteps?: string[];
+  }): Promise<any> {
+    const entry = await this.loadDevlog(args.id);
+    if (!entry) {
+      throw new Error(`Devlog entry '${args.id}' not found`);
+    }
+
+    const now = new Date().toISOString();
+    
+    // Update AI context
+    if (args.summary) entry.aiContext.currentSummary = args.summary;
+    if (args.insights) entry.aiContext.keyInsights = [...entry.aiContext.keyInsights, ...args.insights];
+    if (args.questions) entry.aiContext.openQuestions = args.questions;
+    if (args.patterns) entry.aiContext.relatedPatterns = [...entry.aiContext.relatedPatterns, ...args.patterns];
+    if (args.nextSteps) entry.aiContext.suggestedNextSteps = args.nextSteps;
+    
+    entry.aiContext.lastAIUpdate = now;
+    entry.aiContext.contextVersion += 1;
+    entry.updatedAt = now;
+
+    await this.saveDevlog(entry);
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Updated AI context for devlog: ${args.id}\nContext version: ${entry.aiContext.contextVersion}\nSummary: ${entry.aiContext.currentSummary}`,
+        },
+      ],
+    };
+  }
+
+  async addDecision(args: {
+    id: string;
+    decision: string;
+    rationale: string;
+    alternatives?: string[];
+    decisionMaker: string;
+  }): Promise<any> {
+    const entry = await this.loadDevlog(args.id);
+    if (!entry) {
+      throw new Error(`Devlog entry '${args.id}' not found`);
+    }
+
+    const now = new Date().toISOString();
+    const decision = {
+      id: `decision-${Date.now()}`,
+      timestamp: now,
+      decision: args.decision,
+      rationale: args.rationale,
+      alternatives: args.alternatives || [],
+      decisionMaker: args.decisionMaker,
+    };
+
+    entry.context.decisions.push(decision);
+    entry.updatedAt = now;
+
+    await this.saveDevlog(entry);
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Added decision to devlog: ${args.id}\nDecision: ${args.decision}\nRationale: ${args.rationale}\nMade by: ${args.decisionMaker}`,
+        },
+      ],
+    };
+  }
+
+  async getContextForAI(args: { id: string }): Promise<any> {
+    const entry = await this.loadDevlog(args.id);
+    if (!entry) {
+      throw new Error(`Devlog entry '${args.id}' not found`);
+    }
+
+    const contextSummary = {
+      id: entry.id,
+      title: entry.title,
+      type: entry.type,
+      status: entry.status,
+      priority: entry.priority,
+      description: entry.description,
+      
+      // Business and technical context
+      businessContext: entry.context.businessContext,
+      technicalContext: entry.context.technicalContext,
+      acceptanceCriteria: entry.context.acceptanceCriteria,
+      
+      // Current AI understanding
+      currentSummary: entry.aiContext.currentSummary,
+      keyInsights: entry.aiContext.keyInsights,
+      openQuestions: entry.aiContext.openQuestions,
+      relatedPatterns: entry.aiContext.relatedPatterns,
+      suggestedNextSteps: entry.aiContext.suggestedNextSteps,
+      
+      // Decisions and dependencies
+      decisions: entry.context.decisions,
+      dependencies: entry.context.dependencies,
+      risks: entry.context.risks,
+      
+      // Recent activity
+      recentNotes: entry.notes.slice(-3),
+      filesChanged: entry.files,
+      relatedDevlogs: entry.relatedDevlogs,
+      
+      // Metadata
+      contextVersion: entry.aiContext.contextVersion,
+      lastUpdate: entry.updatedAt,
+    };
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `AI Context for ${entry.id}:\n\n${JSON.stringify(contextSummary, null, 2)}`,
         },
       ],
     };

@@ -8,8 +8,6 @@
     "allowImportingTsExtensions": false,
     "resolveJsonModule": true,
     "declaration": true,
-    "outDir": "./build",
-    "rootDir": "./src",
     "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
@@ -24,5 +22,6 @@
     { "path": "./packages/mcp-server" },
     { "path": "./packages/types" }
   ],
+  "files": [],
   "exclude": ["node_modules", "**/build", "**/dist"]
 }

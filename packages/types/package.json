@@ -5,10 +5,25 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "type": "module",
+  "files": [
+    "build/**/*",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/devlog-monorepo.git",
+    "directory": "packages/types"
+  },
+  "homepage": "https://github.com/your-username/devlog-monorepo#readme",
+  "bugs": {
+    "url": "https://github.com/your-username/devlog-monorepo/issues"
+  },
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf build",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "test": "echo 'No tests for types package'",
+    "prepublishOnly": "pnpm build"
   },
   "keywords": [
     "typescript",

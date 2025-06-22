@@ -3,14 +3,36 @@
   "version": "1.0.0",
   "description": "MCP server for managing development logs and working notes",
   "main": "build/index.js",
+  "types": "build/index.d.ts",
   "type": "module",
+  "files": [
+    "build/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "bin": {
+    "devlog-mcp": "build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/devlog-monorepo.git",
+    "directory": "packages/mcp-server"
+  },
+  "homepage": "https://github.com/your-username/devlog-monorepo#readme",
+  "bugs": {
+    "url": "https://github.com/your-username/devlog-monorepo/issues"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node build/index.js",
     "dev": "tsx src/index.ts",
-    "test": "npm run build && node build/test.js",
-    "prepare": "npm run build",
-    "clean": "rm -rf build"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:integration": "pnpm build && node build/test.js",
+    "prepare": "pnpm build",
+    "clean": "rm -rf build",
+    "prepublishOnly": "pnpm build"
   },
   "keywords": [
     "mcp",
@@ -26,8 +48,10 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@vitest/ui": "^2.1.9",
     "tsx": "^4.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^2.1.9"
   },
   "engines": {
     "node": ">=18"

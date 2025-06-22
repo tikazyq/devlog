@@ -25,6 +25,7 @@ export interface DevlogNote {
   timestamp: string;
   category: "progress" | "issue" | "solution" | "idea" | "reminder";
   content: string;
+  files?: string[];
 }
 
 export class DevlogManager {
@@ -170,9 +171,18 @@ export class DevlogManager {
       const entry = await this.loadDevlog(id);
       if (entry) {
         // Apply filters
-        if (filters.status && entry.status !== filters.status) continue;
-        if (filters.type && entry.type !== filters.type) continue;
-        if (filters.priority && entry.priority !== filters.priority) continue;
+        if (filters.status) {
+          const statusArray = Array.isArray(filters.status) ? filters.status : [filters.status];
+          if (!statusArray.includes(entry.status)) continue;
+        }
+        if (filters.type) {
+          const typeArray = Array.isArray(filters.type) ? filters.type : [filters.type];
+          if (!typeArray.includes(entry.type)) continue;
+        }
+        if (filters.priority) {
+          const priorityArray = Array.isArray(filters.priority) ? filters.priority : [filters.priority];
+          if (!priorityArray.includes(entry.priority)) continue;
+        }
         
         entries.push(entry);
       }
@@ -285,16 +295,29 @@ export class DevlogManager {
       content: args.note,
     };
 
+    // Add files if provided
+    if (args.files && Array.isArray(args.files) && args.files.length > 0) {
+      note.files = args.files;
+    }
+
     entry.notes.push(note);
     entry.updated_at = new Date().toISOString();
 
     await this.saveDevlog(entry);
 
+    // Build the output text
+    let outputText = `Added note to devlog '${entry.id}':\n[${note.timestamp}] (${note.category}): ${note.content}`;
+    
+    // Include files in output if they were provided
+    if (note.files && note.files.length > 0) {
+      outputText += `\nFiles: ${note.files.join(', ')}`;
+    }
+
     return {
       content: [
         {
           type: "text",
-          text: `Added note to devlog '${entry.id}':\n[${note.timestamp}] (${note.category}): ${note.content}`,
+          text: outputText,
         },
       ],
     };

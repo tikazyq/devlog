@@ -1,4 +1,42 @@
 import React, { useState } from 'react';
+import { 
+  Typography, 
+  Card, 
+  Button, 
+  Space, 
+  Tag, 
+  Form, 
+  Input, 
+  Select, 
+  Row, 
+  Col, 
+  Divider,
+  Timeline,
+  Popconfirm,
+  Alert
+} from 'antd';
+import { 
+  ArrowLeftOutlined, 
+  EditOutlined, 
+  DeleteOutlined, 
+  SaveOutlined, 
+  CloseOutlined,
+  CheckCircleOutlined,
+  SyncOutlined,
+  StopOutlined,
+  ClockCircleOutlined,
+  MinusCircleOutlined,
+  ExclamationCircleOutlined,
+  WarningOutlined,
+  InfoCircleOutlined,
+  BugOutlined,
+  ToolOutlined,
+  BookOutlined
+} from '@ant-design/icons';
+
+const { Title, Text, Paragraph } = Typography;
+const { TextArea } = Input;
+const { Option } = Select;
 
 interface DevlogEntry {
   id: string;
@@ -28,241 +66,310 @@ interface DevlogDetailsProps {
 
 export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDetailsProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    title: devlog.title,
-    type: devlog.type,
-    status: devlog.status,
-    priority: devlog.priority,
-    description: devlog.description,
-    businessContext: devlog.businessContext || '',
-    technicalContext: devlog.technicalContext || ''
-  });
+  const [form] = Form.useForm();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onUpdate({ id: devlog.id, ...formData });
+  const handleSubmit = (values: any) => {
+    onUpdate({ id: devlog.id, ...values });
     setIsEditing(false);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'done': return 'bg-green-100 text-green-800';
-      case 'in-progress': return 'bg-blue-100 text-blue-800';
-      case 'blocked': return 'bg-red-100 text-red-800';
-      case 'todo': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'done': return 'success';
+      case 'in-progress': return 'processing';
+      case 'blocked': return 'error';
+      case 'review': return 'warning';
+      case 'testing': return 'cyan';
+      case 'todo': return 'default';
+      default: return 'default';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'done': return <CheckCircleOutlined />;
+      case 'in-progress': return <SyncOutlined spin />;
+      case 'blocked': return <StopOutlined />;
+      case 'review': return <ExclamationCircleOutlined />;
+      case 'testing': return <ToolOutlined />;
+      case 'todo': return <ClockCircleOutlined />;
+      default: return <MinusCircleOutlined />;
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'critical': return 'bg-red-100 text-red-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'critical': return 'red';
+      case 'high': return 'orange';
+      case 'medium': return 'gold';
+      case 'low': return 'green';
+      default: return 'default';
+    }
+  };
+
+  const getPriorityIcon = (priority: string) => {
+    switch (priority) {
+      case 'critical': return <ExclamationCircleOutlined />;
+      case 'high': return <WarningOutlined />;
+      case 'medium': return <InfoCircleOutlined />;
+      case 'low': return <CheckCircleOutlined />;
+      default: return <MinusCircleOutlined />;
+    }
+  };
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'feature': return '✨';
+      case 'bugfix': return <BugOutlined />;
+      case 'task': return '📋';
+      case 'refactor': return <ToolOutlined />;
+      case 'docs': return <BookOutlined />;
+      default: return '📝';
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <button
+    <div>
+      <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Button 
+          type="text" 
+          icon={<ArrowLeftOutlined />} 
           onClick={onBack}
-          className="text-sm text-gray-600 hover:text-gray-900 flex items-center space-x-1"
+          size="large"
         >
-          <span>←</span>
-          <span>Back to List</span>
-        </button>
-        <div className="flex items-center space-x-3">
-          <button
+          Back to List
+        </Button>
+        <Space>
+          <Button 
+            type={isEditing ? 'default' : 'primary'}
+            icon={isEditing ? <CloseOutlined /> : <EditOutlined />}
             onClick={() => setIsEditing(!isEditing)}
-            className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
           >
             {isEditing ? 'Cancel' : 'Edit'}
-          </button>
-          <button
-            onClick={onDelete}
-            className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors"
+          </Button>
+          <Popconfirm
+            title="Delete Devlog"
+            description="Are you sure you want to delete this devlog? This action cannot be undone."
+            onConfirm={onDelete}
+            okText="Yes, Delete"
+            cancelText="Cancel"
+            okButtonProps={{ danger: true }}
           >
-            Delete
-          </button>
-        </div>
+            <Button danger icon={<DeleteOutlined />}>
+              Delete
+            </Button>
+          </Popconfirm>
+        </Space>
       </div>
 
-      <div className="bg-white shadow rounded-lg">
+      <Card>
         {isEditing ? (
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2">
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  id="title"
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleSubmit}
+            initialValues={{
+              title: devlog.title,
+              type: devlog.type,
+              status: devlog.status,
+              priority: devlog.priority,
+              description: devlog.description,
+              businessContext: devlog.businessContext || '',
+              technicalContext: devlog.technicalContext || ''
+            }}
+          >
+            <Row gutter={[16, 0]}>
+              <Col span={24}>
+                <Form.Item
                   name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
+                  label="Title"
+                  rules={[{ required: true, message: 'Please enter a title' }]}
+                >
+                  <Input size="large" />
+                </Form.Item>
+              </Col>
 
-              <div>
-                <label htmlFor="type" className="block text-sm font-medium text-gray-700">
-                  Type
-                </label>
-                <select
-                  id="type"
+              <Col xs={24} md={8}>
+                <Form.Item
                   name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  label="Type"
+                  rules={[{ required: true, message: 'Please select a type' }]}
                 >
-                  <option value="feature">Feature</option>
-                  <option value="bugfix">Bug Fix</option>
-                  <option value="task">Task</option>
-                  <option value="refactor">Refactor</option>
-                  <option value="docs">Documentation</option>
-                </select>
-              </div>
+                  <Select size="large">
+                    <Option value="feature">Feature</Option>
+                    <Option value="bugfix">Bug Fix</Option>
+                    <Option value="task">Task</Option>
+                    <Option value="refactor">Refactor</Option>
+                    <Option value="docs">Documentation</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
 
-              <div>
-                <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-                  Status
-                </label>
-                <select
-                  id="status"
+              <Col xs={24} md={8}>
+                <Form.Item
                   name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  label="Status"
+                  rules={[{ required: true, message: 'Please select a status' }]}
                 >
-                  <option value="todo">To Do</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="blocked">Blocked</option>
-                  <option value="review">Review</option>
-                  <option value="testing">Testing</option>
-                  <option value="done">Done</option>
-                </select>
-              </div>
+                  <Select size="large">
+                    <Option value="todo">To Do</Option>
+                    <Option value="in-progress">In Progress</Option>
+                    <Option value="blocked">Blocked</Option>
+                    <Option value="review">Review</Option>
+                    <Option value="testing">Testing</Option>
+                    <Option value="done">Done</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
 
-              <div>
-                <label htmlFor="priority" className="block text-sm font-medium text-gray-700">
-                  Priority
-                </label>
-                <select
-                  id="priority"
+              <Col xs={24} md={8}>
+                <Form.Item
                   name="priority"
-                  value={formData.priority}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  label="Priority"
+                  rules={[{ required: true, message: 'Please select a priority' }]}
                 >
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                  <option value="critical">Critical</option>
-                </select>
-              </div>
+                  <Select size="large">
+                    <Option value="low">Low</Option>
+                    <Option value="medium">Medium</Option>
+                    <Option value="high">High</Option>
+                    <Option value="critical">Critical</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
 
-              <div className="md:col-span-2">
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                  Description
-                </label>
-                <textarea
-                  id="description"
+              <Col span={24}>
+                <Form.Item
                   name="description"
-                  rows={4}
-                  value={formData.description}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
-            </div>
+                  label="Description"
+                  rules={[{ required: true, message: 'Please enter a description' }]}
+                >
+                  <TextArea rows={4} showCount maxLength={500} />
+                </Form.Item>
+              </Col>
 
-            <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200">
-              <button
-                type="button"
-                onClick={() => setIsEditing(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
-              >
-                Save Changes
-              </button>
-            </div>
-          </form>
+              <Col span={24}>
+                <Form.Item
+                  name="businessContext"
+                  label="Business Context"
+                >
+                  <TextArea rows={3} showCount maxLength={300} />
+                </Form.Item>
+              </Col>
+
+              <Col span={24}>
+                <Form.Item
+                  name="technicalContext"
+                  label="Technical Context"
+                >
+                  <TextArea rows={3} showCount maxLength={300} />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Divider />
+
+            <Form.Item style={{ marginBottom: 0 }}>
+              <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+                <Button onClick={() => setIsEditing(false)}>
+                  Cancel
+                </Button>
+                <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
+                  Save Changes
+                </Button>
+              </Space>
+            </Form.Item>
+          </Form>
         ) : (
-          <div className="p-6 space-y-6">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h1 className="text-2xl font-bold text-gray-900">{devlog.title}</h1>
-                <div className="flex items-center space-x-2">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(devlog.status)}`}>
+          <div>
+            <div style={{ marginBottom: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                <Title level={2} style={{ margin: 0 }}>
+                  {devlog.title}
+                </Title>
+                <Space>
+                  <Tag 
+                    color={getStatusColor(devlog.status)} 
+                    icon={getStatusIcon(devlog.status)}
+                    style={{ fontSize: '14px', padding: '4px 12px' }}
+                  >
                     {devlog.status}
-                  </span>
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(devlog.priority)}`}>
+                  </Tag>
+                  <Tag 
+                    color={getPriorityColor(devlog.priority)}
+                    icon={getPriorityIcon(devlog.priority)}
+                    style={{ fontSize: '14px', padding: '4px 12px' }}
+                  >
                     {devlog.priority}
-                  </span>
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                  </Tag>
+                  <Tag 
+                    color="blue" 
+                    icon={getTypeIcon(devlog.type)}
+                    style={{ fontSize: '14px', padding: '4px 12px' }}
+                  >
                     {devlog.type}
-                  </span>
-                </div>
+                  </Tag>
+                </Space>
               </div>
               
-              <div className="text-sm text-gray-500 mb-4">
+              <Text type="secondary">
                 Created: {new Date(devlog.createdAt).toLocaleString()} • 
                 Updated: {new Date(devlog.updatedAt).toLocaleString()}
-              </div>
+              </Text>
+            </div>
 
-              <div className="prose max-w-none">
-                <p className="text-gray-700">{devlog.description}</p>
-              </div>
+            <div style={{ marginBottom: '24px' }}>
+              <Title level={4}>Description</Title>
+              <Paragraph style={{ fontSize: '16px', lineHeight: '1.6' }}>
+                {devlog.description}
+              </Paragraph>
             </div>
 
             {devlog.businessContext && (
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Business Context</h3>
-                <p className="text-gray-700">{devlog.businessContext}</p>
+              <div style={{ marginBottom: '24px' }}>
+                <Title level={4}>Business Context</Title>
+                <Alert
+                  message={devlog.businessContext}
+                  type="info"
+                  showIcon
+                  icon={<InfoCircleOutlined />}
+                  style={{ fontSize: '16px' }}
+                />
               </div>
             )}
 
             {devlog.technicalContext && (
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Technical Context</h3>
-                <p className="text-gray-700">{devlog.technicalContext}</p>
+              <div style={{ marginBottom: '24px' }}>
+                <Title level={4}>Technical Context</Title>
+                <Alert
+                  message={devlog.technicalContext}
+                  type="warning"
+                  showIcon
+                  icon={<ToolOutlined />}
+                  style={{ fontSize: '16px' }}
+                />
               </div>
             )}
 
             {devlog.notes && devlog.notes.length > 0 && (
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Notes</h3>
-                <div className="space-y-2">
+                <Title level={4}>Notes</Title>
+                <Timeline>
                   {devlog.notes.map((note) => (
-                    <div key={note.id} className="bg-gray-50 p-3 rounded">
-                      <p className="text-sm text-gray-700">{note.note}</p>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {note.category} • {new Date(note.timestamp).toLocaleString()}
+                    <Timeline.Item key={note.id}>
+                      <div style={{ marginBottom: '8px' }}>
+                        <Text>{note.note}</Text>
                       </div>
-                    </div>
+                      <Text type="secondary" style={{ fontSize: '12px' }}>
+                        {note.category} • {new Date(note.timestamp).toLocaleString()}
+                      </Text>
+                    </Timeline.Item>
                   ))}
-                </div>
+                </Timeline>
               </div>
             )}
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

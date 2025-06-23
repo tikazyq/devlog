@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ConfigProvider, Layout, Alert, theme } from 'antd';
 import { DevlogEntry, DevlogStats } from '@devlog/types';
 import { Dashboard } from './components/Dashboard';
 import { DevlogList } from './components/DevlogList';
@@ -8,6 +9,8 @@ import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { useDevlogs } from './hooks/useDevlogs';
 import { useWebSocket } from './hooks/useWebSocket';
+
+const { Content } = Layout;
 
 type View = 'dashboard' | 'list' | 'create' | 'details';
 
@@ -55,7 +58,7 @@ function App() {
       await updateDevlog(data);
       if (selectedDevlog) {
         // Refresh the selected devlog
-        const updated = devlogs.find(d => d.id === selectedDevlog.id);
+        const updated = devlogs.find((d: DevlogEntry) => d.id === selectedDevlog.id);
         setSelectedDevlog(updated || null);
       }
     } catch (error) {
@@ -82,7 +85,7 @@ function App() {
           <Dashboard 
             stats={stats}
             recentDevlogs={devlogs.slice(0, 5)}
-            onViewDevlog={(devlog) => handleViewChange('details', devlog)}
+            onViewDevlog={(devlog: DevlogEntry) => handleViewChange('details', devlog)}
           />
         );
       case 'list':
@@ -90,7 +93,7 @@ function App() {
           <DevlogList 
             devlogs={devlogs}
             loading={loading}
-            onViewDevlog={(devlog) => handleViewChange('details', devlog)}
+            onViewDevlog={(devlog: DevlogEntry) => handleViewChange('details', devlog)}
             onDeleteDevlog={handleDevlogDelete}
           />
         );
@@ -118,27 +121,41 @@ function App() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar 
-        currentView={currentView}
-        onViewChange={handleViewChange}
-        stats={stats}
-      />
-      <div className="flex-1 flex flex-col">
-        <Header 
-          connected={connected}
-          onRefresh={refetch}
+    <ConfigProvider
+      theme={{
+        algorithm: theme.defaultAlgorithm,
+        token: {
+          colorPrimary: '#3b82f6',
+          borderRadius: 8,
+        },
+      }}
+    >
+      <Layout style={{ height: '100vh' }}>
+        <Sidebar 
+          currentView={currentView}
+          onViewChange={handleViewChange}
+          stats={stats}
         />
-        <main className="flex-1 overflow-auto p-6">
-          {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-red-800">{error}</p>
-            </div>
-          )}
-          {renderCurrentView()}
-        </main>
-      </div>
-    </div>
+        <Layout>
+          <Header 
+            connected={connected}
+            onRefresh={refetch}
+          />
+          <Content style={{ margin: '24px', overflow: 'auto' }}>
+            {error && (
+              <Alert
+                message="Error"
+                description={error}
+                type="error"
+                showIcon
+                style={{ marginBottom: 16 }}
+              />
+            )}
+            {renderCurrentView()}
+          </Content>
+        </Layout>
+      </Layout>
+    </ConfigProvider>
   );
 }
 

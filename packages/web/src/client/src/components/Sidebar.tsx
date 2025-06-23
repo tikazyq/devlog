@@ -1,4 +1,14 @@
 import React from 'react';
+import { Layout, Menu, Typography, Card, Statistic, Row, Col } from 'antd';
+import { 
+  DashboardOutlined, 
+  FileTextOutlined, 
+  PlusOutlined,
+  CodeOutlined 
+} from '@ant-design/icons';
+
+const { Sider } = Layout;
+const { Title, Text } = Typography;
 
 interface SidebarProps {
   currentView: string;
@@ -8,54 +18,81 @@ interface SidebarProps {
 
 export function Sidebar({ currentView, onViewChange, stats }: SidebarProps) {
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'list', label: 'All Devlogs', icon: '📝' },
-    { id: 'create', label: 'New Devlog', icon: '➕' },
+    { 
+      key: 'dashboard', 
+      label: 'Dashboard', 
+      icon: <DashboardOutlined /> 
+    },
+    { 
+      key: 'list', 
+      label: 'All Devlogs', 
+      icon: <FileTextOutlined /> 
+    },
+    { 
+      key: 'create', 
+      label: 'New Devlog', 
+      icon: <PlusOutlined /> 
+    },
   ];
 
   return (
-    <div className="w-64 bg-white shadow-lg">
-      <div className="p-6">
-        <h1 className="text-2xl font-bold text-gray-800">Devlog</h1>
-        <p className="text-sm text-gray-600">Development Tracker</p>
+    <Sider 
+      width={280} 
+      style={{ 
+        background: '#fff',
+        borderRight: '1px solid #f0f0f0'
+      }}
+    >
+      <div style={{ padding: '24px 24px 16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+          <CodeOutlined style={{ fontSize: '24px', color: '#3b82f6' }} />
+          <Title level={3} style={{ margin: 0, color: '#1f2937' }}>
+            Devlog
+          </Title>
+        </div>
+        <Text type="secondary">Development Tracker</Text>
       </div>
       
-      <nav className="mt-6">
-        {menuItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => onViewChange(item.id as any)}
-            className={`w-full text-left px-6 py-3 flex items-center space-x-3 hover:bg-gray-50 transition-colors ${
-              currentView === item.id ? 'bg-blue-50 border-r-2 border-blue-500 text-blue-700' : 'text-gray-700'
-            }`}
-          >
-            <span className="text-lg">{item.icon}</span>
-            <span className="font-medium">{item.label}</span>
-          </button>
-        ))}
-      </nav>
+      <Menu
+        mode="inline"
+        selectedKeys={[currentView]}
+        style={{ borderRight: 0 }}
+        items={menuItems}
+        onClick={({ key }) => onViewChange(key)}
+      />
 
       {stats && (
-        <div className="mt-8 px-6">
-          <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-            Quick Stats
-          </h3>
-          <div className="mt-4 space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Total</span>
-              <span className="text-sm font-medium">{stats.total || 0}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">In Progress</span>
-              <span className="text-sm font-medium">{stats.inProgress || 0}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Completed</span>
-              <span className="text-sm font-medium">{stats.completed || 0}</span>
-            </div>
-          </div>
+        <div style={{ padding: '24px 16px' }}>
+          <Title level={5} style={{ marginBottom: '16px', color: '#6b7280' }}>
+            QUICK STATS
+          </Title>
+          <Card size="small" style={{ background: '#fafafa' }}>
+            <Row gutter={[16, 16]}>
+              <Col span={24}>
+                <Statistic 
+                  title="Total" 
+                  value={stats.total || 0} 
+                  valueStyle={{ fontSize: '16px' }}
+                />
+              </Col>
+              <Col span={12}>
+                <Statistic 
+                  title="In Progress" 
+                  value={stats.inProgress || 0}
+                  valueStyle={{ fontSize: '14px', color: '#1890ff' }}
+                />
+              </Col>
+              <Col span={12}>
+                <Statistic 
+                  title="Completed" 
+                  value={stats.completed || 0}
+                  valueStyle={{ fontSize: '14px', color: '#52c41a' }}
+                />
+              </Col>
+            </Row>
+          </Card>
         </div>
       )}
-    </div>
+    </Sider>
   );
 }

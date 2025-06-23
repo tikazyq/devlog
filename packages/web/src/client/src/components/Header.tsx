@@ -1,4 +1,9 @@
 import React from 'react';
+import { Layout, Button, Space, Badge, Typography } from 'antd';
+import { ReloadOutlined, WifiOutlined } from '@ant-design/icons';
+
+const { Header: AntHeader } = Layout;
+const { Text } = Typography;
 
 interface HeaderProps {
   connected: boolean;
@@ -7,30 +12,39 @@ interface HeaderProps {
 
 export function Header({ connected, onRefresh }: HeaderProps) {
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
-      <div className="px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <h2 className="text-xl font-semibold text-gray-800">
-            Dashboard
-          </h2>
-        </div>
+    <AntHeader style={{ 
+      padding: '0 24px', 
+      background: '#fff', 
+      borderBottom: '1px solid #f0f0f0',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    }}>
+      <Typography.Title level={3} style={{ margin: 0, color: '#1f2937' }}>
+        Devlog Dashboard
+      </Typography.Title>
+      
+      <Space size="middle">
+        <Space size="small">
+          <Badge 
+            status={connected ? 'success' : 'error'} 
+            text={
+              <Text type={connected ? 'success' : 'danger'}>
+                {connected ? 'Connected' : 'Disconnected'}
+              </Text>
+            }
+          />
+          <WifiOutlined style={{ color: connected ? '#52c41a' : '#ff4d4f' }} />
+        </Space>
         
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500' : 'bg-red-500'}`} />
-            <span className="text-sm text-gray-600">
-              {connected ? 'Connected' : 'Disconnected'}
-            </span>
-          </div>
-          
-          <button
-            onClick={onRefresh}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
-          >
-            Refresh
-          </button>
-        </div>
-      </div>
-    </header>
+        <Button 
+          icon={<ReloadOutlined />}
+          onClick={onRefresh}
+          type="default"
+        >
+          Refresh
+        </Button>
+      </Space>
+    </AntHeader>
   );
 }

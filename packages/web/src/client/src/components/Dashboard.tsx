@@ -1,4 +1,17 @@
 import React from 'react';
+import { Typography, Card, Row, Col, List, Tag, Avatar, Statistic, Empty } from 'antd';
+import { 
+  FileTextOutlined, 
+  SyncOutlined, 
+  CheckCircleOutlined, 
+  StopOutlined,
+  ClockCircleOutlined,
+  ExclamationCircleOutlined,
+  WarningOutlined,
+  MinusCircleOutlined 
+} from '@ant-design/icons';
+
+const { Title, Paragraph, Text } = Typography;
 
 interface DevlogEntry {
   id: string;
@@ -27,123 +40,165 @@ interface DashboardProps {
 export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'done': return 'bg-green-100 text-green-800';
-      case 'in-progress': return 'bg-blue-100 text-blue-800';
-      case 'blocked': return 'bg-red-100 text-red-800';
-      case 'todo': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'done': return 'success';
+      case 'in-progress': return 'processing';
+      case 'blocked': return 'error';
+      case 'todo': return 'default';
+      default: return 'default';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'done': return <CheckCircleOutlined />;
+      case 'in-progress': return <SyncOutlined spin />;
+      case 'blocked': return <StopOutlined />;
+      case 'todo': return <ClockCircleOutlined />;
+      default: return <MinusCircleOutlined />;
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'critical': return 'bg-red-100 text-red-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'critical': return 'red';
+      case 'high': return 'orange';
+      case 'medium': return 'gold';
+      case 'low': return 'green';
+      default: return 'default';
+    }
+  };
+
+  const getPriorityIcon = (priority: string) => {
+    switch (priority) {
+      case 'critical': return <ExclamationCircleOutlined />;
+      case 'high': return <WarningOutlined />;
+      case 'medium': return <MinusCircleOutlined />;
+      case 'low': return <CheckCircleOutlined />;
+      default: return <MinusCircleOutlined />;
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600">Overview of your development progress</p>
+    <div>
+      <div style={{ marginBottom: '24px' }}>
+        <Title level={2}>Dashboard</Title>
+        <Paragraph type="secondary">
+          Overview of your development progress
+        </Paragraph>
       </div>
 
       {/* Stats Cards */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <span className="text-blue-600 text-xl">📝</span>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Devlogs</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <span className="text-yellow-600 text-xl">🏃</span>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">In Progress</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.byStatus['in-progress'] || 0}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <span className="text-green-600 text-xl">✅</span>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Completed</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.byStatus['done'] || 0}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <span className="text-red-600 text-xl">🚫</span>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Blocked</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.byStatus['blocked'] || 0}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Row gutter={[16, 16]} style={{ marginBottom: '32px' }}>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Total Devlogs"
+                value={stats.total}
+                prefix={<FileTextOutlined style={{ color: '#1890ff' }} />}
+                valueStyle={{ color: '#1890ff' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="In Progress"
+                value={stats.byStatus['in-progress'] || 0}
+                prefix={<SyncOutlined spin style={{ color: '#faad14' }} />}
+                valueStyle={{ color: '#faad14' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Completed"
+                value={stats.byStatus['done'] || 0}
+                prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
+                valueStyle={{ color: '#52c41a' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Blocked"
+                value={stats.byStatus['blocked'] || 0}
+                prefix={<StopOutlined style={{ color: '#ff4d4f' }} />}
+                valueStyle={{ color: '#ff4d4f' }}
+              />
+            </Card>
+          </Col>
+        </Row>
       )}
 
       {/* Recent Devlogs */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">Recent Devlogs</h2>
-        </div>
-        <div className="divide-y divide-gray-200">
-          {recentDevlogs.length === 0 ? (
-            <div className="px-6 py-8 text-center">
-              <p className="text-gray-500">No devlogs found</p>
-            </div>
-          ) : (
-            recentDevlogs.map((devlog) => (
-              <div
-                key={devlog.id}
-                className="px-6 py-4 hover:bg-gray-50 cursor-pointer"
+      <Card 
+        title="Recent Devlogs"
+        bodyStyle={{ padding: 0 }}
+      >
+        {recentDevlogs.length === 0 ? (
+          <Empty 
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="No devlogs found"
+            style={{ padding: '40px' }} 
+          />
+        ) : (
+          <List
+            itemLayout="horizontal"
+            dataSource={recentDevlogs}
+            renderItem={(devlog) => (
+              <List.Item
+                style={{ cursor: 'pointer', padding: '16px 24px' }}
                 onClick={() => onViewDevlog(devlog)}
+                actions={[
+                  <Text type="secondary" key="date">
+                    {new Date(devlog.updatedAt).toLocaleDateString()}
+                  </Text>
+                ]}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-sm font-medium text-gray-900">{devlog.title}</h3>
-                    <p className="text-sm text-gray-500 mt-1">{devlog.description}</p>
-                    <div className="flex items-center space-x-4 mt-2">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(devlog.status)}`}>
-                        {devlog.status}
-                      </span>
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(devlog.priority)}`}>
-                        {devlog.priority}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {new Date(devlog.updatedAt).toLocaleDateString()}
-                      </span>
+                <List.Item.Meta
+                  avatar={
+                    <Avatar 
+                      icon={getStatusIcon(devlog.status)} 
+                      style={{ 
+                        backgroundColor: getStatusColor(devlog.status) === 'success' ? '#52c41a' :
+                                         getStatusColor(devlog.status) === 'processing' ? '#1890ff' :
+                                         getStatusColor(devlog.status) === 'error' ? '#ff4d4f' : '#d9d9d9'
+                      }}
+                    />
+                  }
+                  title={
+                    <div>
+                      <Text strong>{devlog.title}</Text>
+                      <div style={{ marginTop: '4px' }}>
+                        <Tag 
+                          color={getStatusColor(devlog.status)} 
+                          icon={getStatusIcon(devlog.status)}
+                        >
+                          {devlog.status}
+                        </Tag>
+                        <Tag 
+                          color={getPriorityColor(devlog.priority)}
+                          icon={getPriorityIcon(devlog.priority)}
+                        >
+                          {devlog.priority}
+                        </Tag>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
+                  }
+                  description={
+                    <Text type="secondary" ellipsis>
+                      {devlog.description}
+                    </Text>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+        )}
+      </Card>
     </div>
   );
 }

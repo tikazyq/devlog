@@ -9,9 +9,9 @@ import {
   EnterpriseIntegration
 } from "@devlog/types";
 
-import { FileSystemStorage } from "./storage/file-system-storage";
-import { DevlogOperations } from "./operations/devlog-operations";
-import { EnterpriseSync } from "./integrations/enterprise-sync";
+import { FileSystemStorage } from "./storage/file-system-storage.js";
+import { DevlogOperations } from "./operations/devlog-operations.js";
+import { EnterpriseSync } from "./integrations/enterprise-sync.js";
 
 export interface DevlogManagerOptions {
   workspaceRoot?: string;

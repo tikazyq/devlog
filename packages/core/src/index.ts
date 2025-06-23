@@ -2,6 +2,28 @@ export { DevlogManager, type DevlogManagerOptions } from "./devlog-manager.js";
 
 // New modular architecture exports
 export { DevlogManager as DevlogManagerV2, type DevlogManagerOptions as DevlogManagerOptionsV2 } from "./devlog-manager-v2.js";
+
+// V3 Storage Architecture
+export { NewDevlogManager, type NewDevlogManagerOptions } from "./devlog-manager-v3.js";
+export { ConfigurationManager, type DevlogConfig } from "./configuration-manager.js";
+
+// Storage Providers
+export { 
+  StorageProviderFactory, 
+  type StorageProvider, 
+  type StorageConfig, 
+  type EnterpriseStorageProvider 
+} from "./storage/storage-provider.js";
+export { JSONStorageProvider } from "./storage/json-storage.js";
+export { SQLiteStorageProvider } from "./storage/sqlite-storage.js";
+export { PostgreSQLStorageProvider } from "./storage/postgresql-storage.js";
+export { MySQLStorageProvider } from "./storage/mysql-storage.js";
+export { EnterpriseStorageAdapter } from "./storage/enterprise-storage.js";
+
+// Migration utilities
+export { StorageMigration, type MigrationOptions, type MigrationResult } from "./storage/migration.js";
+
+// Legacy exports
 export { FileSystemStorage, type DevlogStorage } from "./storage/file-system-storage.js";
 export { DevlogOperations } from "./operations/devlog-operations.js";
 export { EnterpriseSync } from "./integrations/enterprise-sync.js";
@@ -24,5 +46,10 @@ export type {
   Dependency,
   Decision,
   Risk,
-  ExternalReference
+  ExternalReference,
+  EnterpriseIntegration,
+  JiraConfig,
+  AdoConfig,
+  GitHubConfig,
+  SlackConfig
 } from "@devlog/types";

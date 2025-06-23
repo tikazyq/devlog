@@ -40,6 +40,11 @@
   "dependencies": {
     "@devlog/types": "workspace:*"
   },
+  "optionalDependencies": {
+    "better-sqlite3": "^11.0.0",
+    "pg": "^8.12.0",
+    "mysql2": "^3.11.0"
+  },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@vitest/ui": "^2.1.9",

@@ -4,12 +4,12 @@ This guide helps you configure devlog to sync with enterprise project management
 
 ## Configuration File Setup
 
-Create a configuration file named `devlog-integrations.config.json` in one of these locations:
+Create a configuration file named `devlog.config.json` in one of these locations:
 - Your project root directory
-- `~/.devlog-integrations.config.json` (global config)
+- `~/.devlog.config.json` (global config)
 - `.devlog/integrations.config.json` (workspace-specific)
 
-Copy the template from `devlog-integrations.config.template.json` and fill in your credentials.
+Copy the template from `devlog.config.template.json` and fill in your credentials.
 
 ## Platform-Specific Setup
 

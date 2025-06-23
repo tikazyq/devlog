@@ -152,7 +152,7 @@ Devlog supports synchronization with popular enterprise project management platf
 
 1. Copy the integration config template:
    ```bash
-   cp devlog-integrations.config.template.json devlog-integrations.config.json
+   cp devlog.config.template.json devlog.config.json
    ```
 
 2. Fill in your platform credentials (see [INTEGRATIONS.md](./INTEGRATIONS.md) for detailed setup)

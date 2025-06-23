@@ -53,9 +53,9 @@ When working with the `@devlog/web` application, use Playwright MCP tools for co
 
 ### 7. Testing Setup
 - Start the web application with the `Web: Dev (Full Stack)` task before testing
-- Use `mcp_playwright_browser_navigate` to access the local development server
-- Default development URL: `http://localhost:5173` (Vite dev server)
-- Always take a snapshot with `mcp_playwright_browser_snapshot` before interacting with elements
+- Use `browser_navigate` to access the local development server
+- Default development URL: `http://localhost:3000` (Vite dev server)
+- Always take a snapshot with `browser_snapshot` before interacting with elements
 
 ### 8. Core Testing Patterns
 - **Navigation Testing**: Verify routes and page transitions work correctly

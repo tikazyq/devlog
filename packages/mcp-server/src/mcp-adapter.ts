@@ -378,6 +378,60 @@ export class MCPDevlogAdapter {
     }
   }
 
+  async syncWithGitHubProject(id: string): Promise<CallToolResult> {
+    try {
+      const entry = await this.devlogManager.syncWithGitHubProject(id);
+      const githubProjectRef = entry.externalReferences?.find(ref => 
+        ref.system === "github" && ref.url?.includes('projects')
+      );
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Successfully synced devlog ${entry.id} with GitHub Project.\n\nProject Item: ${githubProjectRef?.id}\nURL: ${githubProjectRef?.url}\nStatus: ${githubProjectRef?.status}\nLast Sync: ${githubProjectRef?.lastSync}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to sync with GitHub Project: ${error}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+
+  async importGitHubProjectItems(args?: any): Promise<CallToolResult> {
+    try {
+      const projectNumber = args?.projectNumber;
+      const importedEntries = await this.devlogManager.importGitHubProjectItems(projectNumber);
+      
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Successfully imported ${importedEntries.length} GitHub project items as devlog entries.\n\nImported entries:\n${importedEntries.map(entry => `- ${entry.id}: ${entry.title}`).join('\n')}`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to import GitHub project items: ${error}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+
   async syncAllIntegrations(id: string): Promise<CallToolResult> {
     try {
       const entry = await this.devlogManager.syncAllIntegrations(id);

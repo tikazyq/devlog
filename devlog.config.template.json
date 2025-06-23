@@ -14,7 +14,9 @@
     "github": {
       "owner": "your-github-username",
       "repo": "your-repository",
-      "token": "your-github-token"
+      "token": "your-github-token",
+      "projectNumber": 2,
+      "projectId": "your-project-id"
     },
     "slack": {
       "botToken": "xoxb-your-slack-bot-token",

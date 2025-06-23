@@ -15,9 +15,11 @@ import * as path from "path";
 // Load integrations config if available
 function loadIntegrationsConfig(): EnterpriseIntegration | undefined {
   const configPaths = [
-    "devlog-integrations.config.json",
+    "devlog.config.json",
+    "devlog-integrations.config.json", // backward compatibility
     ".devlog/integrations.config.json",
-    path.join(process.env.HOME || "~", ".devlog-integrations.config.json")
+    path.join(process.env.HOME || "~", ".devlog.config.json"),
+    path.join(process.env.HOME || "~", ".devlog-integrations.config.json") // backward compatibility
   ];
 
   for (const configPath of configPaths) {
@@ -475,59 +477,30 @@ const tools: Tool[] = [
     },
   },
   {
-    name: "find_or_create_devlog",
-    description: "Find an existing devlog entry by title or create a new one if it doesn't exist",
+    name: "sync_with_github_project",
+    description: "Sync a devlog entry with GitHub Project (create or update project item)",
     inputSchema: {
       type: "object",
       properties: {
         id: {
           type: "string",
-          description: "Unique identifier for the devlog entry",
-        },
-        title: {
-          type: "string",
-          description: "Title of the task/feature/bugfix",
-        },
-        type: {
-          type: "string",
-          enum: ["feature", "bugfix", "task", "refactor", "docs"],
-          description: "Type of work being done",
-        },
-        description: {
-          type: "string",
-          description: "Detailed description of the work",
-        },
-        priority: {
-          type: "string",
-          enum: ["low", "medium", "high", "critical"],
-          description: "Priority level",
-          default: "medium",
-        },
-        businessContext: {
-          type: "string",
-          description: "Business context - why this work matters and what problem it solves",
-        },
-        technicalContext: {
-          type: "string",
-          description: "Technical context - architecture decisions, constraints, assumptions",
-        },
-        acceptanceCriteria: {
-          type: "array",
-          items: { type: "string" },
-          description: "Acceptance criteria or definition of done",
-        },
-        initialInsights: {
-          type: "array",
-          items: { type: "string" },
-          description: "Initial insights or knowledge about this work",
-        },
-        relatedPatterns: {
-          type: "array",
-          items: { type: "string" },
-          description: "Related patterns or examples from other projects",
+          description: "ID of the devlog entry to sync",
         },
       },
-      required: ["title", "type", "description"],
+      required: ["id"],
+    },
+  },
+  {
+    name: "import_github_project_items",
+    description: "Import existing GitHub project items as devlog entries",
+    inputSchema: {
+      type: "object",
+      properties: {
+        projectNumber: {
+          type: "number",
+          description: "GitHub project number (optional, uses configured project if not provided)",
+        },
+      },
     },
   },
 ];
@@ -618,6 +591,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           throw new Error("Missing required parameter: id");
         }
         return await devlogAdapter.syncAllIntegrations(args.id as string);
+
+      case "sync_with_github_project":
+        if (!args || typeof args !== 'object' || !('id' in args)) {
+          throw new Error("Missing required parameter: id");
+        }
+        return await devlogAdapter.syncWithGitHubProject(args.id as string);
+
+      case "import_github_project_items":
+        return await devlogAdapter.importGitHubProjectItems(args);
 
       case "find_or_create_devlog":
         if (!args || typeof args !== 'object') {

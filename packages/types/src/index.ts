@@ -181,6 +181,8 @@ export interface GitHubConfig {
   owner: string;
   repo: string;
   token: string;
+  projectNumber?: number; // GitHub Project V2 number
+  projectId?: string; // GitHub Project V2 ID (for GraphQL)
 }
 
 // AI Agent Context Enhancement

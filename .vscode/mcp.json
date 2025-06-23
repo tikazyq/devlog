@@ -2,6 +2,15 @@
     "servers": {
         "github": {
             "url": "https://api.githubcopilot.com/mcp/"
+        },
+        "devlog": {
+            "type": "stdio",
+            "command": "pnpm",
+            "args": [
+                "--filter",
+                "@devlog/mcp-server",
+                "dev"
+            ]
         }
     }
 }

@@ -3,18 +3,18 @@
  */
 
 import * as crypto from "crypto";
-import { NewDevlogManager, ConfigurationManager, type DevlogConfig } from "@devlog/core";
+import { DevlogManager, ConfigurationManager, type DevlogConfig } from "@devlog/core";
 import { DevlogEntry, CreateDevlogRequest, UpdateDevlogRequest } from "@devlog/types";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 
 export class MCPDevlogAdapter {
-  private devlogManager: NewDevlogManager;
+  private devlogManager: DevlogManager;
   private configManager: ConfigurationManager;
   private config: DevlogConfig | null = null;
 
   constructor(workspaceRoot?: string) {
     this.configManager = new ConfigurationManager(workspaceRoot);
-    this.devlogManager = new NewDevlogManager();
+    this.devlogManager = new DevlogManager();
   }
 
   /**
@@ -22,7 +22,7 @@ export class MCPDevlogAdapter {
    */
   async initialize(): Promise<void> {
     this.config = await this.configManager.loadConfig();
-    this.devlogManager = new NewDevlogManager({
+    this.devlogManager = new DevlogManager({
       workspaceRoot: this.config.workspaceRoot,
       storage: this.config.storage,
       integrations: this.config.integrations

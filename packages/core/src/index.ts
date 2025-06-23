@@ -1,10 +1,4 @@
 export { DevlogManager, type DevlogManagerOptions } from "./devlog-manager.js";
-
-// New modular architecture exports
-export { DevlogManager as DevlogManagerV2, type DevlogManagerOptions as DevlogManagerOptionsV2 } from "./devlog-manager-v2.js";
-
-// V3 Storage Architecture
-export { NewDevlogManager, type NewDevlogManagerOptions } from "./devlog-manager-v3.js";
 export { ConfigurationManager, type DevlogConfig } from "./configuration-manager.js";
 
 // Storage Providers

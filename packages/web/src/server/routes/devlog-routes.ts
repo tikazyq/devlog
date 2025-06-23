@@ -41,7 +41,7 @@ export function devlogRoutes(devlogManager: DevlogManager): Router {
   router.post('/', async (req, res) => {
     try {
       const request: CreateDevlogRequest = req.body;
-      const devlog = await devlogManager.createDevlog(request);
+      const devlog = await devlogManager.findOrCreateDevlog(request);
       res.status(201).json(devlog);
     } catch (error) {
       console.error('Error creating devlog:', error);

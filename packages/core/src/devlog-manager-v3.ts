@@ -19,19 +19,19 @@ import {
 
 import { StorageProvider, StorageConfig, StorageProviderFactory } from "./storage/storage-provider.js";
 
-export interface NewDevlogManagerOptions {
+export interface DevlogManagerOptions {
   workspaceRoot?: string;
   storage?: StorageConfig;
   integrations?: EnterpriseIntegration;
 }
 
-export class NewDevlogManager {
+export class DevlogManager {
   private storageProvider!: StorageProvider;
   private workspaceRoot: string;
   private integrations?: EnterpriseIntegration;
   private initialized = false;
 
-  constructor(private options: NewDevlogManagerOptions = {}) {
+  constructor(private options: DevlogManagerOptions = {}) {
     this.workspaceRoot = options.workspaceRoot || process.cwd();
     this.integrations = options.integrations;
   }

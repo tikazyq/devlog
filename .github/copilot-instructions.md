@@ -1,5 +1,22 @@
 # Devlog Project - Copilot Instructions
 
+## Early Development Stage Guidelines
+
+**IMPORTANT**: This project is in early development. We prioritize clean, modern architecture over backwards compatibility.
+
+### Legacy Code Management
+- **Remove obsolete code**: Don't preserve legacy implementations when refactoring
+- **Modernize aggressively**: Prefer current best practices over maintaining old patterns  
+- **Clean slate approach**: It's better to rewrite than to patch outdated code
+- **Breaking changes are acceptable**: We're not bound by API compatibility during this phase
+- **Focus on the future**: Design for where we want to be, not where we've been
+
+### Development Philosophy
+- **Quality over continuity**: A well-architected solution is more valuable than preserving broken legacy code
+- **Rapid iteration**: Make bold changes to improve the codebase structure
+- **Technical debt elimination**: Actively remove code that doesn't serve the current vision
+- **Modern tooling**: Always use the latest stable versions and best practices
+
 ## Dogfooding Guidelines
 
 This project uses **itself** for development tracking. When working on devlog features, ALWAYS:

@@ -12,12 +12,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/tikazyq/devlog.git",
+    "url": "https://github.com/codervisor/devlog.git",
     "directory": "packages/core"
   },
-  "homepage": "https://github.com/tikazyq/devlog#readme",
+  "homepage": "https://github.com/codervisor/devlog#readme",
   "bugs": {
-    "url": "https://github.com/tikazyq/devlog/issues"
+    "url": "https://github.com/codervisor/devlog/issues"
   },
   "scripts": {
     "build": "tsc",
@@ -25,7 +25,6 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "prepare": "pnpm build",
     "clean": "rm -rf build",
     "prepublishOnly": "pnpm build"
   },
@@ -35,7 +34,10 @@
     "core",
     "library"
   ],
-  "author": "",
+  "author": {
+    "name": "Marvin Zhang",
+    "email": "tikazyq@163.com"
+  },
   "license": "MIT",
   "dependencies": {
     "@devlog/types": "workspace:*"
@@ -46,6 +48,7 @@
     "mysql2": "^3.11.0"
   },
   "devDependencies": {
+    "@devlog/types": "workspace:*",
     "@types/node": "^20.0.0",
     "@vitest/ui": "^2.1.9",
     "typescript": "^5.0.0",

@@ -145,3 +145,6 @@ build/
 # Devlog configuration with credentials
 devlog.config.json
 devlog-integrations.config.json
+
+# Local environment variables for development
+.nx

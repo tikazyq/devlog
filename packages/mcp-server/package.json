@@ -30,7 +30,6 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:integration": "pnpm build && node build/test.js",
-    "prepare": "pnpm build",
     "clean": "rm -rf build",
     "prepublishOnly": "pnpm build"
   },
@@ -49,6 +48,8 @@
     "@devlog/core": "workspace:*"
   },
   "devDependencies": {
+    "@devlog/types": "workspace:*",
+    "@devlog/core": "workspace:*",
     "@types/node": "^20.0.0",
     "@vitest/ui": "^2.1.9",
     "tsx": "^4.0.0",

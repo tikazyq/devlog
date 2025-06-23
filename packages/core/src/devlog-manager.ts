@@ -4,7 +4,7 @@
  */
 
 import * as crypto from "crypto";
-import { 
+import type {
   DevlogEntry, 
   DevlogNote, 
   CreateDevlogRequest,
@@ -27,8 +27,8 @@ export interface DevlogManagerOptions {
 
 export class DevlogManager {
   private storageProvider!: StorageProvider;
-  private workspaceRoot: string;
-  private integrations?: EnterpriseIntegration;
+  private readonly workspaceRoot: string;
+  private readonly integrations?: EnterpriseIntegration;
   private initialized = false;
 
   constructor(private options: DevlogManagerOptions = {}) {

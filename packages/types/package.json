@@ -11,12 +11,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/devlog-monorepo.git",
+    "url": "https://github.com/codervisor/devlog.git",
     "directory": "packages/types"
   },
-  "homepage": "https://github.com/your-username/devlog-monorepo#readme",
+  "homepage": "https://github.com/codervisor/devlog#readme",
   "bugs": {
-    "url": "https://github.com/your-username/devlog-monorepo/issues"
+    "url": "https://github.com/codervisor/devlog/issues"
   },
   "scripts": {
     "build": "tsc",

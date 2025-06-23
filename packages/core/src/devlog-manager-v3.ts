@@ -17,7 +17,7 @@ import {
   EnterpriseIntegration
 } from "@devlog/types";
 
-import { StorageProvider, StorageConfig, StorageProviderFactory } from "./storage/storage-provider";
+import { StorageProvider, StorageConfig, StorageProviderFactory } from "./storage/storage-provider.js";
 
 export interface NewDevlogManagerOptions {
   workspaceRoot?: string;

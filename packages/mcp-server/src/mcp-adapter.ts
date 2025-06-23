@@ -1,23 +1,39 @@
-import { DevlogManager, DevlogEntry } from "@devlog/core";
-import { CreateDevlogRequest, UpdateDevlogRequest, EnterpriseIntegration } from "@devlog/types";
+/**
+ * MCP adapter that uses the flexible storage architecture
+ */
+
+import * as crypto from "crypto";
+import { NewDevlogManager, ConfigurationManager, type DevlogConfig } from "@devlog/core";
+import { DevlogEntry, CreateDevlogRequest, UpdateDevlogRequest } from "@devlog/types";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 
-/**
- * Adapter class that wraps DevlogManager and converts responses to MCP format
- */
 export class MCPDevlogAdapter {
-  private devlogManager: DevlogManager;
+  private devlogManager: NewDevlogManager;
+  private configManager: ConfigurationManager;
+  private config: DevlogConfig | null = null;
 
-  constructor(workspaceRoot?: string, integrations?: EnterpriseIntegration, devlogDir?: string) {
-    this.devlogManager = new DevlogManager({ 
-      workspaceRoot, 
-      integrations,
-      devlogDir 
+  constructor(workspaceRoot?: string) {
+    this.configManager = new ConfigurationManager(workspaceRoot);
+    this.devlogManager = new NewDevlogManager();
+  }
+
+  /**
+   * Initialize the adapter with appropriate storage configuration
+   */
+  async initialize(): Promise<void> {
+    this.config = await this.configManager.loadConfig();
+    this.devlogManager = new NewDevlogManager({
+      workspaceRoot: this.config.workspaceRoot,
+      storage: this.config.storage,
+      integrations: this.config.integrations
     });
+    await this.devlogManager.initialize();
   }
 
   async createDevlog(args: CreateDevlogRequest): Promise<CallToolResult> {
-    const entry = await this.devlogManager.createDevlog(args);
+    await this.ensureInitialized();
+    
+    const entry = await this.devlogManager.findOrCreateDevlog(args);
     
     return {
       content: [
@@ -29,50 +45,90 @@ export class MCPDevlogAdapter {
     };
   }
 
-  async updateDevlog(args: any): Promise<CallToolResult> {
-    // Convert old format to new UpdateDevlogRequest format
-    const updateRequest: UpdateDevlogRequest = {
-      id: args.id,
-      status: args.status,
-      files: args.files_changed,
-      progress: args.progress,
-      codeChanges: args.code_changes,
-      noteCategory: "progress"
-    };
-
-    // Handle legacy fields
-    if (args.blockers) {
-      await this.devlogManager.addNote(args.id, {
-        category: "issue",
-        content: `Blockers: ${args.blockers}`
-      });
-    }
-
-    if (args.next_steps) {
-      await this.devlogManager.updateAIContext({
-        id: args.id,
-        nextSteps: args.next_steps.split('\n').filter((step: string) => step.trim())
-      });
-    }
-
-    const entry = await this.devlogManager.updateDevlog(updateRequest);
-
+  async findOrCreateDevlog(args: CreateDevlogRequest): Promise<CallToolResult> {
+    await this.ensureInitialized();
+    
+    const entry = await this.devlogManager.findOrCreateDevlog(args);
+    
+    const statusText = entry.createdAt === entry.updatedAt ? "Created" : "Found existing";
+    
     return {
       content: [
         {
           type: "text",
-          text: `Updated devlog entry: ${entry.id}\nStatus: ${entry.status}\nLast updated: ${entry.updatedAt}`,
+          text: `${statusText} devlog entry: ${entry.id}\nTitle: ${entry.title}\nType: ${entry.type}\nPriority: ${entry.priority}\nStatus: ${entry.status}\n\nBusiness Context: ${entry.context.businessContext}\nTechnical Context: ${entry.context.technicalContext}`,
         },
       ],
     };
   }
 
-  async listDevlogs(filters: any = {}): Promise<CallToolResult> {
-    const entries = await this.devlogManager.listDevlogs(filters);
+  async updateDevlog(args: UpdateDevlogRequest): Promise<CallToolResult> {
+    await this.ensureInitialized();
+    
+    const entry = await this.devlogManager.updateDevlog(args);
+    
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Updated devlog entry: ${entry.id}\nTitle: ${entry.title}\nStatus: ${entry.status}\nLast Updated: ${entry.updatedAt}\n\nTotal Notes: ${entry.notes.length}`,
+        },
+      ],
+    };
+  }
 
-    const summary = entries.map((entry: DevlogEntry) => 
-      `ID: ${entry.id}\nTitle: ${entry.title}\nType: ${entry.type}\nStatus: ${entry.status}\nPriority: ${entry.priority}\nUpdated: ${entry.updatedAt}\n`
-    ).join("\n");
+  async getDevlog(args: { id: string }): Promise<CallToolResult> {
+    await this.ensureInitialized();
+    
+    const entry = await this.devlogManager.getDevlog(args.id);
+    
+    if (!entry) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Devlog entry '${args.id}' not found.`,
+          },
+        ],
+        isError: true,
+      };
+    }
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(entry, null, 2),
+        },
+      ],
+    };
+  }
+
+  async listDevlogs(args: any = {}): Promise<CallToolResult> {
+    await this.ensureInitialized();
+    
+    const filter = {
+      status: args.status ? [args.status] : undefined,
+      type: args.type ? [args.type] : undefined,
+      priority: args.priority ? [args.priority] : undefined,
+    };
+
+    const entries = await this.devlogManager.listDevlogs(filter);
+    
+    if (entries.length === 0) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: "No devlog entries found matching the criteria.",
+          },
+        ],
+      };
+    }
+
+    const summary = entries.map(entry => 
+      `- [${entry.status}] ${entry.title} (${entry.type}, ${entry.priority}) - ${entry.id}`
+    ).join('\n');
 
     return {
       content: [
@@ -84,403 +140,235 @@ export class MCPDevlogAdapter {
     };
   }
 
-  async getDevlog(id: string): Promise<CallToolResult> {
-    const entry = await this.devlogManager.getDevlog(id);
+  async searchDevlogs(args: { query: string }): Promise<CallToolResult> {
+    await this.ensureInitialized();
+    
+    const entries = await this.devlogManager.searchDevlogs(args.query);
+    
+    if (entries.length === 0) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `No devlog entries found matching query: "${args.query}"`,
+          },
+        ],
+      };
+    }
+
+    const summary = entries.map(entry => 
+      `- [${entry.status}] ${entry.title} (${entry.type}, ${entry.priority}) - ${entry.id}`
+    ).join('\n');
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Found ${entries.length} devlog entries matching "${args.query}":\n\n${summary}`,
+        },
+      ],
+    };
+  }
+
+  async addDevlogNote(args: { id: string; note: string; category?: string }): Promise<CallToolResult> {
+    await this.ensureInitialized();
+    
+    const category = args.category as any || "progress";
+    const entry = await this.devlogManager.addNote(args.id, args.note, category);
+    
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Added ${category} note to devlog '${entry.id}':\n${args.note}\n\nTotal notes: ${entry.notes.length}`,
+        },
+      ],
+    };
+  }
+
+  async addDecision(args: { id: string; decision: string; rationale: string; decisionMaker: string; alternatives?: string[] }): Promise<CallToolResult> {
+    await this.ensureInitialized();
+    
+    const entry = await this.devlogManager.getDevlog(args.id);
     if (!entry) {
-      throw new Error(`Devlog entry '${id}' not found`);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Devlog entry '${args.id}' not found.`,
+          },
+        ],
+        isError: true,
+      };
     }
 
-    const details = [
-      `ID: ${entry.id}`,
-      `Title: ${entry.title}`,
-      `Type: ${entry.type}`,
-      `Priority: ${entry.priority}`,
-      `Status: ${entry.status}`,
-      `Created: ${entry.createdAt}`,
-      `Updated: ${entry.updatedAt}`,
-      `\nDescription:\n${entry.description}`,
-      `\nBusiness Context:\n${entry.context.businessContext}`,
-      `\nTechnical Context:\n${entry.context.technicalContext}`,
-      entry.context.acceptanceCriteria.length ? `\nAcceptance Criteria:\n${entry.context.acceptanceCriteria.map((c: string) => `- ${c}`).join('\n')}` : null,
-      entry.files.length ? `\nFiles Changed:\n${entry.files.join(", ")}` : null,
-    ].filter(Boolean).join("\n");
-
-    let notesText = "";
-    if (entry.notes.length > 0) {
-      notesText = "\n\nNotes:\n" + entry.notes.map((note: any) => 
-        `[${note.timestamp}] (${note.category}): ${note.content}`
-      ).join("\n");
-    }
-
-    return {
-      content: [
-        {
-          type: "text",
-          text: details + notesText,
-        },
-      ],
+    const decision = {
+      id: crypto.randomUUID(),
+      timestamp: new Date().toISOString(),
+      decision: args.decision,
+      rationale: args.rationale,
+      alternatives: args.alternatives,
+      decisionMaker: args.decisionMaker
     };
-  }
 
-  async searchDevlogs(query: string): Promise<CallToolResult> {
-    const matches = await this.devlogManager.searchDevlogs(query);
-
-    const summary = matches.map((entry: DevlogEntry) => 
-      `ID: ${entry.id}\nTitle: ${entry.title}\nType: ${entry.type}\nStatus: ${entry.status}\n`
-    ).join("\n");
-
-    return {
-      content: [
-        {
-          type: "text",
-          text: `Found ${matches.length} matching devlog entries for "${query}":\n\n${summary}`,
-        },
-      ],
-    };
-  }
-
-  async addNote(args: any): Promise<CallToolResult> {
-    const entry = await this.devlogManager.addNote(args.id, {
-      category: args.category || "progress",
-      content: args.note,
-      files: args.files
+    entry.context.decisions.push(decision);
+    
+    // Update the entry to trigger save
+    const updated = await this.devlogManager.updateDevlog({
+      id: args.id,
+      // Use a field that exists in UpdateDevlogRequest to trigger save
+      tags: entry.tags
     });
 
-    // Build the output text
-    const lastNote = entry.notes[entry.notes.length - 1];
-    let outputText = `Added note to devlog '${entry.id}':\n[${lastNote.timestamp}] (${lastNote.category}): ${lastNote.content}`;
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Added decision to devlog '${args.id}':\nDecision: ${args.decision}\nRationale: ${args.rationale}\nDecision Maker: ${args.decisionMaker}`,
+        },
+      ],
+    };
+  }
+
+  async completeDevlog(args: { id: string; summary?: string }): Promise<CallToolResult> {
+    await this.ensureInitialized();
     
-    // Include files in output if they were provided
-    if (lastNote.files && lastNote.files.length > 0) {
-      outputText += `\nFiles: ${lastNote.files.join(', ')}`;
+    const entry = await this.devlogManager.completeDevlog(args.id, args.summary);
+    
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Completed devlog '${entry.id}': ${entry.title}\nStatus: ${entry.status}\nCompletion summary: ${args.summary || 'None provided'}`,
+        },
+      ],
+    };
+  }
+
+  async getActiveContext(args: { limit?: number } = {}): Promise<CallToolResult> {
+    await this.ensureInitialized();
+    
+    const filter = {
+      status: ["todo", "in-progress", "review", "testing"] as any[]
+    };
+    
+    const entries = await this.devlogManager.listDevlogs(filter);
+    const limited = entries.slice(0, args.limit || 10);
+    
+    if (limited.length === 0) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: "No active devlog entries found.",
+          },
+        ],
+      };
     }
 
-    return {
-      content: [
-        {
-          type: "text",
-          text: outputText,
-        },
-      ],
-    };
-  }
-
-  async completeDevlog(args: any): Promise<CallToolResult> {
-    const entry = await this.devlogManager.completeDevlog(args.id, args.summary);
+    const summary = limited.map(entry => {
+      const recentNotes = entry.notes.slice(-2);
+      const notesText = recentNotes.length > 0 
+        ? `\n  Recent notes: ${recentNotes.map(n => n.content).join('; ')}`
+        : '';
+      
+      return `- [${entry.status}] ${entry.title} (${entry.type}, ${entry.priority})${notesText}`;
+    }).join('\n');
 
     return {
       content: [
         {
           type: "text",
-          text: `Completed devlog entry: ${entry.id}\nTitle: ${entry.title}\nCompleted at: ${entry.updatedAt}`,
-        },
-      ],
-    };
-  }
-
-  async getActiveContext(limit: number = 10): Promise<CallToolResult> {
-    const contextEntries = await this.devlogManager.getActiveContext(limit);
-    
-    const context = contextEntries.map((entry: DevlogEntry) => {
-      const recentNotes = entry.notes.slice(-2).map((note: any) => 
-        `  - [${note.category}] ${note.content}`
-      ).join("\n");
-
-      return [
-        `## ${entry.title} (${entry.id})`,
-        `**Type:** ${entry.type} | **Priority:** ${entry.priority} | **Status:** ${entry.status}`,
-        `**Description:** ${entry.description}`,
-        `**Business Context:** ${entry.context.businessContext}`,
-        `**AI Summary:** ${entry.aiContext.currentSummary}`,
-        entry.aiContext.suggestedNextSteps.length ? `**Next Steps:** ${entry.aiContext.suggestedNextSteps.join(', ')}` : null,
-        entry.files.length ? `**Files:** ${entry.files.join(", ")}` : null,
-        recentNotes ? `**Recent Notes:**\n${recentNotes}` : null,
-      ].filter(Boolean).join("\n");
-    }).join("\n\n---\n\n");
-
-    return {
-      content: [
-        {
-          type: "text",
-          text: `# Active Development Context\n\nShowing ${contextEntries.length} active devlog entries:\n\n${context}`,
-        },
-      ],
-    };
-  }
-
-  async updateAIContext(args: {
-    id: string;
-    summary?: string;
-    insights?: string[];
-    questions?: string[];
-    patterns?: string[];
-    nextSteps?: string[];
-  }): Promise<CallToolResult> {
-    const entry = await this.devlogManager.updateAIContext(args);
-
-    return {
-      content: [
-        {
-          type: "text",
-          text: `Updated AI context for devlog: ${args.id}\nContext version: ${entry.aiContext.contextVersion}\nSummary: ${entry.aiContext.currentSummary}`,
-        },
-      ],
-    };
-  }
-
-  async addDecision(args: {
-    id: string;
-    decision: string;
-    rationale: string;
-    alternatives?: string[];
-    decisionMaker: string;
-  }): Promise<CallToolResult> {
-    const entry = await this.devlogManager.addDecision(args);
-
-    return {
-      content: [
-        {
-          type: "text",
-          text: `Added decision to devlog: ${args.id}\nDecision: ${args.decision}\nRationale: ${args.rationale}\nMade by: ${args.decisionMaker}`,
+          text: `${limited.length} active devlog entries:\n\n${summary}`,
         },
       ],
     };
   }
 
   async getContextForAI(args: { id: string }): Promise<CallToolResult> {
-    const entry = await this.devlogManager.getDevlog(args.id);
+    await this.ensureInitialized();
+    
+    const entry = await this.devlogManager.getContextForAI(args.id);
+    
     if (!entry) {
-      throw new Error(`Devlog entry '${args.id}' not found`);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Devlog entry '${args.id}' not found.`,
+          },
+        ],
+        isError: true,
+      };
     }
 
-    const contextSummary = {
+    const context = {
       id: entry.id,
       title: entry.title,
       type: entry.type,
       status: entry.status,
       priority: entry.priority,
       description: entry.description,
-      
-      // Business and technical context
-      businessContext: entry.context.businessContext,
-      technicalContext: entry.context.technicalContext,
-      acceptanceCriteria: entry.context.acceptanceCriteria,
-      
-      // Current AI understanding
-      currentSummary: entry.aiContext.currentSummary,
-      keyInsights: entry.aiContext.keyInsights,
-      openQuestions: entry.aiContext.openQuestions,
-      relatedPatterns: entry.aiContext.relatedPatterns,
-      suggestedNextSteps: entry.aiContext.suggestedNextSteps,
-      
-      // Decisions and dependencies
-      decisions: entry.context.decisions,
-      dependencies: entry.context.dependencies,
-      risks: entry.context.risks,
-      
-      // Recent activity
-      recentNotes: entry.notes.slice(-3),
-      filesChanged: entry.files,
-      relatedDevlogs: entry.relatedDevlogs,
-      
-      // Metadata
-      contextVersion: entry.aiContext.contextVersion,
-      lastUpdate: entry.updatedAt,
+      context: entry.context,
+      aiContext: entry.aiContext,
+      recentNotes: entry.notes.slice(-5),
+      totalNotes: entry.notes.length,
+      createdAt: entry.createdAt,
+      updatedAt: entry.updatedAt
     };
 
     return {
       content: [
         {
           type: "text",
-          text: `AI Context for ${entry.id}:\n\n${JSON.stringify(contextSummary, null, 2)}`,
+          text: JSON.stringify(context, null, 2),
         },
       ],
     };
   }
 
-  // Enterprise Integration Methods
+  async updateAIContext(args: { 
+    id: string; 
+    summary?: string; 
+    insights?: string[]; 
+    questions?: string[]; 
+    patterns?: string[]; 
+    nextSteps?: string[]; 
+  }): Promise<CallToolResult> {
+    await this.ensureInitialized();
+    
+    const contextUpdate: any = {};
+    
+    if (args.summary) contextUpdate.currentSummary = args.summary;
+    if (args.insights) contextUpdate.keyInsights = args.insights;
+    if (args.questions) contextUpdate.openQuestions = args.questions;
+    if (args.patterns) contextUpdate.relatedPatterns = args.patterns;
+    if (args.nextSteps) contextUpdate.suggestedNextSteps = args.nextSteps;
+    
+    contextUpdate.lastAIUpdate = new Date().toISOString();
+    contextUpdate.contextVersion = (contextUpdate.contextVersion || 0) + 1;
 
-  async syncWithJira(id: string): Promise<CallToolResult> {
-    try {
-      const entry = await this.devlogManager.syncWithJira(id);
-      const jiraRef = entry.externalReferences?.find(ref => ref.system === "jira");
-      
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Successfully synced devlog ${entry.id} with Jira.\n\nJira Issue: ${jiraRef?.id}\nURL: ${jiraRef?.url}\nStatus: ${jiraRef?.status}\nLast Sync: ${jiraRef?.lastSync}`,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Failed to sync with Jira: ${error}`,
-          },
-        ],
-        isError: true,
-      };
+    const entry = await this.devlogManager.updateAIContext(args.id, contextUpdate);
+    
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Updated AI context for devlog '${entry.id}':\n${JSON.stringify(contextUpdate, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  async dispose(): Promise<void> {
+    if (this.devlogManager) {
+      await this.devlogManager.dispose();
     }
   }
 
-  async syncWithADO(id: string): Promise<CallToolResult> {
-    try {
-      const entry = await this.devlogManager.syncWithADO(id);
-      const adoRef = entry.externalReferences?.find(ref => ref.system === "ado");
-      
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Successfully synced devlog ${entry.id} with Azure DevOps.\n\nWork Item: ${adoRef?.id}\nURL: ${adoRef?.url}\nStatus: ${adoRef?.status}\nLast Sync: ${adoRef?.lastSync}`,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Failed to sync with Azure DevOps: ${error}`,
-          },
-        ],
-        isError: true,
-      };
-    }
-  }
-
-  async syncWithGitHub(id: string): Promise<CallToolResult> {
-    try {
-      const entry = await this.devlogManager.syncWithGitHub(id);
-      const githubRef = entry.externalReferences?.find(ref => ref.system === "github");
-      
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Successfully synced devlog ${entry.id} with GitHub.\n\nIssue: #${githubRef?.id}\nURL: ${githubRef?.url}\nStatus: ${githubRef?.status}\nLast Sync: ${githubRef?.lastSync}`,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Failed to sync with GitHub: ${error}`,
-          },
-        ],
-        isError: true,
-      };
-    }
-  }
-
-  async syncWithGitHubProject(id: string): Promise<CallToolResult> {
-    try {
-      const entry = await this.devlogManager.syncWithGitHubProject(id);
-      const githubProjectRef = entry.externalReferences?.find(ref => 
-        ref.system === "github" && ref.url?.includes('projects')
-      );
-      
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Successfully synced devlog ${entry.id} with GitHub Project.\n\nProject Item: ${githubProjectRef?.id}\nURL: ${githubProjectRef?.url}\nStatus: ${githubProjectRef?.status}\nLast Sync: ${githubProjectRef?.lastSync}`,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Failed to sync with GitHub Project: ${error}`,
-          },
-        ],
-        isError: true,
-      };
-    }
-  }
-
-  async importGitHubProjectItems(args?: any): Promise<CallToolResult> {
-    try {
-      const projectNumber = args?.projectNumber;
-      const importedEntries = await this.devlogManager.importGitHubProjectItems(projectNumber);
-      
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Successfully imported ${importedEntries.length} GitHub project items as devlog entries.\n\nImported entries:\n${importedEntries.map(entry => `- ${entry.id}: ${entry.title}`).join('\n')}`,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Failed to import GitHub project items: ${error}`,
-          },
-        ],
-        isError: true,
-      };
-    }
-  }
-
-  async syncAllIntegrations(id: string): Promise<CallToolResult> {
-    try {
-      const entry = await this.devlogManager.syncAllIntegrations(id);
-      const syncedSystems = entry.externalReferences?.map(ref => `${ref.system}: ${ref.id}`).join(", ") || "none";
-      
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Successfully synced devlog ${entry.id} with all configured integrations.\n\nSynced Systems: ${syncedSystems}\nLast Updated: ${entry.updatedAt}`,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Failed to sync with integrations: ${error}`,
-          },
-        ],
-        isError: true,
-      };
-    }
-  }
-
-  async findOrCreateDevlog(args: any): Promise<CallToolResult> {
-    try {
-      const result = await this.devlogManager.findOrCreateDevlog(args as any);
-      const action = result.created ? "Created" : "Found existing";
-      
-      return {
-        content: [
-          {
-            type: "text",
-            text: `${action} devlog entry: ${result.entry.id}\nTitle: ${result.entry.title}\nType: ${result.entry.type}\nPriority: ${result.entry.priority}\nStatus: ${result.entry.status}\n\nBusiness Context: ${result.entry.context.businessContext}\nTechnical Context: ${result.entry.context.technicalContext}`,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Failed to find or create devlog: ${error}`,
-          },
-        ],
-        isError: true,
-      };
+  private async ensureInitialized(): Promise<void> {
+    if (!this.config) {
+      await this.initialize();
     }
   }
 }

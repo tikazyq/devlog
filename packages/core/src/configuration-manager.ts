@@ -5,7 +5,7 @@
 import * as fs from "fs/promises";
 import * as path from "path";
 import { EnterpriseIntegration } from "@devlog/types";
-import { StorageConfig } from "./storage/storage-provider";
+import { StorageConfig } from "./storage/storage-provider.js";
 
 export interface DevlogConfig {
   storage: StorageConfig;

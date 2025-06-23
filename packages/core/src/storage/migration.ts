@@ -4,8 +4,8 @@
 
 import * as path from "path";
 import { DevlogEntry } from "@devlog/types";
-import { FileSystemStorage } from "./file-system-storage";
-import { StorageProvider, StorageConfig, StorageProviderFactory } from "./storage-provider";
+import { FileSystemStorage } from "./file-system-storage.js";
+import { StorageProvider, StorageConfig, StorageProviderFactory } from "./storage-provider.js";
 
 export interface MigrationOptions {
   sourceDir: string;

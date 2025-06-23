@@ -10,9 +10,9 @@ import {
   DevlogFilter
 } from "@devlog/types";
 
-import { DevlogStorage } from "../storage/file-system-storage";
-import { DevlogUtils } from "../utils/devlog-utils";
-import { EnterpriseSync } from "../integrations/enterprise-sync";
+import { DevlogStorage } from "../storage/file-system-storage.js";
+import { DevlogUtils } from "../utils/devlog-utils.js";
+import { EnterpriseSync } from "../integrations/enterprise-sync.js";
 
 export class DevlogOperations {
   private storage: DevlogStorage;

@@ -3,7 +3,7 @@
  */
 
 import { DevlogEntry, DevlogFilter, DevlogStats } from "@devlog/types";
-import { StorageProvider } from "./storage-provider";
+import { StorageProvider } from "./storage-provider.js";
 
 export class MySQLStorageProvider implements StorageProvider {
   private connectionString: string;

@@ -3,7 +3,7 @@
  */
 
 import { DevlogEntry, DevlogFilter, DevlogStats, DevlogStatus, DevlogType, DevlogPriority } from "@devlog/types";
-import { StorageProvider } from "./storage-provider";
+import { StorageProvider } from "./storage-provider.js";
 
 export class SQLiteStorageProvider implements StorageProvider {
   private db: any = null;

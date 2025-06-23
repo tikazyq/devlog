@@ -3,8 +3,8 @@
  */
 
 import { DevlogEntry, DevlogFilter, DevlogStats, EnterpriseIntegration, ExternalReference } from "@devlog/types";
-import { EnterpriseStorageProvider } from "./storage-provider";
-import { EnterpriseSync } from "../integrations/enterprise-sync";
+import { EnterpriseStorageProvider } from "./storage-provider.js";
+import { EnterpriseSync } from "../integrations/enterprise-sync.js";
 
 export class EnterpriseStorageAdapter implements EnterpriseStorageProvider {
   private enterpriseSync: EnterpriseSync;

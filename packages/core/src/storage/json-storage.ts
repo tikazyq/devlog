@@ -6,7 +6,7 @@
 import * as fs from "fs/promises";
 import * as path from "path";
 import { DevlogEntry, DevlogFilter, DevlogStats, DevlogStatus, DevlogType, DevlogPriority } from "@devlog/types";
-import { StorageProvider } from "./storage-provider";
+import { StorageProvider } from "./storage-provider.js";
 
 export class JSONStorageProvider implements StorageProvider {
   private devlogDir: string;

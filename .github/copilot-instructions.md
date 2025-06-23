@@ -32,11 +32,11 @@ This project uses **itself** for development tracking. When working on devlog fe
 - Same title + same type = same entry (by design)
 - Different types can have same title (different IDs)
 
-### 5. Current Major Features
-- ✅ Standardized ID generation (hash-based, deterministic)
-- ✅ Enterprise integrations (Jira, ADO, GitHub)
-- ✅ Duplicate prevention system
-- ✅ MCP server for AI assistant integration
+### 5. Architecture Principles
+- **Standardized IDs**: All devlog entries use deterministic hash-based IDs for consistency
+- **MCP Integration**: Primary interface for AI assistants is through MCP server tools
+- **Storage Flexibility**: Support for both local JSON files and enterprise integrations
+- **Duplicate Prevention**: Built-in safeguards against creating duplicate entries
 
 ### 6. When Adding New Features
 1. Create devlog entry for the feature using MCP server
@@ -46,3 +46,58 @@ This project uses **itself** for development tracking. When working on devlog fe
 5. Demo the feature by using it through the MCP interface
 
 This ensures the devlog system is continuously tested and improved through real-world usage.
+
+## Web Testing Guidelines with Playwright MCP
+
+When working with the `@devlog/web` application, use Playwright MCP tools for comprehensive testing:
+
+### 7. Testing Setup
+- Start the web application with the `Web: Dev (Full Stack)` task before testing
+- Use `mcp_playwright_browser_navigate` to access the local development server
+- Default development URL: `http://localhost:5173` (Vite dev server)
+- Always take a snapshot with `mcp_playwright_browser_snapshot` before interacting with elements
+
+### 8. Core Testing Patterns
+- **Navigation Testing**: Verify routes and page transitions work correctly
+- **Form Testing**: Test devlog entry creation, editing, and deletion
+- **Data Validation**: Ensure data persists correctly across operations
+- **UI Responsiveness**: Test different screen sizes and interactions
+- **Error Handling**: Verify error messages and edge cases
+
+### 9. Common Test Scenarios
+```javascript
+// Start web app first
+// Navigate to devlog web interface
+// Take snapshot to see current state
+// Test creating a new devlog entry
+// Test editing existing entries  
+// Test filtering and search functionality
+// Test responsive design on different screen sizes
+// Verify data persistence
+```
+
+### 10. Playwright MCP Best Practices
+- **Always snapshot first**: Use `browser_snapshot` to see the current page state
+- **Use descriptive selectors**: Target elements by role, label, or test IDs when possible  
+- **Verify interactions**: Take snapshots after interactions to confirm expected changes
+- **Handle async operations**: Use `browser_wait_for` for dynamic content
+- **Test error states**: Verify error messages and validation feedback
+- **Clean up test data**: Remove any test entries created during testing
+
+### 11. Web App Testing Checklist
+- [ ] Home page loads correctly
+- [ ] Navigation menu works
+- [ ] Create new devlog entry form
+- [ ] Edit existing devlog entries
+- [ ] Delete devlog entries
+- [ ] Search and filter functionality
+- [ ] Responsive design on mobile/tablet
+- [ ] Error handling for invalid inputs
+- [ ] Data persistence after page refresh
+- [ ] Integration with backend API
+
+### 12. Debugging Failed Tests
+- Use `mcp_playwright_browser_console_messages` to check for JavaScript errors
+- Take screenshots with `mcp_playwright_browser_take_screenshot` for visual debugging
+- Check network requests with `mcp_playwright_browser_network_requests`
+- Verify element states before interactions using snapshots

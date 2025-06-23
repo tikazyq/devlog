@@ -11,6 +11,12 @@
                 "@devlog/mcp-server",
                 "dev"
             ]
+        },
+        "playwright": {
+            "command": "npx",
+            "args": [
+                "@playwright/mcp@latest"
+            ]
         }
     }
 }

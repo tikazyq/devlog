@@ -8,8 +8,12 @@ import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 export class MCPDevlogAdapter {
   private devlogManager: DevlogManager;
 
-  constructor(workspaceRoot?: string, integrations?: EnterpriseIntegration) {
-    this.devlogManager = new DevlogManager({ workspaceRoot, integrations });
+  constructor(workspaceRoot?: string, integrations?: EnterpriseIntegration, devlogDir?: string) {
+    this.devlogManager = new DevlogManager({ 
+      workspaceRoot, 
+      integrations,
+      devlogDir 
+    });
   }
 
   async createDevlog(args: CreateDevlogRequest): Promise<CallToolResult> {

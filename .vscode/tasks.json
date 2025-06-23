@@ -65,6 +65,111 @@
 				"clean"
 			],
 			"group": "build"
+		},
+		{
+			"label": "Web: Dev (Full Stack)",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"--filter",
+				"@devlog/web",
+				"dev"
+			],
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Web: Dev Server",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"--filter",
+				"@devlog/web",
+				"dev:server"
+			],
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": [
+				"$tsc"
+			]
+		},
+		{
+			"label": "Web: Dev Client",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"--filter",
+				"@devlog/web",
+				"dev:client"
+			],
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Web: Build",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"--filter",
+				"@devlog/web",
+				"build"
+			],
+			"group": "build",
+			"problemMatcher": [
+				"$tsc"
+			]
+		},
+		{
+			"label": "Web: Build Server",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"--filter",
+				"@devlog/web",
+				"build:server"
+			],
+			"group": "build",
+			"problemMatcher": [
+				"$tsc"
+			]
+		},
+		{
+			"label": "Web: Build Client",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"--filter",
+				"@devlog/web",
+				"build:client"
+			],
+			"group": "build",
+			"problemMatcher": []
+		},
+		{
+			"label": "Web: Start",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"--filter",
+				"@devlog/web",
+				"start"
+			],
+			"group": "test",
+			"isBackground": true
+		},
+		{
+			"label": "Web: Preview",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"--filter",
+				"@devlog/web",
+				"preview"
+			],
+			"group": "test",
+			"isBackground": true
 		}
 	]
 }

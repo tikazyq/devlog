@@ -1,15 +1,5 @@
 import { useState, useEffect } from 'react';
-
-interface DevlogEntry {
-  id: string;
-  title: string;
-  type: string;
-  status: string;
-  priority: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { DevlogEntry } from '@devlog/types';
 
 export function useDevlogs() {
   const [devlogs, setDevlogs] = useState<DevlogEntry[]>([]);

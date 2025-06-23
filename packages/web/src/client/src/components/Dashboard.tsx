@@ -10,26 +10,9 @@ import {
   WarningOutlined,
   MinusCircleOutlined 
 } from '@ant-design/icons';
+import { DevlogEntry, DevlogStats } from '@devlog/types';
 
 const { Title, Paragraph, Text } = Typography;
-
-interface DevlogEntry {
-  id: string;
-  title: string;
-  type: string;
-  status: string;
-  priority: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface DevlogStats {
-  total: number;
-  byStatus: Record<string, number>;
-  byType: Record<string, number>;
-  byPriority: Record<string, number>;
-}
 
 interface DashboardProps {
   stats: DevlogStats | null;
@@ -94,7 +77,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
             <Card>
               <Statistic
                 title="Total Devlogs"
-                value={stats.total}
+                value={stats.totalEntries}
                 prefix={<FileTextOutlined style={{ color: '#1890ff' }} />}
                 valueStyle={{ color: '#1890ff' }}
               />
@@ -123,10 +106,10 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
           <Col xs={24} sm={12} lg={6}>
             <Card>
               <Statistic
-                title="Blocked"
-                value={stats.byStatus['blocked'] || 0}
-                prefix={<StopOutlined style={{ color: '#ff4d4f' }} />}
-                valueStyle={{ color: '#ff4d4f' }}
+                title="Todo"
+                value={stats.byStatus['todo'] || 0}
+                prefix={<ClockCircleOutlined style={{ color: '#8c8c8c' }} />}
+                valueStyle={{ color: '#8c8c8c' }}
               />
             </Card>
           </Col>

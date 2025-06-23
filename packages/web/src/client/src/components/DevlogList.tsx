@@ -12,19 +12,9 @@ import {
   WarningOutlined 
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
+import { DevlogEntry } from '@devlog/types';
 
 const { Title, Text } = Typography;
-
-interface DevlogEntry {
-  id: string;
-  title: string;
-  type: string;
-  status: string;
-  priority: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 interface DevlogListProps {
   devlogs: DevlogEntry[];

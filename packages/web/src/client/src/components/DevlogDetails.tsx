@@ -33,29 +33,11 @@ import {
   ToolOutlined,
   BookOutlined
 } from '@ant-design/icons';
+import { DevlogEntry } from '@devlog/types';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
-
-interface DevlogEntry {
-  id: string;
-  title: string;
-  type: string;
-  status: string;
-  priority: string;
-  description: string;
-  businessContext?: string;
-  technicalContext?: string;
-  createdAt: string;
-  updatedAt: string;
-  notes?: Array<{
-    id: string;
-    note: string;
-    category: string;
-    timestamp: string;
-  }>;
-}
 
 interface DevlogDetailsProps {
   devlog: DevlogEntry;
@@ -174,8 +156,8 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
               status: devlog.status,
               priority: devlog.priority,
               description: devlog.description,
-              businessContext: devlog.businessContext || '',
-              technicalContext: devlog.technicalContext || ''
+              businessContext: devlog.context?.businessContext || '',
+              technicalContext: devlog.context?.technicalContext || ''
             }}
           >
             <Row gutter={[16, 0]}>
@@ -324,11 +306,11 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
               </Paragraph>
             </div>
 
-            {devlog.businessContext && (
+            {devlog.context?.businessContext && (
               <div style={{ marginBottom: '24px' }}>
                 <Title level={4}>Business Context</Title>
                 <Alert
-                  message={devlog.businessContext}
+                  message={devlog.context.businessContext}
                   type="info"
                   showIcon
                   icon={<InfoCircleOutlined />}
@@ -337,11 +319,11 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
               </div>
             )}
 
-            {devlog.technicalContext && (
+            {devlog.context?.technicalContext && (
               <div style={{ marginBottom: '24px' }}>
                 <Title level={4}>Technical Context</Title>
                 <Alert
-                  message={devlog.technicalContext}
+                  message={devlog.context.technicalContext}
                   type="warning"
                   showIcon
                   icon={<ToolOutlined />}
@@ -357,7 +339,7 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
                   {devlog.notes.map((note) => (
                     <Timeline.Item key={note.id}>
                       <div style={{ marginBottom: '8px' }}>
-                        <Text>{note.note}</Text>
+                        <Text>{note.content}</Text>
                       </div>
                       <Text type="secondary" style={{ fontSize: '12px' }}>
                         {note.category} • {new Date(note.timestamp).toLocaleString()}

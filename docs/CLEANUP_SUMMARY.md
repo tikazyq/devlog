@@ -12,18 +12,12 @@
 - Removed `test:quick` npm script (outdated test script)
 
 ### Documentation Cleanup
-- Moved 4 development-specific docs to `docs/archive/`:
-  - `REFACTORING.md`
-  - `STANDARDIZED_ID_SOLUTION.md`
-  - `STORAGE_ARCHITECTURE_V3.md`
-  - `DOGFOODING.md`
-- Kept 6 user-facing docs in root:
-  - `README.md`
-  - `CONTRIBUTING.md`
-  - `EXAMPLES.md`
-  - `TESTING.md`
-  - `GITHUB_SETUP.md`
-  - `INTEGRATIONS.md`
+- Moved 7 markdown files to organized structure:
+  - **Moved to `docs/guides/`**: `EXAMPLES.md`, `TESTING.md`, `GITHUB_SETUP.md`, `INTEGRATIONS.md`
+  - **Moved to `docs/`**: `CLEANUP_SUMMARY.md`
+- **Kept 2 essential docs in root**: `README.md`, `CONTRIBUTING.md`
+- **Created `docs/README.md`** - Navigation guide for all documentation
+- **Updated references** in main README to point to new locations
 
 ### Demo Files Cleanup
 - Moved 4 demo/test files from root to `scripts/archive/root-demos/`:
@@ -39,11 +33,13 @@
 - Both archive directories have README.md files explaining their contents
 
 ## Benefits
-- Cleaner project structure
-- Easier navigation for new users
-- Preserved historical development files for reference
-- Maintained all npm scripts and build processes
-- Separated user-facing docs from implementation details
+- **Much cleaner project structure**
+- **Easier navigation for new users**
+- **Organized documentation in logical hierarchy**
+- **Preserved historical development files for reference**
+- **Maintained all npm scripts and build processes**
+- **Separated user-facing docs from implementation details**
+- **Clear documentation navigation via docs/README.md**
 
 ## Next Steps
 - Archive directories can be removed in the future if not needed

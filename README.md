@@ -58,6 +58,20 @@ pnpm build:core
 pnpm build:mcp
 ```
 
+## Documentation
+
+### 📚 Available Guides
+- **[Usage Examples](docs/guides/EXAMPLES.md)** - Common workflows and usage patterns
+- **[Testing Guide](docs/guides/TESTING.md)** - How to test the devlog system  
+- **[GitHub Setup](docs/guides/GITHUB_SETUP.md)** - GitHub integration configuration
+- **[Enterprise Integrations](docs/guides/INTEGRATIONS.md)** - Jira, Azure DevOps, and GitHub sync
+
+### 🤝 Contributing
+- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
+
+### 📁 Full Documentation
+See the [docs/](docs/) directory for complete documentation including archived implementation details.
+
 ### Using the Core Package
 
 The `@devlog/core` package can be used directly in your own applications:
@@ -155,7 +169,7 @@ Devlog supports synchronization with popular enterprise project management platf
    cp devlog.config.template.json devlog.config.json
    ```
 
-2. Fill in your platform credentials (see [INTEGRATIONS.md](./INTEGRATIONS.md) for detailed setup)
+2. Fill in your platform credentials (see [docs/guides/INTEGRATIONS.md](docs/guides/INTEGRATIONS.md) for detailed setup)
 
 3. Use the sync tools:
    ```typescript
@@ -175,7 +189,7 @@ Devlog supports synchronization with popular enterprise project management platf
 - `sync_with_github` - Sync devlog entry with GitHub
 - `sync_all_integrations` - Sync with all configured platforms
 
-For complete setup instructions, see [INTEGRATIONS.md](./INTEGRATIONS.md).
+For complete setup instructions, see [docs/guides/INTEGRATIONS.md](docs/guides/INTEGRATIONS.md).
 
 ### Available Tools
 

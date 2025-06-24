@@ -17,6 +17,13 @@
             "args": [
                 "@playwright/mcp@latest"
             ]
+        },
+        "sqlite": {
+            "command": "uvx",
+            "args": [
+                "mcp-sqlite",
+                ".devlog/devlogs.db"
+            ]
         }
     }
 }

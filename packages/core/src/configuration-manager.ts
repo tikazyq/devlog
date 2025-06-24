@@ -8,6 +8,8 @@ config({ path: [".env.local", ".env"] });
 
 import * as fs from "fs/promises";
 import * as path from "path";
+import * as crypto from "crypto";
+import * as os from "os";
 import { EnterpriseIntegration } from "@devlog/types";
 import { StorageConfig } from "./storage/storage-provider.js";
 
@@ -15,12 +17,36 @@ export interface DevlogConfig {
   storage: StorageConfig;
   integrations?: EnterpriseIntegration;
   workspaceRoot?: string;
+  workspaceId?: string; // Added for workspace identification
+}
+
+/**
+ * Global devlog directory structure in ~/.devlog
+ */
+interface DevlogGlobalStructure {
+  configPath: string;      // ~/.devlog/config.json
+  workspacesDir: string;   // ~/.devlog/workspaces/
+  cacheDir: string;        // ~/.devlog/cache/
+  backupsDir: string;      // ~/.devlog/backups/
+  logsDir: string;         // ~/.devlog/logs/
+}
+
+/**
+ * Workspace-specific structure within ~/.devlog/workspaces/{workspaceId}/
+ */
+interface DevlogWorkspaceStructure {
+  workspaceDir: string;    // ~/.devlog/workspaces/{workspaceId}/
+  dbPath: string;          // ~/.devlog/workspaces/{workspaceId}/devlog.db
+  metadataPath: string;    // ~/.devlog/workspaces/{workspaceId}/metadata.json
+  attachmentsDir: string;  // ~/.devlog/workspaces/{workspaceId}/attachments/
 }
 
 export class ConfigurationManager {
   private readonly configPath: string;
+  private readonly workspaceRoot: string;
 
   constructor(workspaceRoot: string = process.cwd()) {
+    this.workspaceRoot = workspaceRoot;
     this.configPath = path.join(workspaceRoot, "devlog.config.json");
   }
 
@@ -103,10 +129,14 @@ export class ConfigurationManager {
       }
     }
 
-    // Default to SQLite for local development
+    // Default to SQLite using global workspace structure
+    const workspace = await this.getWorkspaceStructure();
+    await this.initializeGlobalStructure();
+    await this.initializeWorkspaceStructure(workspace);
+    
     return {
       type: "sqlite",
-      filePath: process.env.DEVLOG_SQLITE_PATH || ".devlog/devlogs.db"
+      filePath: workspace.dbPath
     };
   }
 
@@ -212,10 +242,14 @@ export class ConfigurationManager {
   private async createDefaultConfig(): Promise<DevlogConfig> {
     const storage = await this.detectBestStorage();
     const integrations = await this.detectEnterpriseIntegrations();
+    const detectedRoot = await this.detectProjectRoot();
+    const workspace = await this.getWorkspaceStructure(detectedRoot || undefined);
     
     return {
       storage,
-      integrations
+      integrations,
+      workspaceRoot: detectedRoot || this.workspaceRoot,
+      workspaceId: path.basename(workspace.workspaceDir)
     };
   }
 
@@ -259,12 +293,156 @@ export class ConfigurationManager {
     return !!(integrations.jira || integrations.ado || integrations.github);
   }
 
-  private validateAndEnhanceConfig(config: DevlogConfig): DevlogConfig {
+  private async validateAndEnhanceConfig(config: DevlogConfig): Promise<DevlogConfig> {
     // Add any missing fields or validate existing ones
     if (!config.storage) {
       throw new Error("Storage configuration is required");
     }
 
-    return config;
+    // Detect and set workspace information
+    const detectedRoot = await this.detectProjectRoot();
+    const workspace = await this.getWorkspaceStructure(detectedRoot || undefined);
+    
+    return {
+      ...config,
+      workspaceRoot: detectedRoot || this.workspaceRoot,
+      workspaceId: path.basename(workspace.workspaceDir)
+    };
+  }
+
+  /**
+   * Get the global devlog directory structure
+   */
+  private getGlobalStructure(): DevlogGlobalStructure {
+    const homeDir = os.homedir();
+    const devlogDir = path.join(homeDir, '.devlog');
+    
+    return {
+      configPath: path.join(devlogDir, 'config.json'),
+      workspacesDir: path.join(devlogDir, 'workspaces'),
+      cacheDir: path.join(devlogDir, 'cache'),
+      backupsDir: path.join(devlogDir, 'backups'),
+      logsDir: path.join(devlogDir, 'logs')
+    };
+  }
+
+  /**
+   * Generate a deterministic workspace ID based on project path
+   */
+  private generateWorkspaceId(projectPath: string): string {
+    // Use first 12 characters of SHA-256 hash for short, deterministic ID
+    const hash = crypto.createHash('sha256').update(projectPath).digest('hex');
+    return hash.substring(0, 12);
+  }
+
+  /**
+   * Detect the actual project root (where .git, package.json, etc. exist)
+   */
+  private async detectProjectRoot(startPath: string = this.workspaceRoot): Promise<string | null> {
+    let currentDir = path.resolve(startPath);
+    
+    while (currentDir !== path.dirname(currentDir)) {
+      // Check for common project root indicators
+      const indicators = [
+        path.join(currentDir, '.git'),
+        path.join(currentDir, 'package.json'),
+        path.join(currentDir, 'pyproject.toml'),
+        path.join(currentDir, 'Cargo.toml'),
+        path.join(currentDir, 'go.mod'),
+        path.join(currentDir, 'devlog.config.json')
+      ];
+      
+      for (const indicator of indicators) {
+        try {
+          await fs.access(indicator);
+          return currentDir;
+        } catch {
+          // Continue checking
+        }
+      }
+      
+      currentDir = path.dirname(currentDir);
+    }
+    
+    return null;
+  }
+
+  /**
+   * Get workspace structure for a given project path
+   */
+  private async getWorkspaceStructure(projectPath?: string): Promise<DevlogWorkspaceStructure> {
+    const global = this.getGlobalStructure();
+    
+    // Determine workspace ID
+    let workspaceId: string;
+    if (projectPath) {
+      workspaceId = this.generateWorkspaceId(projectPath);
+    } else {
+      // Try to detect project root
+      const detectedRoot = await this.detectProjectRoot();
+      if (detectedRoot) {
+        workspaceId = this.generateWorkspaceId(detectedRoot);
+      } else {
+        workspaceId = 'default';
+      }
+    }
+    
+    const workspaceDir = path.join(global.workspacesDir, workspaceId);
+    
+    return {
+      workspaceDir,
+      dbPath: path.join(workspaceDir, 'devlog.db'),
+      metadataPath: path.join(workspaceDir, 'metadata.json'),
+      attachmentsDir: path.join(workspaceDir, 'attachments')
+    };
+  }
+
+  /**
+   * Initialize the global devlog directory structure
+   */
+  private async initializeGlobalStructure(): Promise<void> {
+    const global = this.getGlobalStructure();
+    
+    // Create all necessary directories
+    await fs.mkdir(global.workspacesDir, { recursive: true });
+    await fs.mkdir(global.cacheDir, { recursive: true });
+    await fs.mkdir(global.backupsDir, { recursive: true });
+    await fs.mkdir(global.logsDir, { recursive: true });
+    
+    // Create global config if it doesn't exist
+    try {
+      await fs.access(global.configPath);
+    } catch {
+      const defaultGlobalConfig = {
+        version: "1.0.0",
+        created: new Date().toISOString(),
+        defaultStorage: "sqlite"
+      };
+      await fs.writeFile(global.configPath, JSON.stringify(defaultGlobalConfig, null, 2));
+    }
+  }
+
+  /**
+   * Initialize workspace-specific structure
+   */
+  private async initializeWorkspaceStructure(workspace: DevlogWorkspaceStructure, projectPath?: string): Promise<void> {
+    // Create workspace directory
+    await fs.mkdir(workspace.workspaceDir, { recursive: true });
+    await fs.mkdir(workspace.attachmentsDir, { recursive: true });
+    
+    // Create workspace metadata if it doesn't exist
+    try {
+      await fs.access(workspace.metadataPath);
+    } catch {
+      const detectedRoot = projectPath || await this.detectProjectRoot();
+      const metadata = {
+        version: "1.0.0",
+        created: new Date().toISOString(),
+        projectPath: detectedRoot,
+        workspaceId: path.basename(workspace.workspaceDir),
+        lastAccessed: new Date().toISOString()
+      };
+      await fs.writeFile(workspace.metadataPath, JSON.stringify(metadata, null, 2));
+    }
   }
 }

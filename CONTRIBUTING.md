@@ -63,8 +63,8 @@ You can also work directly with individual packages using pnpm filters:
 
 ```bash
 # Work on the MCP server package
-pnpm --filter @devlog/mcp-server build
-pnpm --filter @devlog/mcp-server dev
+pnpm --filter @devlog/mcp build
+pnpm --filter @devlog/mcp dev
 
 # Work on the core package
 pnpm --filter @devlog/core build
@@ -75,7 +75,7 @@ pnpm --filter @devlog/types build
 pnpm --filter @devlog/types dev
 
 # Install dependencies for a specific package
-pnpm --filter @devlog/mcp-server add some-dependency
+pnpm --filter @devlog/mcp add some-dependency
 ```
 
 ## Adding New Packages
@@ -101,7 +101,7 @@ When adding a new package to the monorepo:
 
 - `@devlog/types`: Shared TypeScript types and interfaces
 - `@devlog/core`: Core devlog management functionality (file system operations, CRUD, etc.)
-- `@devlog/mcp-server`: MCP server implementation that wraps the core functionality
+- `@devlog/mcp`: MCP server implementation that wraps the core functionality
 - Future packages might include:
   - `@devlog/cli`: Command-line interface for devlog management
   - `@devlog/web`: Web interface for browsing devlogs

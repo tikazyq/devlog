@@ -1,5 +1,5 @@
 {
-  "name": "@devlog/mcp-server",
+  "name": "@devlog/mcp",
   "version": "1.0.0",
   "description": "MCP server for managing development logs and working notes",
   "main": "build/index.js",
@@ -16,7 +16,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/your-username/devlog-monorepo.git",
-    "directory": "packages/mcp-server"
+    "directory": "packages/mcp"
   },
   "homepage": "https://github.com/your-username/devlog-monorepo#readme",
   "bugs": {

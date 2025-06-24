@@ -121,7 +121,7 @@ Storage is configured through the `DevlogManager` constructor or environment var
 
 This core package is designed to be used by:
 
-- `@devlog/mcp-server` - MCP server for AI assistants
+- `@devlog/mcp` - MCP server for AI assistants
 - `@devlog/cli` - Command-line interface
 - `@devlog/web` - Web interface for browsing devlogs
 - Custom applications and scripts

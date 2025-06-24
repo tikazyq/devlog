@@ -10,7 +10,7 @@ Shared TypeScript types and interfaces used across all packages.
 ### `@devlog/core` 
 Core devlog management functionality including file system operations, CRUD operations, filtering, and search. This package provides the foundation that other packages build upon.
 
-### `@devlog/mcp-server`
+### `@devlog/mcp`
 MCP (Model Context Protocol) server that wraps the core functionality for AI assistant integration.
 
 ## Features

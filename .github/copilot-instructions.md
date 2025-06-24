@@ -23,7 +23,7 @@
 This project uses **itself** for development tracking. When working on devlog features, ALWAYS:
 
 ### 1. Use Devlog for All Development Work
-- Create devlog entries for new features, bugs, or improvements using `@devlog/mcp-server`
+- Create devlog entries for new features, bugs, or improvements using `@devlog/mcp`
 - Use `find_or_create_devlog` to prevent duplicates
 - Track progress with notes and status updates through the MCP server tools
 
@@ -68,8 +68,9 @@ This ensures the devlog system is continuously tested and improved through real-
 ## Testing Best Practices
 
 ### 1. Prefer Structured Tests Over Temporary Scripts
-- **Use Vitest framework**: Create proper test cases instead of ad-hoc scripts in `scripts/`
-- **Avoid temp scripts**: Don't create temporary `.mjs` files for testing functionality
+- **Use Vitest framework**: Create proper test cases instead of ad-hoc scripts for testing functionality
+- **Avoid temp scripts in tracked directories**: Don't create temporary `.mjs` files in `scripts/`, `src/`, or other tracked locations
+- **Use `tmp/` for debugging only**: When debugging or quick testing is needed, use the `tmp/` directory (gitignored)
 - **Comprehensive test coverage**: Write unit tests, integration tests, and end-to-end tests as needed
 - **Maintainable testing**: Tests should be part of the CI/CD pipeline and easily runnable
 - **Clean up legacy**: Remove temporary scripts once proper tests are in place
@@ -82,8 +83,14 @@ This ensures the devlog system is continuously tested and improved through real-
 - **Descriptive test names**: Tests should clearly describe what they're validating
 
 ### 3. Testing Workflow
-1. Identify functionality that needs testing
-2. Write appropriate test cases using Vitest
-3. Ensure tests can be run with standard npm/pnpm scripts
-4. Include tests in CI/CD pipeline
-5. Remove any temporary scripts that served the same purpose
+1. **Primary approach**: Write proper test cases using Vitest framework
+2. **For debugging only**: Use `tmp/` directory for temporary debugging scripts (gitignored)
+3. **Test organization**: Ensure tests can be run with standard npm/pnpm scripts
+4. **Cleanup**: Remove any temporary debugging files from `tmp/` when no longer needed
+5. **Structured over ad-hoc**: Always prefer structured tests over temporary scripts
+
+### 4. File Management for Testing
+- **Proper tests**: `packages/*/src/__tests__/` directories using Vitest
+- **Debugging files**: `tmp/` directory (temporary, gitignored)
+- **Never create**: Temporary scripts in `scripts/`, `src/`, or other tracked directories
+- **Clean codebase**: Keep the main codebase free of debugging artifacts

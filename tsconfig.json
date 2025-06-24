@@ -22,7 +22,7 @@
   "references": [
     { "path": "./packages/types" },
     { "path": "./packages/core" },
-    { "path": "./packages/mcp-server" }
+    { "path": "./packages/mcp" }
   ],
   "files": [],
   "exclude": ["node_modules", "**/build", "**/dist"]

@@ -49,7 +49,7 @@ pnpm test:integration
 pnpm test
 
 # Run only MCP server tests
-pnpm --filter @devlog/mcp-server test
+pnpm --filter @devlog/mcp test
 ```
 
 ## 🔧 Manual Testing with MCP Client

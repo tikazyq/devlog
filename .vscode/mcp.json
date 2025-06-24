@@ -8,7 +8,7 @@
             "command": "pnpm",
             "args": [
                 "--filter",
-                "@devlog/mcp-server",
+                "@devlog/mcp",
                 "start"
             ]
         },

@@ -16,7 +16,7 @@ on:
           - minor
           - major
       packages:
-        description: 'Packages to publish (comma-separated: mcp-server,types or leave empty for all)'
+        description: 'Packages to publish (comma-separated: mcp,types or leave empty for all)'
         required: false
         type: string
 
@@ -93,7 +93,7 @@ jobs:
           if [ -n "${{ github.event.inputs.packages }}" ]; then
             PACKAGES="${{ github.event.inputs.packages }}"
           else
-            PACKAGES="mcp-server,types"
+            PACKAGES="mcp,types"
           fi
           echo "packages=$PACKAGES" >> $GITHUB_OUTPUT
 
@@ -103,8 +103,8 @@ jobs:
           IFS=',' read -ra PACKAGE_ARRAY <<< "${{ steps.packages.outputs.packages }}"
           for pkg in "${PACKAGE_ARRAY[@]}"; do
             pkg=$(echo "$pkg" | xargs) # trim whitespace
-            if [ "$pkg" == "mcp-server" ]; then
-              cd packages/mcp-server
+            if [ "$pkg" == "mcp" ]; then
+              cd packages/mcp
               npm version ${{ steps.version.outputs.version }} --no-git-tag-version
               cd ../..
             elif [ "$pkg" == "types" ]; then
@@ -120,8 +120,8 @@ jobs:
           IFS=',' read -ra PACKAGE_ARRAY <<< "${{ steps.packages.outputs.packages }}"
           for pkg in "${PACKAGE_ARRAY[@]}"; do
             pkg=$(echo "$pkg" | xargs) # trim whitespace
-            if [ "$pkg" == "mcp-server" ]; then
-              cd packages/mcp-server
+            if [ "$pkg" == "mcp" ]; then
+              cd packages/mcp
               npm version ${{ steps.version.outputs.version }} --no-git-tag-version --allow-same-version
               cd ../..
             elif [ "$pkg" == "types" ]; then
@@ -141,9 +141,9 @@ jobs:
           IFS=',' read -ra PACKAGE_ARRAY <<< "${{ steps.packages.outputs.packages }}"
           for pkg in "${PACKAGE_ARRAY[@]}"; do
             pkg=$(echo "$pkg" | xargs) # trim whitespace
-            if [ "$pkg" == "mcp-server" ]; then
-              echo "Publishing @devlog/mcp-server..."
-              cd packages/mcp-server
+            if [ "$pkg" == "mcp" ]; then
+              echo "Publishing @devlog/mcp..."
+              cd packages/mcp
               npm publish --access public
               cd ../..
             elif [ "$pkg" == "types" ]; then
@@ -175,7 +175,7 @@ jobs:
             Published packages: ${{ steps.packages.outputs.packages }}
             
             ### Packages
-            - @devlog/mcp-server@${{ steps.version.outputs.version }}
+            - @devlog/mcp@${{ steps.version.outputs.version }}
             - @devlog/types@${{ steps.version.outputs.version }}
           draft: false
           prerelease: false

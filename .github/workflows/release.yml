@@ -83,7 +83,7 @@ jobs:
               NEW_VERSION=$(npm version ${{ github.event.inputs.release_type }} --no-git-tag-version)
               NEW_VERSION=${NEW_VERSION#v} # Remove 'v' prefix
               echo "mcp_new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-              NEW_VERSIONS="$NEW_VERSIONS@devlog/mcp-server@$NEW_VERSION "
+              NEW_VERSIONS="$NEW_VERSIONS@devlog/mcp@$NEW_VERSION "
               cd ../..
             elif [ "$pkg" == "types" ]; then
               cd packages/types
@@ -107,7 +107,7 @@ jobs:
           CHANGELOG="$CHANGELOG### Packages Updated\n"
           
           if [[ "${{ steps.bump_versions.outputs.packages }}" == *"mcp-server"* ]]; then
-            CHANGELOG="$CHANGELOG- **@devlog/mcp-server**: ${{ steps.current_versions.outputs.mcp_version }} → ${{ steps.bump_versions.outputs.mcp_new_version }}\n"
+            CHANGELOG="$CHANGELOG- **@devlog/mcp**: ${{ steps.current_versions.outputs.mcp_version }} → ${{ steps.bump_versions.outputs.mcp_new_version }}\n"
           fi
           
           if [[ "${{ steps.bump_versions.outputs.packages }}" == *"types"* ]]; then
@@ -153,7 +153,7 @@ jobs:
           for pkg in "${PACKAGE_ARRAY[@]}"; do
             pkg=$(echo "$pkg" | xargs) # trim whitespace
             if [ "$pkg" == "mcp-server" ]; then
-              echo "Publishing @devlog/mcp-server..."
+              echo "Publishing @devlog/mcp..."
               cd packages/mcp-server
               npm publish --access public
               cd ../..

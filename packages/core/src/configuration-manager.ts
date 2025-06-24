@@ -373,18 +373,13 @@ export class ConfigurationManager {
   private async getWorkspaceStructure(projectPath?: string): Promise<DevlogWorkspaceStructure> {
     const global = this.getGlobalStructure();
     
-    // Determine workspace ID
-    let workspaceId: string;
+    // Use 'default' workspace by default for simplicity
+    // Users can still override with environment variables if needed
+    let workspaceId = 'default';
+    
+    // Only use project-specific workspace if explicitly requested via projectPath
     if (projectPath) {
       workspaceId = this.generateWorkspaceId(projectPath);
-    } else {
-      // Try to detect project root
-      const detectedRoot = await this.detectProjectRoot();
-      if (detectedRoot) {
-        workspaceId = this.generateWorkspaceId(detectedRoot);
-      } else {
-        workspaceId = 'default';
-      }
     }
     
     const workspaceDir = path.join(global.workspacesDir, workspaceId);

@@ -148,3 +148,6 @@ devlog-integrations.config.json
 
 # Local environment variables for development
 .nx
+
+# Temporal folder for debugging or quick testing
+tmp/

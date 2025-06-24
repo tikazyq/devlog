@@ -18,6 +18,7 @@ import type {
 } from "@devlog/types";
 
 import { StorageProvider, StorageConfig, StorageProviderFactory } from "./storage/storage-provider.js";
+import { ConfigurationManager } from "./configuration-manager.js";
 
 export interface DevlogManagerOptions {
   workspaceRoot?: string;
@@ -29,11 +30,13 @@ export class DevlogManager {
   private storageProvider!: StorageProvider;
   private readonly workspaceRoot: string;
   private readonly integrations?: EnterpriseIntegration;
+  private readonly configManager: ConfigurationManager;
   private initialized = false;
 
   constructor(private options: DevlogManagerOptions = {}) {
     this.workspaceRoot = options.workspaceRoot || process.cwd();
     this.integrations = options.integrations;
+    this.configManager = new ConfigurationManager(this.workspaceRoot);
   }
 
   /**
@@ -42,7 +45,7 @@ export class DevlogManager {
   async initialize(): Promise<void> {
     if (this.initialized) return;
 
-    const storageConfig = this.determineStorageConfig();
+    const storageConfig = await this.determineStorageConfig();
     this.storageProvider = await StorageProviderFactory.create(storageConfig);
     await this.storageProvider.initialize();
     this.initialized = true;
@@ -279,12 +282,12 @@ export class DevlogManager {
     }
   }
 
-  private determineStorageConfig(): StorageConfig {
+  private async determineStorageConfig(): Promise<StorageConfig> {
     if (this.options.storage) {
       return this.options.storage;
     }
 
-    // Determine storage type based on configuration
+    // If we have enterprise integrations, prioritize them in the configuration manager
     if (this.integrations && this.hasEnterpriseIntegrations()) {
       return {
         type: "enterprise",
@@ -292,28 +295,9 @@ export class DevlogManager {
       };
     }
 
-    // Check for database environment variables
-    if (process.env.DATABASE_URL) {
-      if (process.env.DATABASE_URL.startsWith("postgres://") || process.env.DATABASE_URL.startsWith("postgresql://")) {
-        return {
-          type: "postgres",
-          connectionString: process.env.DATABASE_URL
-        };
-      }
-      if (process.env.DATABASE_URL.startsWith("mysql://")) {
-        return {
-          type: "mysql",
-          connectionString: process.env.DATABASE_URL
-        };
-      }
-    }
-
-    // Default to SQLite for local storage
-    const sqlitePath = process.env.DEVLOG_SQLITE_PATH || `${this.workspaceRoot}/.devlog/devlogs.db`;
-    return {
-      type: "sqlite",
-      filePath: sqlitePath
-    };
+    // Use ConfigurationManager to detect the best storage configuration
+    // This will automatically handle ~/.devlog folder creation and usage
+    return await this.configManager.detectBestStorage();
   }
 
   private hasEnterpriseIntegrations(): boolean {

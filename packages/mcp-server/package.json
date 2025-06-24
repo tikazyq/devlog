@@ -30,7 +30,7 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:integration": "pnpm build && node build/test.js",
-    "clean": "rm -rf build",
+    "clean": "rm -rf build *.tsbuildinfo",
     "prepublishOnly": "pnpm build"
   },
   "keywords": [

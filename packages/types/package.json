@@ -20,7 +20,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "clean": "rm -rf build",
+    "clean": "rm -rf build *.tsbuildinfo",
     "dev": "tsc --watch",
     "test": "echo 'No tests for types package'",
     "prepublishOnly": "pnpm build"

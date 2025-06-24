@@ -14,7 +14,7 @@ export interface DevlogConfig {
 }
 
 export class ConfigurationManager {
-  private configPath: string;
+  private readonly configPath: string;
 
   constructor(workspaceRoot: string = process.cwd()) {
     this.configPath = path.join(workspaceRoot, "devlog.config.json");

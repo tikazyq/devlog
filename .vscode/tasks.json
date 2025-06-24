@@ -14,19 +14,16 @@
 			]
 		},
 		{
-			"label": "Build MCP Server",
+			"label": "Clean All Packages",
 			"type": "shell",
 			"command": "pnpm",
 			"args": [
-				"build:mcp"
+				"clean"
 			],
-			"group": "build",
-			"problemMatcher": [
-				"$tsc"
-			]
+			"group": "build"
 		},
 		{
-			"label": "Build Types",
+			"label": "Types: Build",
 			"type": "shell",
 			"command": "pnpm",
 			"args": [
@@ -38,7 +35,19 @@
 			]
 		},
 		{
-			"label": "Start MCP Server",
+			"label": "MCP Server: Build",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"build:mcp"
+			],
+			"group": "build",
+			"problemMatcher": [
+				"$tsc"
+			]
+		},
+		{
+			"label": "MCP Server: Start",
 			"type": "shell",
 			"command": "pnpm",
 			"args": [
@@ -48,7 +57,7 @@
 			"isBackground": true
 		},
 		{
-			"label": "Dev MCP Server",
+			"label": "MCP Server: Dev",
 			"type": "shell",
 			"command": "pnpm",
 			"args": [
@@ -56,15 +65,6 @@
 			],
 			"group": "test",
 			"isBackground": true
-		},
-		{
-			"label": "Clean All",
-			"type": "shell",
-			"command": "pnpm",
-			"args": [
-				"clean"
-			],
-			"group": "build"
 		},
 		{
 			"label": "Web: Dev (Full Stack)",

@@ -4,7 +4,6 @@
   "description": "Core devlog management functionality",
   "main": "build/index.js",
   "types": "build/index.d.ts",
-  "type": "module",
   "files": [
     "build/**/*",
     "README.md",

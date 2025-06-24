@@ -20,9 +20,6 @@ These documents explain the fundamental challenges this project addresses: how A
 - **[Detailed Analysis of Memory Loss Risks in Agentic/Autonomous AI Coding Applications for Large Tasks](reference/ai-agent-memory-challenge.md)** - Comprehensive analysis of memory loss risks in autonomous AI coding applications for large tasks
 - **[大型任务中代理/自主AI编程应用内存丢失风险的详细分析](reference/ai-agent-memory-challenge-zh.md)** - Chinese version of the memory challenge analysis
 
-### `/archive/` - Historical Documentation
-- Implementation details and development history preserved for reference
-
 ## 🚀 Quick Start
 
 ### 🎯 For New Users - Start Here!

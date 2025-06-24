@@ -57,27 +57,10 @@ export interface StorageProvider {
 }
 
 export interface StorageConfig {
-  type: "sqlite" | "postgres" | "mysql" | "enterprise";
+  type: "sqlite" | "postgres" | "mysql";
   connectionString?: string;
   filePath?: string;
   options?: Record<string, any>;
-}
-
-export interface EnterpriseStorageProvider extends StorageProvider {
-  /**
-   * Sync an entry with the remote system
-   */
-  syncWithRemote(entry: DevlogEntry): Promise<DevlogEntry>;
-
-  /**
-   * Fetch the latest version from remote system
-   */
-  fetchFromRemote(id: string): Promise<DevlogEntry | null>;
-
-  /**
-   * Check if entry should be stored locally or only remotely
-   */
-  shouldStoreLocally(entry: DevlogEntry): boolean;
 }
 
 /**
@@ -97,13 +80,6 @@ export class StorageProviderFactory {
       case "mysql":
         const { MySQLStorageProvider } = await import("./mysql-storage.js");
         return new MySQLStorageProvider(config.connectionString!, config.options);
-
-      case "enterprise":
-        const { EnterpriseStorageAdapter } = await import("./enterprise-storage.js");
-        if (!config.options?.integrations) {
-          throw new Error("Enterprise storage requires integrations configuration");
-        }
-        return new EnterpriseStorageAdapter(config.options as { integrations: any });
 
       default:
         throw new Error(`Unsupported storage type: ${config.type}`);

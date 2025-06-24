@@ -13,9 +13,17 @@ import * as os from "os";
 import { EnterpriseIntegration } from "@devlog/types";
 import { StorageConfig } from "./storage/storage-provider.js";
 
+export interface SyncStrategy {
+  sourceOfTruth: 'local' | 'external' | 'manual';
+  conflictResolution: 'local-wins' | 'external-wins' | 'most-recent' | 'manual';
+  syncInterval?: number; // minutes
+  autoSync?: boolean;
+}
+
 export interface DevlogConfig {
   storage: StorageConfig;
   integrations?: EnterpriseIntegration;
+  syncStrategy?: SyncStrategy;
   workspaceRoot?: string;
   workspaceId?: string; // Added for workspace identification
 }
@@ -77,15 +85,6 @@ export class ConfigurationManager {
    * Detect the best storage configuration automatically
    */
   async detectBestStorage(): Promise<StorageConfig> {
-    // Check for enterprise integrations first
-    const integrations = await this.detectEnterpriseIntegrations();
-    if (integrations && this.hasEnterpriseIntegrations(integrations)) {
-      return {
-        type: "enterprise",
-        options: { integrations }
-      };
-    }
-
     // Check for database environment variables
     if (process.env.DATABASE_URL) {
       const dbUrl = process.env.DATABASE_URL;
@@ -153,27 +152,6 @@ export class ConfigurationManager {
   }> {
     return [
       {
-        type: "enterprise",
-        name: "Enterprise Integration",
-        description: "Store devlogs directly in enterprise tools (Jira, ADO, GitHub)",
-        pros: [
-          "No local storage duplication",
-          "Integrated with existing workflows",
-          "Automatic synchronization",
-          "Enterprise-grade security"
-        ],
-        cons: [
-          "Requires enterprise tool access",
-          "Limited offline capability",
-          "Dependent on external services"
-        ],
-        bestFor: [
-          "Teams using Jira, Azure DevOps, or GitHub Issues",
-          "Enterprise environments",
-          "Distributed teams"
-        ]
-      },
-      {
         type: "sqlite",
         name: "SQLite Database",
         description: "Local SQLite database for efficient storage and querying",
@@ -181,7 +159,8 @@ export class ConfigurationManager {
           "Fast performance",
           "Full-text search",
           "ACID transactions",
-          "No server required"
+          "No server required",
+          "Works offline"
         ],
         cons: [
           "Single-user access",
@@ -191,7 +170,8 @@ export class ConfigurationManager {
         bestFor: [
           "Individual developers",
           "Local development",
-          "Fast prototyping"
+          "Fast prototyping",
+          "Offline work"
         ]
       },
       {
@@ -202,7 +182,8 @@ export class ConfigurationManager {
           "Multi-user support",
           "Advanced querying",
           "Scalable",
-          "Full ACID compliance"
+          "Full ACID compliance",
+          "Concurrent access"
         ],
         cons: [
           "Requires database server",
@@ -212,7 +193,8 @@ export class ConfigurationManager {
         bestFor: [
           "Team collaboration",
           "Production deployments",
-          "Web applications"
+          "Web applications",
+          "Multi-user environments"
         ]
       },
       {
@@ -223,7 +205,8 @@ export class ConfigurationManager {
           "Wide adoption",
           "Good performance",
           "Multi-user support",
-          "Full-text search"
+          "Full-text search",
+          "Mature ecosystem"
         ],
         cons: [
           "Requires database server",
@@ -233,27 +216,82 @@ export class ConfigurationManager {
         bestFor: [
           "Web applications",
           "Existing MySQL infrastructure",
-          "Team collaboration"
+          "Team collaboration",
+          "LAMP stack projects"
         ]
       }
     ];
   }
 
+  /**
+   * Detect the best sync strategy based on environment and integrations
+   */
+  async detectSyncStrategy(integrations?: EnterpriseIntegration): Promise<SyncStrategy> {
+    // Default sync strategy
+    const defaultStrategy: SyncStrategy = {
+      sourceOfTruth: 'local',
+      conflictResolution: 'local-wins',
+      syncInterval: 15, // 15 minutes
+      autoSync: true
+    };
+
+    // If no integrations configured, return minimal strategy
+    if (!integrations || !this.hasEnterpriseIntegrations(integrations)) {
+      return {
+        sourceOfTruth: 'local',
+        conflictResolution: 'local-wins',
+        autoSync: false
+      };
+    }
+
+    // Check for environment-specific sync preferences
+    if (process.env.DEVLOG_SYNC_STRATEGY) {
+      const strategy = process.env.DEVLOG_SYNC_STRATEGY.toLowerCase();
+      switch (strategy) {
+        case 'external':
+          return {
+            ...defaultStrategy,
+            sourceOfTruth: 'external',
+            conflictResolution: 'external-wins'
+          };
+        case 'manual':
+          return {
+            ...defaultStrategy,
+            sourceOfTruth: 'manual',
+            conflictResolution: 'manual',
+            autoSync: false
+          };
+      }
+    }
+
+    // Configure sync interval from environment
+    if (process.env.DEVLOG_SYNC_INTERVAL) {
+      const interval = parseInt(process.env.DEVLOG_SYNC_INTERVAL);
+      if (!isNaN(interval) && interval > 0) {
+        defaultStrategy.syncInterval = interval;
+      }
+    }
+
+    return defaultStrategy;
+  }
+
   private async createDefaultConfig(): Promise<DevlogConfig> {
     const storage = await this.detectBestStorage();
     const integrations = await this.detectEnterpriseIntegrations();
+    const syncStrategy = await this.detectSyncStrategy(integrations);
     const detectedRoot = await this.detectProjectRoot();
     const workspace = await this.getWorkspaceStructure(detectedRoot || undefined);
     
     return {
       storage,
       integrations,
+      syncStrategy,
       workspaceRoot: detectedRoot || this.workspaceRoot,
       workspaceId: path.basename(workspace.workspaceDir)
     };
   }
 
-  private async detectEnterpriseIntegrations(): Promise<EnterpriseIntegration | undefined> {
+  async detectEnterpriseIntegrations(): Promise<EnterpriseIntegration | undefined> {
     const integrations: EnterpriseIntegration = {};
 
     // Check for Jira configuration

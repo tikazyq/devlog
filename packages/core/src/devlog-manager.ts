@@ -39,24 +39,29 @@ export interface DiscoveryResult {
 }
 
 import { StorageProvider, StorageConfig, StorageProviderFactory } from "./storage/storage-provider.js";
-import { ConfigurationManager } from "./configuration-manager.js";
+import { ConfigurationManager, SyncStrategy } from "./configuration-manager.js";
+import { IntegrationService } from "./integration-service.js";
 
 export interface DevlogManagerOptions {
   workspaceRoot?: string;
   storage?: StorageConfig;
   integrations?: EnterpriseIntegration;
+  syncStrategy?: SyncStrategy;
 }
 
 export class DevlogManager {
   private storageProvider!: StorageProvider;
+  private integrationService!: IntegrationService;
   private readonly workspaceRoot: string;
   private readonly integrations?: EnterpriseIntegration;
+  private readonly syncStrategy?: SyncStrategy;
   private readonly configManager: ConfigurationManager;
   private initialized = false;
 
   constructor(private options: DevlogManagerOptions = {}) {
     this.workspaceRoot = options.workspaceRoot || process.cwd();
     this.integrations = options.integrations;
+    this.syncStrategy = options.syncStrategy;
     this.configManager = new ConfigurationManager(this.workspaceRoot);
   }
 
@@ -69,6 +74,17 @@ export class DevlogManager {
     const storageConfig = await this.determineStorageConfig();
     this.storageProvider = await StorageProviderFactory.create(storageConfig);
     await this.storageProvider.initialize();
+
+    // Initialize integration service if integrations are configured
+    const integrations = this.integrations || (await this.configManager.detectEnterpriseIntegrations());
+    const syncStrategy = this.syncStrategy || (await this.configManager.detectSyncStrategy(integrations));
+    
+    this.integrationService = new IntegrationService(
+      this.storageProvider,
+      integrations,
+      syncStrategy
+    );
+
     this.initialized = true;
   }
 
@@ -131,7 +147,8 @@ export class DevlogManager {
       }
     };
 
-    await this.storageProvider.save(entry);
+    // Save with integration sync
+    await this.integrationService.saveWithSync(entry);
     return entry;
   }
 
@@ -183,7 +200,7 @@ export class DevlogManager {
       updated.notes.push(note);
     }
 
-    await this.storageProvider.save(updated);
+    await this.integrationService.saveWithSync(updated);
     return updated;
   }
 
@@ -211,7 +228,7 @@ export class DevlogManager {
       updatedAt: new Date().toISOString()
     };
 
-    await this.storageProvider.save(updated);
+    await this.integrationService.saveWithSync(updated);
     return updated;
   }
 
@@ -439,6 +456,21 @@ export class DevlogManager {
     };
   }
 
+  /**
+   * Manually sync a devlog entry with external systems
+   */
+  async syncDevlog(id: string): Promise<DevlogEntry | null> {
+    await this.ensureInitialized();
+    return await this.integrationService.syncEntry(id);
+  }
+
+  /**
+   * Get sync status for a devlog entry
+   */
+  getSyncStatus(entry: DevlogEntry) {
+    return this.integrationService.getSyncStatus(entry);
+  }
+
   // Private methods
 
   private async ensureInitialized(): Promise<void> {
@@ -450,14 +482,6 @@ export class DevlogManager {
   private async determineStorageConfig(): Promise<StorageConfig> {
     if (this.options.storage) {
       return this.options.storage;
-    }
-
-    // If we have enterprise integrations, prioritize them in the configuration manager
-    if (this.integrations && this.hasEnterpriseIntegrations()) {
-      return {
-        type: "enterprise",
-        options: { integrations: this.integrations }
-      };
     }
 
     // Use ConfigurationManager to detect the best storage configuration

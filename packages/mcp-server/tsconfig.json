@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "allowImportingTsExtensions": false,
@@ -13,17 +13,8 @@
     "rootDir": "./src",
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true,
-    "composite": true
+    "sourceMap": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "build", "src/**/*.test.ts", "src/__tests__"],
-  "references": [
-    {
-      "path": "../types"
-    },
-    {
-      "path": "../core"
-    }
-  ]
+  "exclude": ["node_modules", "build", "src/**/*.test.ts", "src/__tests__"]
 }

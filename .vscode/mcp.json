@@ -9,7 +9,7 @@
             "args": [
                 "--filter",
                 "@devlog/mcp-server",
-                "dev"
+                "start"
             ]
         },
         "playwright": {

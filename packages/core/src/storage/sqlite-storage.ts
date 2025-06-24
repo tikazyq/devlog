@@ -18,12 +18,15 @@ export class SQLiteStorageProvider implements StorageProvider {
   async initialize(): Promise<void> {
     // Dynamic import to make better-sqlite3 optional
     try {
-      const sqlite3Module = await import("better-sqlite3" as any);
+      // Use eval to prevent TypeScript from transforming the import
+      const dynamicImport = eval('(specifier) => import(specifier)');
+      const sqlite3Module = await dynamicImport("better-sqlite3");
       const Database = sqlite3Module.default;
       
       this.db = new Database(this.filePath, this.options);
-    } catch (error) {
-      throw new Error("better-sqlite3 is required for SQLite storage. Install it with: npm install better-sqlite3");
+    } catch (error: any) {
+      console.error("Failed to initialize SQLite storage:", error);
+      throw new Error("Failed to initialize SQLite storage: " + error.message);
     }
     
     // Create tables

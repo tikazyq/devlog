@@ -5,5 +5,9 @@ export default defineConfig({
     environment: 'node',
     globals: true,
     testTimeout: 30000,
+    // Handle dynamic imports better
+    deps: {
+      external: ['better-sqlite3']
+    }
   },
 });

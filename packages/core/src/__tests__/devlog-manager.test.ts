@@ -8,9 +8,18 @@ describe('DevlogManager', () => {
   let testWorkspace: string;
 
   beforeEach(async () => {
-    // Create a temporary test workspace
-    testWorkspace = path.join(process.cwd(), 'test-workspace-' + Date.now());
-    manager = new DevlogManager({ workspaceRoot: testWorkspace });
+    // Create a temporary test workspace with unique name
+    testWorkspace = path.join(process.cwd(), 'test-workspace-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9));
+    
+    // Create isolated storage config for each test
+    const sqliteDbPath = path.join(testWorkspace, 'test.db');
+    manager = new DevlogManager({ 
+      workspaceRoot: testWorkspace,
+      storage: {
+        type: 'sqlite',
+        filePath: sqliteDbPath
+      }
+    });
   });
 
   afterEach(async () => {
@@ -22,9 +31,9 @@ describe('DevlogManager', () => {
     }
   });
 
-  describe('createDevlog', () => {
+  describe('findOrCreateDevlog', () => {
     it('should create a new devlog entry', async () => {
-      const result = await manager.createDevlog({
+      const result = await manager.findOrCreateDevlog({
         title: 'Test Feature',
         type: 'feature',
         description: 'A test feature',
@@ -44,7 +53,7 @@ describe('DevlogManager', () => {
 
     it('should create a devlog with custom ID', async () => {
       const customId = 'my-custom-id';
-      const result = await manager.createDevlog({
+      const result = await manager.findOrCreateDevlog({
         id: customId,
         title: 'Custom ID Test',
         type: 'task',
@@ -230,10 +239,7 @@ describe('DevlogManager', () => {
         description: 'Testing notes'
       });
 
-      const result = await manager.addNote(created.id, {
-        category: 'progress',
-        content: 'Made some progress on this task'
-      });
+      const result = await manager.addNote(created.id, 'Made some progress on this task', 'progress');
 
       expect(result.notes).toHaveLength(1);
       expect(result.notes[0].content).toBe('Made some progress on this task');

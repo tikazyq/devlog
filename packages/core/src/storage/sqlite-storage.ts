@@ -45,10 +45,20 @@ export class SQLiteStorageProvider implements StorageProvider {
     // Dynamic import to make better-sqlite3 optional
     try {
       console.log(`[SQLiteStorage] Attempting to import better-sqlite3...`);
-      // Use eval to prevent TypeScript from transforming the import
-      const dynamicImport = eval('(specifier) => import(specifier)');
-      const sqlite3Module = await dynamicImport("better-sqlite3");
-      console.log(`[SQLiteStorage] Successfully imported better-sqlite3`);
+      
+      // Try different import approaches for better compatibility
+      let sqlite3Module;
+      try {
+        // Standard dynamic import
+        sqlite3Module = await import("better-sqlite3");
+        console.log(`[SQLiteStorage] Successfully imported better-sqlite3 via standard import`);
+      } catch (importError) {
+        console.log(`[SQLiteStorage] Standard import failed, trying eval approach...`);
+        // Fallback to eval approach for environments that require it
+        const dynamicImport = eval('(specifier) => import(specifier)');
+        sqlite3Module = await dynamicImport("better-sqlite3");
+        console.log(`[SQLiteStorage] Successfully imported better-sqlite3 via eval import`);
+      }
       
       const Database = sqlite3Module.default;
       console.log(`[SQLiteStorage] Creating database instance...`);

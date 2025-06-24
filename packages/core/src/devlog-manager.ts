@@ -74,11 +74,20 @@ export class DevlogManager {
 
   /**
    * Create a new devlog entry or find existing one with same title and type
+   * Alias for findOrCreateDevlog to provide a cleaner API
+   */
+  async createDevlog(request: CreateDevlogRequest): Promise<DevlogEntry> {
+    return this.findOrCreateDevlog(request);
+  }
+
+  /**
+   * Create a new devlog entry or find existing one with same title and type
    */
   async findOrCreateDevlog(request: CreateDevlogRequest): Promise<DevlogEntry> {
     await this.ensureInitialized();
 
-    const id = this.generateId(request.title, request.type);
+    // Use provided ID if available, otherwise generate one
+    const id = request.id || this.generateId(request.title, request.type);
     
     // Check if entry already exists
     const existing = await this.storageProvider.get(id);
@@ -235,6 +244,12 @@ export class DevlogManager {
    */
   async deleteDevlog(id: string): Promise<void> {
     await this.ensureInitialized();
+    
+    const existing = await this.storageProvider.get(id);
+    if (!existing) {
+      throw new Error(`Devlog entry with ID '${id}' not found`);
+    }
+    
     await this.storageProvider.delete(id);
   }
 
@@ -260,6 +275,20 @@ export class DevlogManager {
   async getContextForAI(id: string): Promise<DevlogEntry | null> {
     await this.ensureInitialized();
     return await this.storageProvider.get(id);
+  }
+
+  /**
+   * Get active devlog entries for AI context
+   */
+  async getActiveContext(limit?: number): Promise<DevlogEntry[]> {
+    await this.ensureInitialized();
+    
+    const filter = {
+      status: ["todo", "in-progress", "review", "testing"] as any[]
+    };
+    
+    const entries = await this.storageProvider.list(filter);
+    return entries.slice(0, limit || 10);
   }
 
   /**

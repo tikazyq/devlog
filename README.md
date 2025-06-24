@@ -37,6 +37,34 @@ pnpm install
 pnpm build
 ```
 
+## Configuration
+
+### Environment Variables
+
+The devlog system supports configuration through environment variables and `.env` files. Copy the example file and customize as needed:
+
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+#### Storage Configuration
+- `DEVLOG_STORAGE_TYPE` - Storage backend (sqlite, postgres, mysql, enterprise)
+- `DEVLOG_SQLITE_PATH` - SQLite database file path
+- `DATABASE_URL` - Database connection string for PostgreSQL/MySQL
+
+#### Enterprise Integrations
+- **Jira**: `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN`, `JIRA_PROJECT_KEY`
+- **Azure DevOps**: `ADO_ORGANIZATION`, `ADO_PROJECT`, `ADO_PAT`
+- **GitHub**: `GITHUB_OWNER`, `GITHUB_REPO`, `GITHUB_TOKEN`, `GITHUB_PROJECT_NUMBER`
+
+#### Web Server
+- `NODE_ENV` - Environment (development/production)
+- `PORT` - Web server port (default: 3001)
+- `DEVLOG_DIR` - Custom devlog directory path
+
+See `.env.example` for complete configuration options.
+
 ## Usage
 
 ### MCP Server

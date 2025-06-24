@@ -5,7 +5,7 @@ Core functionality for the devlog system. This package provides the main `Devlog
 ## Features
 
 - **CRUD Operations**: Create, read, update, and delete devlog entries
-- **File System Storage**: JSON-based storage in `.devlog` directory
+- **Multiple Storage Backends**: SQLite, PostgreSQL, MySQL, and Enterprise integrations
 - **Rich Context**: Support for business context, technical context, and AI-enhanced metadata
 - **Filtering & Search**: Query devlogs by status, type, priority, tags, and text search
 - **Notes & Progress Tracking**: Add timestamped notes to track progress
@@ -106,19 +106,16 @@ Options:
 - `addDecision(args: DecisionArgs): Promise<DevlogEntry>`
 - `getStats(): Promise<DevlogStats>`
 
-## Storage Format
+## Storage
 
-Devlogs are stored as JSON files in the `.devlog` directory with the following structure:
+The core package supports multiple storage backends:
 
-```
-.devlog/
-├── index.json          # Maps devlog IDs to filenames
-├── feature-auth-123.json
-├── bugfix-validation-456.json
-└── ...
-```
+- **SQLite**: Default for local development, provides good performance and full-text search
+- **PostgreSQL**: For production environments requiring multi-user access
+- **MySQL**: Alternative database option for web applications  
+- **Enterprise**: Integration with external systems like Jira, Azure DevOps, etc.
 
-Each devlog file contains a complete `DevlogEntry` object with all metadata, notes, and context information.
+Storage is configured through the `DevlogManager` constructor or environment variables.
 
 ## Integration
 

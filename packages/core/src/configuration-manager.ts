@@ -2,6 +2,10 @@
  * Configuration manager for determining the best storage strategy
  */
 
+// Load environment variables from .env file if available
+import { config } from "dotenv";
+config({ path: [".env.local", ".env"] });
+
 import * as fs from "fs/promises";
 import * as path from "path";
 import { EnterpriseIntegration } from "@devlog/types";
@@ -96,11 +100,6 @@ export class ConfigurationManager {
             type: "mysql",
             connectionString: process.env.DEVLOG_MYSQL_URL || "mysql://localhost/devlog"
           };
-        case "json":
-          return {
-            type: "json",
-            filePath: process.env.DEVLOG_JSON_PATH || ".devlog"
-          };
       }
     }
 
@@ -109,21 +108,6 @@ export class ConfigurationManager {
       type: "sqlite",
       filePath: process.env.DEVLOG_SQLITE_PATH || ".devlog/devlogs.db"
     };
-  }
-
-  /**
-   * Check if current directory has existing JSON devlog data
-   */
-  async hasExistingJsonData(devlogDir: string = ".devlog"): Promise<boolean> {
-    try {
-      const indexPath = path.join(devlogDir, "index.json");
-      await fs.access(indexPath);
-      const indexData = await fs.readFile(indexPath, "utf-8");
-      const index = JSON.parse(indexData);
-      return Object.keys(index).length > 0;
-    } catch {
-      return false;
-    }
   }
 
   /**
@@ -220,27 +204,6 @@ export class ConfigurationManager {
           "Web applications",
           "Existing MySQL infrastructure",
           "Team collaboration"
-        ]
-      },
-      {
-        type: "json",
-        name: "JSON Files (Legacy)",
-        description: "Simple JSON file storage (backward compatibility)",
-        pros: [
-          "Simple setup",
-          "Human-readable",
-          "No dependencies",
-          "Easy backup"
-        ],
-        cons: [
-          "Poor performance with large datasets",
-          "No concurrent access",
-          "Limited querying capabilities"
-        ],
-        bestFor: [
-          "Backward compatibility",
-          "Simple use cases",
-          "Migration scenarios"
         ]
       }
     ];

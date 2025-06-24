@@ -11,128 +11,206 @@ export class SQLiteStorageProvider implements StorageProvider {
   private options: Record<string, any>;
 
   constructor(filePath: string, options: Record<string, any> = {}) {
+    console.log(`[SQLiteStorage] Creating SQLiteStorageProvider with path: ${filePath}`);
+    console.log(`[SQLiteStorage] Constructor options:`, options);
     this.filePath = filePath;
     this.options = options;
   }
 
   async initialize(): Promise<void> {
+    console.log(`[SQLiteStorage] Initializing SQLite storage at path: ${this.filePath}`);
+    console.log(`[SQLiteStorage] Options:`, this.options);
+    
+    // Check if directory exists
+    const path = await import('path');
+    const fs = await import('fs');
+    const dirname = path.dirname(this.filePath);
+    
+    console.log(`[SQLiteStorage] Database directory: ${dirname}`);
+    
+    try {
+      await fs.promises.access(dirname);
+      console.log(`[SQLiteStorage] Directory exists: ${dirname}`);
+    } catch (error) {
+      console.log(`[SQLiteStorage] Directory does not exist, creating: ${dirname}`);
+      try {
+        await fs.promises.mkdir(dirname, { recursive: true });
+        console.log(`[SQLiteStorage] Successfully created directory: ${dirname}`);
+      } catch (mkdirError: any) {
+        console.error(`[SQLiteStorage] Failed to create directory: ${dirname}`, mkdirError);
+        throw new Error(`Cannot create database directory: ${dirname} - ${mkdirError.message}`);
+      }
+    }
+    
     // Dynamic import to make better-sqlite3 optional
     try {
+      console.log(`[SQLiteStorage] Attempting to import better-sqlite3...`);
       // Use eval to prevent TypeScript from transforming the import
       const dynamicImport = eval('(specifier) => import(specifier)');
       const sqlite3Module = await dynamicImport("better-sqlite3");
+      console.log(`[SQLiteStorage] Successfully imported better-sqlite3`);
+      
       const Database = sqlite3Module.default;
+      console.log(`[SQLiteStorage] Creating database instance...`);
       
       this.db = new Database(this.filePath, this.options);
+      console.log(`[SQLiteStorage] Successfully created database instance`);
     } catch (error: any) {
-      console.error("Failed to initialize SQLite storage:", error);
+      console.error(`[SQLiteStorage] Failed to initialize SQLite storage:`, error);
+      console.error(`[SQLiteStorage] Error type:`, typeof error);
+      console.error(`[SQLiteStorage] Error message:`, error.message);
+      console.error(`[SQLiteStorage] Error stack:`, error.stack);
       throw new Error("Failed to initialize SQLite storage: " + error.message);
     }
     
     // Create tables
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS devlog_entries (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        type TEXT NOT NULL,
-        description TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'todo',
-        priority TEXT NOT NULL DEFAULT 'medium',
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        estimated_hours INTEGER,
-        actual_hours INTEGER,
-        assignee TEXT,
-        tags TEXT, -- JSON array
-        files TEXT, -- JSON array
-        related_devlogs TEXT, -- JSON array
-        context TEXT, -- JSON object
-        ai_context TEXT, -- JSON object
-        external_references TEXT, -- JSON array
-        notes TEXT -- JSON array
-      );
+    console.log(`[SQLiteStorage] Creating database tables...`);
+    try {
+      this.db.exec(`
+        CREATE TABLE IF NOT EXISTS devlog_entries (
+          id TEXT PRIMARY KEY,
+          title TEXT NOT NULL,
+          type TEXT NOT NULL,
+          description TEXT NOT NULL,
+          status TEXT NOT NULL DEFAULT 'todo',
+          priority TEXT NOT NULL DEFAULT 'medium',
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL,
+          estimated_hours INTEGER,
+          actual_hours INTEGER,
+          assignee TEXT,
+          tags TEXT, -- JSON array
+          files TEXT, -- JSON array
+          related_devlogs TEXT, -- JSON array
+          context TEXT, -- JSON object
+          ai_context TEXT, -- JSON object
+          external_references TEXT, -- JSON array
+          notes TEXT -- JSON array
+        );
 
-      CREATE INDEX IF NOT EXISTS idx_devlog_status ON devlog_entries(status);
-      CREATE INDEX IF NOT EXISTS idx_devlog_type ON devlog_entries(type);
-      CREATE INDEX IF NOT EXISTS idx_devlog_priority ON devlog_entries(priority);
-      CREATE INDEX IF NOT EXISTS idx_devlog_assignee ON devlog_entries(assignee);
-      CREATE INDEX IF NOT EXISTS idx_devlog_created_at ON devlog_entries(created_at);
-      CREATE INDEX IF NOT EXISTS idx_devlog_updated_at ON devlog_entries(updated_at);
+        CREATE INDEX IF NOT EXISTS idx_devlog_status ON devlog_entries(status);
+        CREATE INDEX IF NOT EXISTS idx_devlog_type ON devlog_entries(type);
+        CREATE INDEX IF NOT EXISTS idx_devlog_priority ON devlog_entries(priority);
+        CREATE INDEX IF NOT EXISTS idx_devlog_assignee ON devlog_entries(assignee);
+        CREATE INDEX IF NOT EXISTS idx_devlog_created_at ON devlog_entries(created_at);
+        CREATE INDEX IF NOT EXISTS idx_devlog_updated_at ON devlog_entries(updated_at);
 
-      -- Full-text search table
-      CREATE VIRTUAL TABLE IF NOT EXISTS devlog_fts USING fts5(
-        id,
-        title,
-        description,
-        content=devlog_entries,
-        content_rowid=rowid
-      );
+        -- Full-text search table
+        CREATE VIRTUAL TABLE IF NOT EXISTS devlog_fts USING fts5(
+          id,
+          title,
+          description,
+          content=devlog_entries,
+          content_rowid=rowid
+        );
 
-      -- Triggers to keep FTS table in sync
-      CREATE TRIGGER IF NOT EXISTS devlog_fts_insert AFTER INSERT ON devlog_entries BEGIN
-        INSERT INTO devlog_fts(rowid, id, title, description) VALUES (new.rowid, new.id, new.title, new.description);
-      END;
+        -- Triggers to keep FTS table in sync
+        CREATE TRIGGER IF NOT EXISTS devlog_fts_insert AFTER INSERT ON devlog_entries BEGIN
+          INSERT INTO devlog_fts(rowid, id, title, description) VALUES (new.rowid, new.id, new.title, new.description);
+        END;
 
-      CREATE TRIGGER IF NOT EXISTS devlog_fts_delete AFTER DELETE ON devlog_entries BEGIN
-        INSERT INTO devlog_fts(devlog_fts, rowid, id, title, description) VALUES ('delete', old.rowid, old.id, old.title, old.description);
-      END;
+        CREATE TRIGGER IF NOT EXISTS devlog_fts_delete AFTER DELETE ON devlog_entries BEGIN
+          INSERT INTO devlog_fts(devlog_fts, rowid, id, title, description) VALUES ('delete', old.rowid, old.id, old.title, old.description);
+        END;
 
-      CREATE TRIGGER IF NOT EXISTS devlog_fts_update AFTER UPDATE ON devlog_entries BEGIN
-        INSERT INTO devlog_fts(devlog_fts, rowid, id, title, description) VALUES ('delete', old.rowid, old.id, old.title, old.description);
-        INSERT INTO devlog_fts(rowid, id, title, description) VALUES (new.rowid, new.id, new.title, new.description);
-      END;
-    `);
+        CREATE TRIGGER IF NOT EXISTS devlog_fts_update AFTER UPDATE ON devlog_entries BEGIN
+          INSERT INTO devlog_fts(devlog_fts, rowid, id, title, description) VALUES ('delete', old.rowid, old.id, old.title, old.description);
+          INSERT INTO devlog_fts(rowid, id, title, description) VALUES (new.rowid, new.id, new.title, new.description);
+        END;
+      `);
+      console.log(`[SQLiteStorage] Successfully created database tables and indexes`);
+    } catch (tableError: any) {
+      console.error(`[SQLiteStorage] Failed to create database tables:`, tableError);
+      throw new Error(`Failed to create database tables: ${tableError.message}`);
+    }
+    
+    console.log(`[SQLiteStorage] Initialization completed successfully`);
   }
 
   async exists(id: string): Promise<boolean> {
-    if (!this.db) throw new Error("Database not initialized");
+    console.log(`[SQLiteStorage] Checking if entry exists: ${id}`);
+    if (!this.db) {
+      console.error(`[SQLiteStorage] Database not initialized when checking exists for: ${id}`);
+      throw new Error("Database not initialized");
+    }
     
-    const stmt = this.db.prepare("SELECT 1 FROM devlog_entries WHERE id = ?");
-    return stmt.get(id) !== undefined;
+    try {
+      const stmt = this.db.prepare("SELECT 1 FROM devlog_entries WHERE id = ?");
+      const result = stmt.get(id) !== undefined;
+      console.log(`[SQLiteStorage] Entry exists result for ${id}: ${result}`);
+      return result;
+    } catch (error: any) {
+      console.error(`[SQLiteStorage] Error checking if entry exists:`, error);
+      throw error;
+    }
   }
 
   async get(id: string): Promise<DevlogEntry | null> {
-    if (!this.db) throw new Error("Database not initialized");
+    console.log(`[SQLiteStorage] Getting entry: ${id}`);
+    if (!this.db) {
+      console.error(`[SQLiteStorage] Database not initialized when getting: ${id}`);
+      throw new Error("Database not initialized");
+    }
     
-    const stmt = this.db.prepare("SELECT * FROM devlog_entries WHERE id = ?");
-    const row = stmt.get(id) as any;
-    
-    if (!row) return null;
-    
-    return this.rowToDevlogEntry(row);
+    try {
+      const stmt = this.db.prepare("SELECT * FROM devlog_entries WHERE id = ?");
+      const row = stmt.get(id) as any;
+      
+      if (!row) {
+        console.log(`[SQLiteStorage] Entry not found: ${id}`);
+        return null;
+      }
+      
+      console.log(`[SQLiteStorage] Found entry: ${id}`);
+      return this.rowToDevlogEntry(row);
+    } catch (error: any) {
+      console.error(`[SQLiteStorage] Error getting entry:`, error);
+      throw error;
+    }
   }
 
   async save(entry: DevlogEntry): Promise<void> {
-    if (!this.db) throw new Error("Database not initialized");
+    console.log(`[SQLiteStorage] Saving entry: ${entry.id} - ${entry.title}`);
+    if (!this.db) {
+      console.error(`[SQLiteStorage] Database not initialized when saving: ${entry.id}`);
+      throw new Error("Database not initialized");
+    }
     
-    const stmt = this.db.prepare(`
-      INSERT OR REPLACE INTO devlog_entries (
-        id, title, type, description, status, priority, created_at, updated_at,
-        estimated_hours, actual_hours, assignee, tags, files, related_devlogs,
-        context, ai_context, external_references, notes
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
+    try {
+      const stmt = this.db.prepare(`
+        INSERT OR REPLACE INTO devlog_entries (
+          id, title, type, description, status, priority, created_at, updated_at,
+          estimated_hours, actual_hours, assignee, tags, files, related_devlogs,
+          context, ai_context, external_references, notes
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
 
-    stmt.run(
-      entry.id,
-      entry.title,
-      entry.type,
-      entry.description,
-      entry.status,
-      entry.priority,
-      entry.createdAt,
-      entry.updatedAt,
-      entry.estimatedHours,
-      entry.actualHours,
-      entry.assignee,
-      JSON.stringify(entry.tags),
-      JSON.stringify(entry.files),
-      JSON.stringify(entry.relatedDevlogs),
-      JSON.stringify(entry.context),
-      JSON.stringify(entry.aiContext),
-      JSON.stringify(entry.externalReferences || []),
-      JSON.stringify(entry.notes)
-    );
+      stmt.run(
+        entry.id,
+        entry.title,
+        entry.type,
+        entry.description,
+        entry.status,
+        entry.priority,
+        entry.createdAt,
+        entry.updatedAt,
+        entry.estimatedHours,
+        entry.actualHours,
+        entry.assignee,
+        JSON.stringify(entry.tags),
+        JSON.stringify(entry.files),
+        JSON.stringify(entry.relatedDevlogs),
+        JSON.stringify(entry.context),
+        JSON.stringify(entry.aiContext),
+        JSON.stringify(entry.externalReferences || []),
+        JSON.stringify(entry.notes)
+      );
+      
+      console.log(`[SQLiteStorage] Successfully saved entry: ${entry.id}`);
+    } catch (error: any) {
+      console.error(`[SQLiteStorage] Error saving entry:`, error);
+      throw error;
+    }
   }
 
   async delete(id: string): Promise<void> {
@@ -251,9 +329,17 @@ export class SQLiteStorageProvider implements StorageProvider {
   }
 
   async dispose(): Promise<void> {
+    console.log(`[SQLiteStorage] Disposing database connection`);
     if (this.db) {
-      this.db.close();
+      try {
+        this.db.close();
+        console.log(`[SQLiteStorage] Database connection closed successfully`);
+      } catch (error: any) {
+        console.error(`[SQLiteStorage] Error closing database:`, error);
+      }
       this.db = null;
+    } else {
+      console.log(`[SQLiteStorage] No database connection to dispose`);
     }
   }
 

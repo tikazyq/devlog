@@ -43,14 +43,15 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0",
-    "@devlog/types": "workspace:*",
     "@devlog/core": "workspace:*",
-    "better-sqlite3": "^11.10.0"
+    "@devlog/types": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "better-sqlite3": "^11.10.0",
+    "dotenv": "16.5.0"
   },
   "devDependencies": {
-    "@devlog/types": "workspace:*",
     "@devlog/core": "workspace:*",
+    "@devlog/types": "workspace:*",
     "@types/node": "^20.0.0",
     "@vitest/ui": "^2.1.9",
     "tsx": "^4.0.0",

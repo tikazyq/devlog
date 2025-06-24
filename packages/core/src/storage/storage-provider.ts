@@ -57,7 +57,7 @@ export interface StorageProvider {
 }
 
 export interface StorageConfig {
-  type: "sqlite" | "postgres" | "mysql" | "enterprise" | "json";
+  type: "sqlite" | "postgres" | "mysql" | "enterprise";
   connectionString?: string;
   filePath?: string;
   options?: Record<string, any>;
@@ -104,10 +104,6 @@ export class StorageProviderFactory {
           throw new Error("Enterprise storage requires integrations configuration");
         }
         return new EnterpriseStorageAdapter(config.options as { integrations: any });
-
-      case "json":
-        const { JSONStorageProvider } = await import("./json-storage.js");
-        return new JSONStorageProvider(config.filePath!, config.options);
 
       default:
         throw new Error(`Unsupported storage type: ${config.type}`);

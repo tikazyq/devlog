@@ -8,18 +8,10 @@ export {
   type StorageConfig, 
   type EnterpriseStorageProvider 
 } from "./storage/storage-provider.js";
-export { JSONStorageProvider } from "./storage/json-storage.js";
 export { SQLiteStorageProvider } from "./storage/sqlite-storage.js";
 export { PostgreSQLStorageProvider } from "./storage/postgresql-storage.js";
 export { MySQLStorageProvider } from "./storage/mysql-storage.js";
 export { EnterpriseStorageAdapter } from "./storage/enterprise-storage.js";
-
-// Migration utilities
-export { StorageMigration, type MigrationOptions, type MigrationResult } from "./storage/migration.js";
-
-// Legacy exports
-export { FileSystemStorage, type DevlogStorage } from "./storage/file-system-storage.js";
-export { DevlogOperations } from "./operations/devlog-operations.js";
 export { EnterpriseSync } from "./integrations/enterprise-sync.js";
 export { DevlogUtils } from "./utils/devlog-utils.js";
 

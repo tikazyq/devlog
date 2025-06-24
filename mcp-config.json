@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "devlog": {
-      "command": "node",
-      "args": ["./packages/mcp-server/build/index.js"],
-      "cwd": "."
-    }
-  }
-}

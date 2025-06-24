@@ -1,3 +1,7 @@
+// Load environment variables from .env file
+import { config } from "dotenv";
+config();
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -111,8 +115,8 @@ async function startServer() {
   const devlogManager = new DevlogManager({
     workspaceRoot: path.dirname(devlogDirectory),
     storage: {
-      type: 'json',
-      filePath: devlogDirectory
+      type: 'sqlite',
+      filePath: path.join(devlogDirectory, 'devlogs.db')
     }
   });
 

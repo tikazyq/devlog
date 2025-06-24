@@ -29,16 +29,16 @@ async function demonstrateStorageArchitecture() {
   // Demo with SQLite (if available) or JSON fallback
   let storageConfig = config.storage;
   
-  // Fallback to JSON if SQLite is not available
+  // Fallback to SQLite in memory if better-sqlite3 is not available
   if (storageConfig.type === "sqlite") {
     try {
       await import("better-sqlite3");
       console.log("✅ SQLite available - using SQLite storage");
     } catch {
-      console.log("⚠️  SQLite not available - falling back to JSON storage");
+      console.log("⚠️  SQLite not available - falling back to in-memory SQLite");
       storageConfig = {
-        type: "json",
-        filePath: ".devlog-demo"
+        type: "sqlite",
+        filePath: ":memory:"
       };
     }
   }

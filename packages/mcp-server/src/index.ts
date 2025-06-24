@@ -5,6 +5,10 @@
  * Supports multiple storage backends: JSON, SQLite, PostgreSQL, MySQL, Enterprise
  */
 
+// Load environment variables from .env file
+import { config } from "dotenv";
+config();
+
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {

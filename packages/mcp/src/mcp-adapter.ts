@@ -4,7 +4,7 @@
 
 import * as crypto from "crypto";
 import { DevlogManager, ConfigurationManager, type DevlogConfig } from "@devlog/core";
-import { DevlogEntry, CreateDevlogRequest, UpdateDevlogRequest } from "@devlog/types";
+import { DevlogEntry, DevlogStatus, DevlogType, CreateDevlogRequest, UpdateDevlogRequest } from "@devlog/types";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 
 export class MCPDevlogAdapter {
@@ -40,23 +40,6 @@ export class MCPDevlogAdapter {
         {
           type: "text",
           text: `Created devlog entry: ${entry.id}\nTitle: ${entry.title}\nType: ${entry.type}\nPriority: ${entry.priority}\nStatus: ${entry.status}\n\nBusiness Context: ${entry.context.businessContext}\nTechnical Context: ${entry.context.technicalContext}`,
-        },
-      ],
-    };
-  }
-
-  async findOrCreateDevlog(args: CreateDevlogRequest): Promise<CallToolResult> {
-    await this.ensureInitialized();
-    
-    const entry = await this.devlogManager.findOrCreateDevlog(args);
-    
-    const statusText = entry.createdAt === entry.updatedAt ? "Created" : "Found existing";
-    
-    return {
-      content: [
-        {
-          type: "text",
-          text: `${statusText} devlog entry: ${entry.id}\nTitle: ${entry.title}\nType: ${entry.type}\nPriority: ${entry.priority}\nStatus: ${entry.status}\n\nBusiness Context: ${entry.context.businessContext}\nTechnical Context: ${entry.context.technicalContext}`,
         },
       ],
     };
@@ -370,5 +353,65 @@ export class MCPDevlogAdapter {
     if (!this.config) {
       await this.initialize();
     }
+  }
+
+  async discoverRelatedDevlogs(args: { 
+    workDescription: string; 
+    workType: DevlogType; 
+    keywords?: string[]; 
+    scope?: string; 
+  }): Promise<CallToolResult> {
+    await this.ensureInitialized();
+    
+    const discoveryResult = await this.devlogManager.discoverRelatedDevlogs(args);
+    
+    if (discoveryResult.relatedEntries.length === 0) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `No related devlog entries found for:\n` +
+                  `Work: ${args.workDescription}\n` +
+                  `Type: ${args.workType}\n` +
+                  `Keywords: ${args.keywords?.join(', ') || 'None'}\n` +
+                  `Scope: ${args.scope || 'N/A'}\n\n` +
+                  `✅ Safe to create a new devlog entry - no overlapping work detected.`,
+          },
+        ],
+      };
+    }
+    
+    // Generate detailed analysis
+    const analysis = discoveryResult.relatedEntries.slice(0, 10).map(({ entry, relevance, matchedTerms }) => {
+      const statusEmoji: Record<DevlogStatus, string> = {
+        'todo': '📋',
+        'in-progress': '🔄',
+        'review': '👀',
+        'testing': '🧪',
+        'done': '✅',
+        'archived': '📦'
+      };
+      
+      return `${statusEmoji[entry.status]} **${entry.title}** (${entry.type})\n` +
+             `   ID: ${entry.id}\n` +
+             `   Status: ${entry.status} | Priority: ${entry.priority}\n` +
+             `   Relevance: ${relevance} (matched: ${matchedTerms.join(', ')})\n` +
+             `   Description: ${entry.description.substring(0, 150)}${entry.description.length > 150 ? '...' : ''}\n` +
+             `   Last Updated: ${new Date(entry.updatedAt).toLocaleDateString()}\n`;
+    }).join('\n');
+    
+    return {
+      content: [
+        {
+          type: "text",
+          text: `## Discovery Analysis for: "${args.workDescription}"\n\n` +
+                `**Search Parameters:**\n` +
+                `- Type: ${args.workType}\n` +
+                `- Keywords: ${args.keywords?.join(', ') || 'None'}\n` +
+                `- Scope: ${args.scope || 'Not specified'}\n\n` +
+                `**Found ${discoveryResult.relatedEntries.length} related entries:**\n\n${analysis}\n\n${discoveryResult.recommendation}`,
+        },
+      ],
+    };
   }
 }

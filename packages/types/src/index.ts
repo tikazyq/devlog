@@ -206,3 +206,23 @@ export interface AIContext {
   lastAIUpdate: string;
   contextVersion: number;
 }
+
+export interface DiscoverDevlogsRequest {
+  workDescription: string;
+  workType: DevlogType;
+  keywords?: string[];
+  scope?: string;
+}
+
+export interface DiscoveredDevlogEntry {
+  entry: DevlogEntry;
+  relevance: 'direct-text-match' | 'same-type' | 'keyword-in-notes';
+  matchedTerms: string[];
+}
+
+export interface DiscoveryResult {
+  relatedEntries: DiscoveredDevlogEntry[];
+  activeCount: number;
+  recommendation: string;
+  searchParameters: DiscoverDevlogsRequest;
+}

@@ -94,55 +94,31 @@ const tools: Tool[] = [
     },
   },
   {
-    name: "find_or_create_devlog",
-    description: "Find an existing devlog entry by title and type or create a new one if it doesn't exist",
+    name: "discover_related_devlogs",
+    description: "Comprehensively search for existing devlog entries related to planned work before creating new entries. Returns detailed analysis of relevant historical context to prevent duplicate work.",
     inputSchema: {
       type: "object",
       properties: {
-        title: {
+        workDescription: {
           type: "string",
-          description: "Title of the task/feature/bugfix",
+          description: "Detailed description of the work you plan to do",
         },
-        type: {
+        workType: {
           type: "string",
           enum: ["feature", "bugfix", "task", "refactor", "docs"],
-          description: "Type of work being done",
+          description: "Type of work being planned",
         },
-        description: {
-          type: "string",
-          description: "Detailed description of the work",
-        },
-        priority: {
-          type: "string",
-          enum: ["low", "medium", "high", "critical"],
-          default: "medium",
-          description: "Priority level",
-        },
-        businessContext: {
-          type: "string",
-          description: "Business context - why this work matters and what problem it solves",
-        },
-        technicalContext: {
-          type: "string",
-          description: "Technical context - architecture decisions, constraints, assumptions",
-        },
-        acceptanceCriteria: {
+        keywords: {
           type: "array",
           items: { type: "string" },
-          description: "Acceptance criteria or definition of done",
+          description: "Key terms, technologies, components, or concepts involved in the work",
         },
-        initialInsights: {
-          type: "array",
-          items: { type: "string" },
-          description: "Initial insights or knowledge about this work",
-        },
-        relatedPatterns: {
-          type: "array",
-          items: { type: "string" },
-          description: "Related patterns or examples from other projects",
+        scope: {
+          type: "string",
+          description: "Scope or area of the codebase this work affects",
         },
       },
-      required: ["title", "type", "description"],
+      required: ["workDescription", "workType"],
     },
   },
   {
@@ -390,8 +366,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case "create_devlog":
         return await adapter.createDevlog(args as any);
       
-      case "find_or_create_devlog":
-        return await adapter.findOrCreateDevlog(args as any);
+      case "discover_related_devlogs":
+        return await adapter.discoverRelatedDevlogs(args as any);
       
       case "update_devlog":
         return await adapter.updateDevlog(args as any);

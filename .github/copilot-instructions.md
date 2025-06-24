@@ -23,8 +23,8 @@
 This project uses **itself** for development tracking. When working on devlog features, ALWAYS:
 
 ### 1. Use Devlog for All Development Work
-- Create devlog entries for new features, bugs, or improvements using `@devlog/mcp`
-- Use `find_or_create_devlog` to prevent duplicates
+- **Always discover first**: Use `discover_related_devlogs` to find existing relevant work before creating new entries
+- Create devlog entries for new features, bugs, or improvements using `@devlog/mcp` only after thorough discovery
 - Track progress with notes and status updates through the MCP server tools
 
 ### 2. Standard Entry Format
@@ -39,13 +39,15 @@ This project uses **itself** for development tracking. When working on devlog fe
 ```
 
 ### 3. Key Practices
-- **Always check existing entries** before creating new ones using MCP server tools
+- **Always discover first**: Use `discover_related_devlogs` before creating new entries to prevent duplicate work
+- **Review related work**: Analyze discovered entries to build upon existing insights and avoid overlapping efforts
 - **Update progress** as work continues through devlog MCP functions
 - **Document decisions** and technical details in notes using `add_devlog_note`
 - **Use enterprise integrations** when configured via MCP sync functions
 - **Demonstrate new features** by using them through the MCP interface
 
 ### 4. Duplicate Prevention
+- Use `discover_related_devlogs` to thoroughly search for existing relevant work before creating new entries
 - Use `find_or_create_devlog` instead of `create_devlog`
 - Same title + same type = same entry (by design)
 - Different types can have same title (different IDs)
@@ -57,11 +59,12 @@ This project uses **itself** for development tracking. When working on devlog fe
 - **Duplicate Prevention**: Built-in safeguards against creating duplicate entries
 
 ### 6. When Adding New Features
-1. Create devlog entry for the feature using MCP server
-2. Use the feature to track its own development
-3. Update the entry as you implement via MCP functions
-4. Document the feature in the entry notes using MCP tools
-5. Demo the feature by using it through the MCP interface
+1. **Discover first**: Use `discover_related_devlogs` to find existing relevant work
+2. Create devlog entry for the feature using MCP server only if no overlapping work exists
+3. Use the feature to track its own development
+4. Update the entry as you implement via MCP functions
+5. Document the feature in the entry notes using MCP tools
+6. Demo the feature by using it through the MCP interface
 
 This ensures the devlog system is continuously tested and improved through real-world usage.
 

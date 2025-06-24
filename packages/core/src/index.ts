@@ -1,4 +1,10 @@
-export { DevlogManager, type DevlogManagerOptions } from "./devlog-manager.js";
+export { 
+  DevlogManager, 
+  type DevlogManagerOptions, 
+  type DiscoverDevlogsRequest, 
+  type DiscoveredDevlogEntry, 
+  type DiscoveryResult 
+} from "./devlog-manager.js";
 export { ConfigurationManager, type DevlogConfig } from "./configuration-manager.js";
 
 // Storage Providers

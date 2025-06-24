@@ -17,6 +17,27 @@ import type {
   EnterpriseIntegration
 } from "@devlog/types";
 
+// Discovery-related interfaces
+export interface DiscoverDevlogsRequest {
+  workDescription: string;
+  workType: DevlogType;
+  keywords?: string[];
+  scope?: string;
+}
+
+export interface DiscoveredDevlogEntry {
+  entry: DevlogEntry;
+  relevance: 'direct-text-match' | 'same-type' | 'keyword-in-notes';
+  matchedTerms: string[];
+}
+
+export interface DiscoveryResult {
+  relatedEntries: DiscoveredDevlogEntry[];
+  activeCount: number;
+  recommendation: string;
+  searchParameters: DiscoverDevlogsRequest;
+}
+
 import { StorageProvider, StorageConfig, StorageProviderFactory } from "./storage/storage-provider.js";
 import { ConfigurationManager } from "./configuration-manager.js";
 
@@ -272,6 +293,121 @@ export class DevlogManager {
     if (this.storageProvider) {
       await this.storageProvider.dispose();
     }
+  }
+
+  /**
+   * Comprehensively discover related devlog entries before creating new work
+   * Prevents duplicate work by finding relevant historical context
+   */
+  async discoverRelatedDevlogs(request: DiscoverDevlogsRequest): Promise<DiscoveryResult> {
+    await this.ensureInitialized();
+    
+    const { workDescription, workType, keywords = [], scope } = request;
+    
+    // Build comprehensive search terms
+    const searchTerms = [
+      workDescription,
+      workType,
+      scope,
+      ...keywords
+    ].filter(Boolean);
+    
+    // Get all entries for analysis
+    const allEntries = await this.listDevlogs();
+    const relatedEntries: DiscoveredDevlogEntry[] = [];
+    
+    // 1. Direct text matching in title/description/context
+    for (const entry of allEntries) {
+      const entryText = `${entry.title} ${entry.description} ${entry.context.businessContext || ''} ${entry.context.technicalContext || ''}`.toLowerCase();
+      const matchedTerms = searchTerms.filter((term): term is string => 
+        term !== undefined && entryText.includes(term.toLowerCase())
+      );
+      
+      if (matchedTerms.length > 0) {
+        relatedEntries.push({
+          entry,
+          relevance: 'direct-text-match',
+          matchedTerms
+        });
+      }
+    }
+    
+    // 2. Same type entries (if not already included)
+    const sameTypeEntries = allEntries.filter(entry => 
+      entry.type === workType && 
+      !relatedEntries.some(r => r.entry.id === entry.id)
+    );
+    
+    for (const entry of sameTypeEntries) {
+      relatedEntries.push({
+        entry,
+        relevance: 'same-type',
+        matchedTerms: [workType]
+      });
+    }
+    
+    // 3. Keyword matching in notes and decisions
+    for (const entry of allEntries) {
+      if (relatedEntries.some(r => r.entry.id === entry.id)) continue;
+      
+      const noteText = entry.notes.map(n => n.content).join(' ').toLowerCase();
+      const decisionText = entry.context.decisions.map(d => `${d.decision} ${d.rationale}`).join(' ').toLowerCase();
+      const combinedText = `${noteText} ${decisionText}`;
+      
+      const matchedKeywords = keywords.filter((keyword): keyword is string => 
+        keyword !== undefined && combinedText.includes(keyword.toLowerCase())
+      );
+      
+      if (matchedKeywords.length > 0) {
+        relatedEntries.push({
+          entry,
+          relevance: 'keyword-in-notes',
+          matchedTerms: matchedKeywords
+        });
+      }
+    }
+    
+    // Sort by relevance and status priority
+    relatedEntries.sort((a, b) => {
+      type RelevanceType = 'direct-text-match' | 'same-type' | 'keyword-in-notes';
+      
+      const relevanceOrder: Record<RelevanceType, number> = { 
+        'direct-text-match': 0, 
+        'same-type': 1, 
+        'keyword-in-notes': 2 
+      };
+      const statusOrder: Record<DevlogStatus, number> = { 
+        'in-progress': 0, 
+        'review': 1, 
+        'todo': 2, 
+        'testing': 3, 
+        'done': 4,
+        'archived': 5
+      };
+      
+      const relevanceDiff = relevanceOrder[a.relevance as RelevanceType] - relevanceOrder[b.relevance as RelevanceType];
+      if (relevanceDiff !== 0) return relevanceDiff;
+      
+      return statusOrder[a.entry.status] - statusOrder[b.entry.status];
+    });
+    
+    // Calculate active entries and generate recommendation
+    const activeCount = relatedEntries.filter(r => 
+      ['todo', 'in-progress', 'review', 'testing'].includes(r.entry.status)
+    ).length;
+    
+    const recommendation = activeCount > 0 
+      ? `⚠️ RECOMMENDATION: Review ${activeCount} active related entries before creating new work. Consider updating existing entries or coordinating efforts.`
+      : relatedEntries.length > 0
+        ? `✅ RECOMMENDATION: Related entries are completed. Safe to create new devlog entry, but review completed work for insights and patterns.`
+        : `✅ RECOMMENDATION: No related work found. Safe to create new devlog entry.`;
+    
+    return {
+      relatedEntries,
+      activeCount,
+      recommendation,
+      searchParameters: request
+    };
   }
 
   // Private methods

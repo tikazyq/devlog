@@ -4,6 +4,7 @@
   "description": "MCP server for managing development logs and working notes",
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "type": "module",
   "files": [
     "build/**/*",
     "README.md",

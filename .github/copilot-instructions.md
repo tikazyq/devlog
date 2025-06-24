@@ -16,6 +16,7 @@
 - **Rapid iteration**: Make bold changes to improve the codebase structure
 - **Technical debt elimination**: Actively remove code that doesn't serve the current vision
 - **Modern tooling**: Always use the latest stable versions and best practices
+- **Proper testing over temp scripts**: Use structured test cases (Vitest) instead of creating temporary scripts for testing functionality
 
 ## Dogfooding Guidelines
 
@@ -118,3 +119,26 @@ When working with the `@devlog/web` application, use Playwright MCP tools for co
 - Take screenshots with `mcp_playwright_browser_take_screenshot` for visual debugging
 - Check network requests with `mcp_playwright_browser_network_requests`
 - Verify element states before interactions using snapshots
+
+## Testing Best Practices
+
+### 13. Prefer Structured Tests Over Temporary Scripts
+- **Use Vitest framework**: Create proper test cases instead of ad-hoc scripts in `scripts/`
+- **Avoid temp scripts**: Don't create temporary `.mjs` files for testing functionality
+- **Comprehensive test coverage**: Write unit tests, integration tests, and end-to-end tests as needed
+- **Maintainable testing**: Tests should be part of the CI/CD pipeline and easily runnable
+- **Clean up legacy**: Remove temporary scripts once proper tests are in place
+
+### 14. Test Organization
+- **Unit tests**: Test individual functions and classes in isolation
+- **Integration tests**: Test interactions between components and external services
+- **E2E tests**: Use Playwright MCP tools for web application testing
+- **Test data management**: Use proper fixtures and test data setup/teardown
+- **Descriptive test names**: Tests should clearly describe what they're validating
+
+### 15. Testing Workflow
+1. Identify functionality that needs testing
+2. Write appropriate test cases using Vitest
+3. Ensure tests can be run with standard npm/pnpm scripts
+4. Include tests in CI/CD pipeline
+5. Remove any temporary scripts that served the same purpose

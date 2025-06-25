@@ -44,11 +44,19 @@
 1. **🔍 ALWAYS** run `discover_related_devlogs` first
 2. **🔧 CHECK ERRORS** using `problems` tool before building/running
 3. **📊 CHECK STATUS** using `git_status` to understand repo state
+4. **🧪 RUN TESTS** using `pnpm test` to ensure everything works before changes
 
 ### Git Operations Priority
 **Use Git MCP tools as primary method:**
 - `git_status`, `git_add`, `git_commit`, `git_push`
 - **Fallback to terminal only when MCP tools unavailable**
+
+### Testing Requirements
+**⚠️ CRITICAL: Use proper testing frameworks, NOT temporary scripts**
+- **Use Vitest**: Write proper test cases in `packages/*/src/__tests__/` directories
+- **Run tests**: Use `pnpm test` or `pnpm test:watch` commands
+- **NO temporary scripts**: Never create test scripts in `.` (root), `src/`, `scripts/`, or tracked directories
+- **For debugging only**: Use `tmp/` directory (gitignored) and clean up when done
 
 ### Commit Early and Often
 - After completing features/fixes

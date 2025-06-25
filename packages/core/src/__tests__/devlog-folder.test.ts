@@ -57,51 +57,29 @@ test('DevlogManager uses ~/.devlog folder for SQLite storage', async () => {
   expect(metadata.projectPath).toBeDefined();
 });
 
-test('ConfigurationManager detects best storage as SQLite with ~/.devlog path', async () => {
+test('ConfigurationManager detects best storage as local-json by default', async () => {
   const configManager = new ConfigurationManager();
   
   const storageConfig = await configManager.detectBestStorage();
   
-  expect(storageConfig.type).toBe('sqlite');
-  expect(storageConfig.filePath).toBeDefined();
+  expect(storageConfig.strategy).toBe('local-json');
+  expect(storageConfig.localJson).toBeDefined();
   
-  // Verify the path is within ~/.devlog/workspaces/
-  const homeDir = os.homedir();
-  const expectedPrefix = path.join(homeDir, '.devlog', 'workspaces');
-  
-  expect(storageConfig.filePath!.startsWith(expectedPrefix)).toBe(true);
-  expect(storageConfig.filePath!.endsWith('devlog.db')).toBe(true);
+  // Verify the default configuration
+  expect(storageConfig.localJson!.directory).toBe('.devlog');
+  expect(storageConfig.localJson!.filePattern).toBe('{id:03d}-{slug}.json');
 });
 
-test('ConfigurationManager creates global structure', async () => {
+test('ConfigurationManager uses local-json storage without global structure', async () => {
   const configManager = new ConfigurationManager();
   
-  // This should trigger the creation of the global structure
-  await configManager.detectBestStorage();
+  // This should detect local-json storage without needing global structure
+  const storageConfig = await configManager.detectBestStorage();
   
-  const homeDir = os.homedir();
-  const devlogDir = path.join(homeDir, '.devlog');
+  expect(storageConfig.strategy).toBe('local-json');
   
-  // Verify all expected directories exist
-  const expectedDirs = [
-    path.join(devlogDir, 'workspaces'),
-    path.join(devlogDir, 'cache'),
-    path.join(devlogDir, 'backups'),
-    path.join(devlogDir, 'logs')
-  ];
-  
-  for (const dir of expectedDirs) {
-    await expect(fs.access(dir)).resolves.toBeUndefined();
-  }
-  
-  // Verify global config file exists
-  const globalConfigPath = path.join(devlogDir, 'config.json');
-  await expect(fs.access(globalConfigPath)).resolves.toBeUndefined();
-  
-  const configContent = await fs.readFile(globalConfigPath, 'utf-8');
-  const config = JSON.parse(configContent);
-  
-  expect(config.version).toBe('1.0.0');
-  expect(config.defaultStorage).toBe('sqlite');
-  expect(config.created).toBeDefined();
+  // Local JSON storage doesn't require global ~/.devlog structure
+  // It uses the project-local .devlog directory instead
+  expect(storageConfig.localJson).toBeDefined();
+  expect(storageConfig.localJson!.directory).toBe('.devlog');
 });

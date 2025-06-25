@@ -17,8 +17,11 @@ describe('Integer ID System', () => {
       workspaceRoot: tempDir,
       useIntegerIds: true,
       storage: {
-        type: 'sqlite',
-        filePath: path.join(tempDir, 'test.db')
+        strategy: 'local-json',
+        localJson: {
+          directory: '.devlog',
+          filePattern: '{id:03d}-{slug}.json'
+        }
       }
     });
   });
@@ -74,40 +77,35 @@ describe('Integer ID System', () => {
   it('should format integer IDs correctly for display', () => {
     expect(IdManager.formatIdForDisplay(1)).toBe('#1');
     expect(IdManager.formatIdForDisplay(123)).toBe('#123');
-    expect(IdManager.formatIdForDisplay('legacy-id')).toBe('legacy-id');
   });
 
   it('should convert between ID formats correctly', () => {
-    // String to ID conversion
+    // String to ID conversion (for parsing)
     expect(IdManager.stringToId('123')).toBe(123);
-    expect(IdManager.stringToId('legacy-id-abc')).toBe('legacy-id-abc');
     
-    // ID to string conversion
+    // ID to string conversion (for storage)
     expect(IdManager.idToString(123)).toBe('123');
-    expect(IdManager.idToString('legacy-id')).toBe('legacy-id');
   });
 
-  it('should work with legacy string IDs when disabled', async () => {
+  it('should throw error when legacy string IDs are disabled', async () => {
     const legacyManager = new DevlogManager({
       workspaceRoot: tempDir,
-      useIntegerIds: false, // Disable integer IDs
+      useIntegerIds: false, // This should throw an error now
       storage: {
-        type: 'sqlite',
-        filePath: path.join(tempDir, 'legacy.db')
+        strategy: 'local-json',
+        localJson: {
+          directory: '.devlog',
+          filePattern: '{id:03d}-{slug}.json'
+        }
       }
     });
 
-    try {
-      const entry = await legacyManager.findOrCreateDevlog({
-        title: 'Legacy Test',
-        type: 'feature',
-        description: 'Testing legacy ID system'
-      });
+    await expect(legacyManager.findOrCreateDevlog({
+      title: 'Legacy Test',
+      type: 'feature',
+      description: 'Testing legacy ID system should fail'
+    })).rejects.toThrow('Legacy string IDs are no longer supported');
 
-      expect(typeof entry.id).toBe('string');
-      expect(entry.id).toMatch(/^legacy-test--[a-f0-9]{8}$/);
-    } finally {
-      await legacyManager.dispose();
-    }
+    await legacyManager.dispose();
   });
 });

@@ -11,13 +11,16 @@ describe('DevlogManager', () => {
     // Create a temporary test workspace with unique name
     testWorkspace = path.join(process.cwd(), 'test-workspace-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9));
     
-    // Create isolated storage config for each test
-    const sqliteDbPath = path.join(testWorkspace, 'test.db');
+    // Create isolated storage config for each test using local JSON
     manager = new DevlogManager({ 
       workspaceRoot: testWorkspace,
+      useIntegerIds: false, // Use string IDs for backward compatibility in tests
       storage: {
-        type: 'sqlite',
-        filePath: sqliteDbPath
+        strategy: 'local-json',
+        localJson: {
+          directory: '.devlog',
+          filePattern: '{id:03d}-{slug}.json'
+        }
       }
     });
   });
@@ -52,7 +55,7 @@ describe('DevlogManager', () => {
     });
 
     it('should create a devlog with custom ID', async () => {
-      const customId = 'my-custom-id';
+      const customId = 123;
       const result = await manager.findOrCreateDevlog({
         id: customId,
         title: 'Custom ID Test',
@@ -131,7 +134,7 @@ describe('DevlogManager', () => {
     });
 
     it('should return null for non-existent devlog', async () => {
-      const result = await manager.getDevlog('non-existent-id');
+      const result = await manager.getDevlog(999); // Non-existent ID
       expect(result).toBeNull();
     });
   });
@@ -354,7 +357,7 @@ describe('DevlogManager', () => {
     });
 
     it('should throw error for non-existent devlog', async () => {
-      await expect(manager.deleteDevlog('non-existent')).rejects.toThrow('not found');
+      await expect(manager.deleteDevlog(999)).rejects.toThrow('not found');
     });
   });
 });

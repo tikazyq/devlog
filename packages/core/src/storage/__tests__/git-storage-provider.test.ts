@@ -12,6 +12,40 @@ import * as os from 'os';
 // Mock child_process spawn
 vi.mock('child_process');
 
+// Move mockEntry to top-level scope so all tests can access it
+const mockEntry: DevlogEntry = {
+  id: 1,
+  key: 'test-entry',
+  title: 'Test Entry',
+  type: 'feature',
+  description: 'A test entry',
+  status: 'todo',
+  priority: 'medium',
+  createdAt: '2025-06-25T10:00:00Z',
+  updatedAt: '2025-06-25T10:00:00Z',
+  tags: ['test'],
+  notes: [],
+  files: [],
+  relatedDevlogs: [],
+  context: {
+    businessContext: 'Test context',
+    technicalContext: 'Test technical context',
+    dependencies: [],
+    decisions: [],
+    acceptanceCriteria: [],
+    risks: []
+  },
+  aiContext: {
+    currentSummary: 'Test summary',
+    keyInsights: [],
+    openQuestions: [],
+    relatedPatterns: [],
+    suggestedNextSteps: [],
+    lastAIUpdate: '2025-06-25T10:00:00Z',
+    contextVersion: 1
+  }
+};
+
 describe('GitStorageProvider', () => {
   let provider: GitStorageProvider;
   let tempDir: string;
@@ -67,39 +101,6 @@ describe('GitStorageProvider', () => {
   });
 
   describe('entry management', () => {
-    const mockEntry: DevlogEntry = {
-      id: 1,
-      key: 'test-entry',
-      title: 'Test Entry',
-      type: 'feature',
-      description: 'A test entry',
-      status: 'todo',
-      priority: 'medium',
-      createdAt: '2025-06-25T10:00:00Z',
-      updatedAt: '2025-06-25T10:00:00Z',
-      tags: ['test'],
-      notes: [],
-      files: [],
-      relatedDevlogs: [],
-      context: {
-        businessContext: 'Test context',
-        technicalContext: 'Test technical context',
-        dependencies: [],
-        decisions: [],
-        acceptanceCriteria: [],
-        risks: []
-      },
-      aiContext: {
-        currentSummary: 'Test summary',
-        keyInsights: [],
-        openQuestions: [],
-        relatedPatterns: [],
-        suggestedNextSteps: [],
-        lastAIUpdate: '2025-06-25T10:00:00Z',
-        contextVersion: 1
-      }
-    };
-
     it('should save and retrieve entries', async () => {
       // Mock file system operations
       const mockWriteFile = vi.spyOn(fs, 'writeFile').mockResolvedValue();

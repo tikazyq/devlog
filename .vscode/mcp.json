@@ -18,12 +18,15 @@
                 "@playwright/mcp@latest"
             ]
         },
-        "sqlite": {
-            "command": "uvx",
+        "git": {
+            "command": "npx",
             "args": [
-                "mcp-sqlite",
-                "/home/marvin/.devlog/workspaces/default/devlog.db"
-            ]
+                "@cyanheads/git-mcp-server"
+            ],
+            "env": {
+                "MCP_LOG_LEVEL": "debug",
+                "GIT_SIGN_COMMITS": "false"
+            }
         }
     }
 }

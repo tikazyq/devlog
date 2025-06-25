@@ -7,16 +7,18 @@ import { DevlogEntry, DevlogFilter, DevlogStats, DevlogId, GitStorageConfig, Git
 import { StorageProvider } from "./storage-provider.js";
 import { GitOperations } from "../utils/git-operations.js";
 import { ConflictResolver } from "../utils/conflict-resolver.js";
+import { RepositoryStructure } from "../utils/repository-structure.js";
+import { GitRepositoryManager } from "../utils/git-repository-manager.js";
 import * as path from "path";
 import * as fs from "fs/promises";
 
 export class GitStorageProvider implements StorageProvider {
   private gitOps: GitOperations;
   private conflictResolver: ConflictResolver;
+  private repoStructure: RepositoryStructure;
+  private repoManager: GitRepositoryManager;
   private config: GitStorageConfig;
   private repositoryPath: string;
-  private entriesPath: string;
-  private indexPath: string;
   private initialized = false;
 
   constructor(config: GitStorageConfig) {
@@ -30,11 +32,11 @@ export class GitStorageProvider implements StorageProvider {
     
     // Repository will be cloned to a temp directory or specified path
     this.repositoryPath = this.getRepositoryPath();
-    this.entriesPath = path.join(this.repositoryPath, this.config.path!, "entries");
-    this.indexPath = path.join(this.repositoryPath, this.config.path!, "index.json");
     
     this.gitOps = new GitOperations(this.repositoryPath, this.config);
     this.conflictResolver = new ConflictResolver();
+    this.repoStructure = new RepositoryStructure(this.repositoryPath, this.config);
+    this.repoManager = new GitRepositoryManager(this.config);
   }
 
   private getRepositoryPath(): string {
@@ -59,7 +61,7 @@ export class GitStorageProvider implements StorageProvider {
       }
 
       // Ensure .devlog directory structure exists
-      await this.ensureDirectoryStructure();
+      await this.repoStructure.initialize();
       
       this.initialized = true;
     } catch (error) {
@@ -76,29 +78,10 @@ export class GitStorageProvider implements StorageProvider {
     }
   }
 
-  private async ensureDirectoryStructure(): Promise<void> {
-    const devlogPath = path.join(this.repositoryPath, this.config.path!);
-    
-    // Create .devlog directory structure
-    await fs.mkdir(devlogPath, { recursive: true });
-    await fs.mkdir(this.entriesPath, { recursive: true });
-    
-    // Create index.json if it doesn't exist
-    try {
-      await fs.access(this.indexPath);
-    } catch {
-      const initialIndex = {
-        version: "1.0",
-        entries: {},
-        nextId: 1,
-        lastModified: new Date().toISOString()
-      };
-      await fs.writeFile(this.indexPath, JSON.stringify(initialIndex, null, 2));
-    }
-  }
-
   async exists(id: DevlogId): Promise<boolean> {
-    const entryPath = this.getEntryPath(id);
+    const entryPath = await this.repoStructure.getEntryPathById(id);
+    if (!entryPath) return false;
+    
     try {
       await fs.access(entryPath);
       return true;
@@ -108,7 +91,8 @@ export class GitStorageProvider implements StorageProvider {
   }
 
   async get(id: DevlogId): Promise<DevlogEntry | null> {
-    const entryPath = this.getEntryPath(id);
+    const entryPath = await this.repoStructure.getEntryPathById(id);
+    if (!entryPath) return null;
     
     try {
       const content = await fs.readFile(entryPath, 'utf-8');
@@ -119,13 +103,13 @@ export class GitStorageProvider implements StorageProvider {
   }
 
   async save(entry: DevlogEntry): Promise<void> {
-    const entryPath = this.getEntryPath(entry.id);
+    const entryPath = this.repoStructure.getEntryPath(entry);
     
     // Write entry to JSON file
     await fs.writeFile(entryPath, JSON.stringify(entry, null, 2));
     
     // Update index
-    await this.updateIndex(entry);
+    await this.repoStructure.updateIndex(entry);
     
     // Auto-sync if enabled
     if (this.config.autoSync) {
@@ -134,11 +118,14 @@ export class GitStorageProvider implements StorageProvider {
   }
 
   async delete(id: DevlogId): Promise<void> {
-    const entryPath = this.getEntryPath(id);
+    const entryPath = await this.repoStructure.getEntryPathById(id);
+    if (!entryPath) {
+      throw new Error(`Entry ${id} not found`);
+    }
     
     try {
       await fs.unlink(entryPath);
-      await this.removeFromIndex(id);
+      await this.repoStructure.removeFromIndex(id);
       
       // Auto-sync if enabled
       if (this.config.autoSync) {
@@ -153,16 +140,19 @@ export class GitStorageProvider implements StorageProvider {
     const entries: DevlogEntry[] = [];
     
     try {
-      const files = await fs.readdir(this.entriesPath);
+      const files = await this.repoStructure.listEntryFiles();
       
       for (const file of files) {
-        if (file.endsWith('.json')) {
-          const content = await fs.readFile(path.join(this.entriesPath, file), 'utf-8');
+        const filePath = path.join(this.repositoryPath, this.config.path!, "entries", file);
+        try {
+          const content = await fs.readFile(filePath, 'utf-8');
           const entry = JSON.parse(content);
           
           if (this.matchesFilter(entry, filter)) {
             entries.push(entry);
           }
+        } catch (error) {
+          console.warn(`Failed to read entry file ${file}:`, error);
         }
       }
     } catch (error) {
@@ -234,52 +224,6 @@ export class GitStorageProvider implements StorageProvider {
 
   async resolveConflicts(strategy: ConflictResolution): Promise<void> {
     await this.conflictResolver.resolveConflicts(strategy, this.repositoryPath);
-  }
-
-  // Private helper methods
-  private getEntryPath(id: DevlogId): string {
-    // Use zero-padded ID for consistent sorting
-    const paddedId = id.toString().padStart(3, '0');
-    return path.join(this.entriesPath, `${paddedId}-entry.json`);
-  }
-
-  private async updateIndex(entry: DevlogEntry): Promise<void> {
-    try {
-      const indexContent = await fs.readFile(this.indexPath, 'utf-8');
-      const index = JSON.parse(indexContent);
-      
-      index.entries[entry.id] = {
-        id: entry.id,
-        title: entry.title,
-        type: entry.type,
-        status: entry.status,
-        priority: entry.priority,
-        createdAt: entry.createdAt,
-        updatedAt: entry.updatedAt,
-        file: `${entry.id.toString().padStart(3, '0')}-entry.json`
-      };
-      
-      index.lastModified = new Date().toISOString();
-      index.nextId = Math.max(index.nextId, entry.id + 1);
-      
-      await fs.writeFile(this.indexPath, JSON.stringify(index, null, 2));
-    } catch (error) {
-      console.error('Failed to update index:', error);
-    }
-  }
-
-  private async removeFromIndex(id: DevlogId): Promise<void> {
-    try {
-      const indexContent = await fs.readFile(this.indexPath, 'utf-8');
-      const index = JSON.parse(indexContent);
-      
-      delete index.entries[id];
-      index.lastModified = new Date().toISOString();
-      
-      await fs.writeFile(this.indexPath, JSON.stringify(index, null, 2));
-    } catch (error) {
-      console.error('Failed to remove from index:', error);
-    }
   }
 
   private matchesFilter(entry: DevlogEntry, filter?: DevlogFilter): boolean {

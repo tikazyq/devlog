@@ -26,6 +26,10 @@ export { GitStorageProvider } from "./storage/git-storage-provider.js";
 export { HybridStorageProvider } from "./storage/hybrid-storage-provider.js";
 export { EnterpriseSync } from "./integrations/enterprise-sync.js";
 export { DevlogUtils } from "./utils/devlog-utils.js";
+export { RepositoryStructure, type DevlogIndex, type DevlogIndexEntry, type DevlogMetadata } from "./utils/repository-structure.js";
+export { GitRepositoryManager, type RepositoryInfo, type RepositoryDiscoveryOptions } from "./utils/git-repository-manager.js";
+export { GitOperations } from "./utils/git-operations.js";
+export { ConflictResolver } from "./utils/conflict-resolver.js";
 
 // Re-export types for convenience
 export type {

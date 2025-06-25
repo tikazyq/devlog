@@ -36,11 +36,28 @@ This document outlines the design for a flexible GitHub integration that transfo
 
 ```typescript
 type StorageStrategy = 
-  | 'local-only'           // Current SQLite-only approach
-  | 'github-primary'       // GitHub repo as source of truth
-  | 'hybrid-github'        // Local cache + GitHub sync
-  | 'github-issues'        // Current approach (GitHub issues only)
+  | 'local-sqlite'         // Current SQLite-only approach
+  | 'git-json'             // Git repo with JSON files (git-native)
+  | 'hybrid-git'           // Git JSON + local SQLite cache (best of both)
 ```
+
+### Storage Strategy Configuration
+
+Each strategy addresses different use cases:
+
+**local-sqlite**: 
+- ✅ Fast local performance, full search capabilities
+- ❌ No cross-workspace access, device-locked data
+
+**git-json**:
+- ✅ Git-native, human-readable, cross-workspace access, works with any Git provider
+- ❌ No local indexing, limited search, potential performance issues
+
+**hybrid-git**:
+- ✅ Best of both worlds: Git access + local performance, provider-agnostic
+- ❌ More complex, requires sync management
+
+*Note: GitHub Issues integration is handled separately in the integrations layer, not as a storage strategy.*
 
 ## Implementation Plan
 
@@ -51,16 +68,16 @@ type StorageStrategy =
 **Objective**: Abstract storage to support multiple backends
 
 **Changes Required**:
-- Extend `StorageProvider` interface to support GitHub repositories
-- Add new `GitHubStorageProvider` class
-- Implement `HybridStorageProvider` for local cache + GitHub sync
+- Extend `StorageProvider` interface to support Git repositories
+- Add new `GitStorageProvider` class
+- Implement `HybridStorageProvider` for local cache + Git sync
 
 **New Interface**:
 ```typescript
 interface StorageProvider {
   // Existing methods...
   
-  // New methods for GitHub storage
+  // New methods for Git storage
   clone(repository: string, branch?: string): Promise<void>;
   pull(): Promise<void>;
   push(message: string): Promise<void>;
@@ -68,13 +85,21 @@ interface StorageProvider {
   resolveConflicts(strategy: ConflictResolution): Promise<void>;
 }
 
-interface GitHubStorageConfig {
-  repository: string;      // "owner/repo"
+interface GitStorageConfig {
+  repository: string;      // "owner/repo" or full Git URL
   branch?: string;         // default: "main"
-  path?: string;           // default: "devlog/"
-  token?: string;          // GitHub token
+  path?: string;           // default: ".devlog/"
+  credentials?: GitCredentials;
   autoSync?: boolean;      // default: true
   conflictResolution?: ConflictResolution;
+}
+
+interface GitCredentials {
+  type: 'token' | 'ssh' | 'basic';
+  token?: string;          // For GitHub/GitLab PAT
+  username?: string;       // For basic auth
+  password?: string;       // For basic auth
+  keyPath?: string;        // For SSH key path
 }
 
 type ConflictResolution = 'local-wins' | 'remote-wins' | 'timestamp-wins' | 'interactive';
@@ -82,23 +107,67 @@ type ConflictResolution = 'local-wins' | 'remote-wins' | 'timestamp-wins' | 'int
 
 #### 1.2 Configuration Management Enhancement
 
-**Objective**: Support GitHub storage configuration
+**Objective**: Support Git storage configuration
 
 **New Configuration Structure**:
 ```json
 {
   "storage": {
-    "type": "github",
+    "type": "hybrid-git",
     "repository": "username/my-devlog",
     "branch": "main",
-    "path": "devlog/",
+    "path": ".devlog/",
     "autoSync": true,
-    "conflictResolution": "timestamp-wins"
-  },
-  "authentication": {
-    "github": {
-      "token": "github_pat_...",
-      "scope": ["repo", "contents"]
+    "conflictResolution": "timestamp-wins",
+    "credentials": {
+      "type": "token",
+      "token": "github_pat_..."
+    },
+    "cache": {
+      "type": "sqlite",
+      "filePath": "~/.devlog/cache/my-devlog.db"
+    }
+  }
+}
+```
+
+**Storage Strategy Examples**:
+```json
+// Pure SQLite (current approach)
+{
+  "storage": {
+    "type": "local-sqlite",
+    "filePath": ".devlog/devlog.db"
+  }
+}
+
+// Pure Git JSON
+{
+  "storage": {
+    "type": "git-json",
+    "repository": "username/devlog",
+    "autoSync": true,
+    "conflictResolution": "timestamp-wins",
+    "credentials": {
+      "type": "token",
+      "token": "github_pat_..."
+    }
+  }
+}
+
+// Hybrid: Git JSON + SQLite cache
+{
+  "storage": {
+    "type": "hybrid-git",
+    "repository": "username/devlog",
+    "cache": {
+      "type": "sqlite",
+      "filePath": "~/.devlog/cache/devlog.db"
+    },
+    "syncStrategy": {
+      "mode": "eager",
+      "interval": 300,
+      "autoSync": true
     }
   }
 }
@@ -110,14 +179,24 @@ type ConflictResolution = 'local-wins' | 'remote-wins' | 'timestamp-wins' | 'int
   "workspaces": {
     "personal": {
       "storage": {
-        "type": "github",
+        "type": "git-json",
         "repository": "username/personal-devlog"
       }
     },
     "work": {
       "storage": {
-        "type": "github", 
-        "repository": "company/team-devlog"
+        "type": "hybrid-git", 
+        "repository": "company/team-devlog",
+        "cache": {
+          "type": "sqlite",
+          "filePath": "~/.devlog/cache/work-cache.db"
+        }
+      }
+    },
+    "local-dev": {
+      "storage": {
+        "type": "local-sqlite",
+        "filePath": "~/.devlog/local/local-dev.db"
       }
     }
   },
@@ -125,16 +204,16 @@ type ConflictResolution = 'local-wins' | 'remote-wins' | 'timestamp-wins' | 'int
 }
 ```
 
-### Phase 2: GitHub Repository Storage (Priority: High)
+### Phase 2: Git Repository Storage (Priority: High)
 
 #### 2.1 Repository-Based Storage Implementation
 
-**Objective**: Store devlog entries as JSON files in GitHub repository
+**Objective**: Store devlog entries as JSON files in Git repository
 
 **File Structure**:
 ```
 devlog-repo/
-├── devlog/
+├── .devlog/
 │   ├── entries/
 │   │   ├── 001-feature-auth.json
 │   │   ├── 002-bugfix-login.json
@@ -143,7 +222,7 @@ devlog-repo/
 │   │   ├── workspace-info.json
 │   │   ├── counters.json
 │   │   └── schema-version.json
-│   └── .devlog-config.json
+│   └── config.json
 ├── README.md
 └── .gitignore
 ```
@@ -346,3 +425,60 @@ class ConflictResolver {
 This design transforms the GitHub integration from a rigid sync mechanism into a flexible, primary storage solution that naturally supports cross-workspace access while leveraging GitHub's powerful collaboration and version control features.
 
 The phased approach ensures we can deliver immediate value (Phase 1-2) while maintaining a clear path for future enhancements. The focus on intuitive setup and automatic discovery addresses the core user need for seamless access across different work environments.
+
+## Storage Locations and Git Best Practices
+
+### What Goes Where
+
+**Git Repository (`.devlog/` folder - tracked):**
+- JSON devlog entry files
+- Index/metadata files
+- Configuration templates
+- Documentation
+
+**Local Cache (`~/.devlog/` - NOT tracked):**
+- SQLite database files (`.db`)
+- Temporary sync files
+- Local-only configurations
+- Performance cache data
+
+### .gitignore Requirements
+
+When using git-based storage, ensure your repository's `.gitignore` includes:
+
+```gitignore
+# Devlog - exclude SQLite databases and local cache
+*.db
+*.db-*
+.devlog/cache/
+.devlog/temp/
+.devlog/local/
+
+# Keep JSON files and structure
+!.devlog/entries/
+!.devlog/*.json
+```
+
+### Directory Structure Example
+
+**In Git Repository:**
+```
+my-project/
+  .devlog/                    # ✅ Tracked
+    entries/                  # ✅ Tracked
+      2024-01-15-feature.json # ✅ Tracked
+      2024-01-16-bugfix.json  # ✅ Tracked
+    index.json                # ✅ Tracked
+    config.json               # ✅ Tracked
+  .gitignore                  # Should exclude .db files
+```
+
+**Local User Directory:**
+```
+~/.devlog/                    # ❌ Never tracked
+  cache/                      # ❌ Never tracked
+    my-project.db             # ❌ Never tracked - SQLite cache
+    work-project.db           # ❌ Never tracked - SQLite cache
+  local/                      # ❌ Never tracked
+    local-only-project.db     # ❌ Never tracked - Local-only storage
+```

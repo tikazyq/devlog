@@ -139,9 +139,8 @@ build/
 
 .idea
 
-# Devlog directory - contains local development notes
-.devlog/
-.devlog*
+# Local development files
+.devlog-counter
 
 # Devlog configuration with credentials
 devlog.config.json

@@ -141,6 +141,7 @@ build/
 
 # Devlog directory - contains local development notes
 .devlog/
+.devlog*
 
 # Devlog configuration with credentials
 devlog.config.json

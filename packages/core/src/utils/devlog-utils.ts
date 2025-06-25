@@ -1,8 +1,11 @@
 import * as crypto from "crypto";
-import { DevlogType, DevlogEntry, DevlogFilter, DevlogNote } from "@devlog/types";
+import { DevlogType, DevlogEntry, DevlogFilter, DevlogNote, DevlogId } from "@devlog/types";
 
 export class DevlogUtils {
-  static generateId(title: string, type?: DevlogType): string {
+  /**
+   * Generate semantic key for devlog entry (used for the key field)
+   */
+  static generateKey(title: string, type?: DevlogType): string {
     // Create a clean slug from the title
     const slug = title
       .toLowerCase()
@@ -10,47 +13,34 @@ export class DevlogUtils {
       .replace(/^-+|-+$/g, "")
       .substring(0, 50); // Limit length
 
-    // Add type prefix if provided
-    const prefix = type ? `${type}-` : "";
-    
-    // Create a hash of the full input for uniqueness
-    const hash = crypto.createHash('md5')
-      .update(`${type || 'unknown'}-${title}`)
-      .digest('hex')
-      .substring(0, 8);
-
-    return `${prefix}${slug}-${hash}`;
+    return slug;
+  }
+  
+  /**
+   * Legacy method for backward compatibility - now generates keys instead of IDs
+   * @deprecated Use generateKey instead
+   */
+  static generateId(title: string, type?: DevlogType): string {
+    return DevlogUtils.generateKey(title, type);
   }
 
+  /**
+   * Generate unique key (deprecated - integer IDs handle uniqueness automatically)
+   * @deprecated No longer needed with integer ID system
+   */
   static async generateUniqueId(
     title: string, 
     type: DevlogType | undefined, 
     checkExisting: (id: string) => Promise<DevlogEntry | null>
   ): Promise<string> {
-    const baseId = DevlogUtils.generateId(title, type);
-    const existing = await checkExisting(baseId);
-    if (!existing) {
-      return baseId;
-    }
-    
-    // If it exists, add a counter suffix
-    let counter = 1;
-    let uniqueId: string;
-    
-    do {
-      uniqueId = `${baseId}-${counter}`;
-      counter++;
-    } while (await checkExisting(uniqueId) && counter < 100); // Prevent infinite loop
-    
-    // Fallback to timestamp if we can't find a unique ID
-    return counter >= 100 ? `${baseId}-${Date.now()}` : uniqueId;
+    return DevlogUtils.generateKey(title, type);
   }
 
   static async checkForDuplicateTitle(
     title: string, 
     type: DevlogType | undefined, 
     getAllEntries: () => Promise<DevlogEntry[]>,
-    excludeId?: string
+    excludeId?: DevlogId
   ): Promise<DevlogEntry | null> {
     const entries = await getAllEntries();
     const normalizedTitle = title.toLowerCase().trim();

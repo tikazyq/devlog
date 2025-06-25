@@ -2,6 +2,15 @@ import { Router } from 'express';
 import { DevlogManager } from '@devlog/core';
 import { CreateDevlogRequest, UpdateDevlogRequest, DevlogFilter } from '@devlog/types';
 
+// Utility function to parse ID from string parameter
+function parseDevlogId(idParam: string): number {
+  const id = parseInt(idParam, 10);
+  if (isNaN(id)) {
+    throw new Error(`Invalid devlog ID: ${idParam}`);
+  }
+  return id;
+}
+
 export function devlogRoutes(devlogManager: DevlogManager): Router {
   const router = Router();
 
@@ -26,7 +35,8 @@ export function devlogRoutes(devlogManager: DevlogManager): Router {
   // Get devlog by ID
   router.get('/:id', async (req, res) => {
     try {
-      const devlog = await devlogManager.getDevlog(req.params.id);
+      const id = parseDevlogId(req.params.id);
+      const devlog = await devlogManager.getDevlog(id);
       if (!devlog) {
         return res.status(404).json({ error: 'Devlog not found' });
       }
@@ -64,7 +74,8 @@ export function devlogRoutes(devlogManager: DevlogManager): Router {
   // Delete devlog
   router.delete('/:id', async (req, res) => {
     try {
-      await devlogManager.deleteDevlog(req.params.id);
+      const id = parseDevlogId(req.params.id);
+      await devlogManager.deleteDevlog(id);
       res.status(204).send();
     } catch (error) {
       console.error('Error deleting devlog:', error);
@@ -75,8 +86,9 @@ export function devlogRoutes(devlogManager: DevlogManager): Router {
   // Add note to devlog
   router.post('/:id/notes', async (req, res) => {
     try {
+      const id = parseDevlogId(req.params.id);
       const { note } = req.body;
-      const devlog = await devlogManager.addNote(req.params.id, note);
+      const devlog = await devlogManager.addNote(id, note);
       res.json(devlog);
     } catch (error) {
       console.error('Error adding note:', error);

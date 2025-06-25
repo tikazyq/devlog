@@ -24,10 +24,12 @@ export class AIContextManager {
   }): Promise<DevlogEntry> {
     
     const now = new Date().toISOString();
-    const id = `task-${Date.now()}`;
+    // Generate integer ID using timestamp-based approach
+    const id = parseInt(Date.now().toString().slice(-8), 10);
     
     const entry: DevlogEntry = {
       id,
+      key: `task-${Date.now()}`, // Use string for the key field
       title: taskData.title,
       type: "feature",
       description: taskData.description,

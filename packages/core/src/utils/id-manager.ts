@@ -22,15 +22,14 @@ export class IdManager {
   }
 
   /**
-   * Convert string ID back to appropriate type (detect if it's a number)
+   * Convert string ID back to integer (since all IDs are now integers)
    */
   static stringToId(idStr: string): DevlogId {
-    // Check if it's a pure integer
     const parsed = parseInt(idStr, 10);
-    if (!isNaN(parsed) && String(parsed) === idStr) {
-      return parsed;
+    if (isNaN(parsed)) {
+      throw new Error(`Invalid integer ID: ${idStr}`);
     }
-    return idStr;
+    return parsed;
   }
 
   /**

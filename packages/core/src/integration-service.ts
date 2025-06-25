@@ -2,7 +2,7 @@
  * Integration service that handles synchronization between local storage and external systems
  */
 
-import { DevlogEntry, EnterpriseIntegration, ExternalReference } from "@devlog/types";
+import { DevlogEntry, EnterpriseIntegration, ExternalReference, DevlogId } from "@devlog/types";
 import { StorageProvider } from "./storage/storage-provider.js";
 import { EnterpriseSync } from "./integrations/enterprise-sync.js";
 import { SyncStrategy } from "./configuration-manager.js";
@@ -86,7 +86,7 @@ export class IntegrationService {
   /**
    * Manually sync an entry to external systems
    */
-  async syncEntry(entryId: string): Promise<DevlogEntry | null> {
+  async syncEntry(entryId: DevlogId): Promise<DevlogEntry | null> {
     const entry = await this.storage.get(entryId);
     if (!entry || !this.enterpriseSync) {
       return entry;

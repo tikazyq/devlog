@@ -17,6 +17,15 @@ export class MCPDevlogAdapter {
     this.devlogManager = new DevlogManager();
   }
 
+  // Helper function to parse string ID to number
+  private parseId(idStr: string): number {
+    const id = parseInt(idStr, 10);
+    if (isNaN(id)) {
+      throw new Error(`Invalid devlog ID "${idStr}". Must be a number.`);
+    }
+    return id;
+  }
+
   /**
    * Initialize the adapter with appropriate storage configuration
    */
@@ -63,7 +72,8 @@ export class MCPDevlogAdapter {
   async getDevlog(args: { id: string }): Promise<CallToolResult> {
     await this.ensureInitialized();
     
-    const entry = await this.devlogManager.getDevlog(args.id);
+    const id = this.parseId(args.id);
+    const entry = await this.devlogManager.getDevlog(id);
     
     if (!entry) {
       return {
@@ -156,8 +166,9 @@ export class MCPDevlogAdapter {
   async addDevlogNote(args: { id: string; note: string; category?: string }): Promise<CallToolResult> {
     await this.ensureInitialized();
     
+    const id = this.parseId(args.id);
     const category = args.category as any || "progress";
-    const entry = await this.devlogManager.addNote(args.id, args.note, category);
+    const entry = await this.devlogManager.addNote(id, args.note, category);
     
     return {
       content: [
@@ -172,7 +183,8 @@ export class MCPDevlogAdapter {
   async addDecision(args: { id: string; decision: string; rationale: string; decisionMaker: string; alternatives?: string[] }): Promise<CallToolResult> {
     await this.ensureInitialized();
     
-    const entry = await this.devlogManager.getDevlog(args.id);
+    const id = this.parseId(args.id);
+    const entry = await this.devlogManager.getDevlog(id);
     if (!entry) {
       return {
         content: [
@@ -198,7 +210,7 @@ export class MCPDevlogAdapter {
     
     // Update the entry to trigger save
     const updated = await this.devlogManager.updateDevlog({
-      id: args.id,
+      id: id,
       // Use a field that exists in UpdateDevlogRequest to trigger save
       tags: entry.tags
     });
@@ -216,7 +228,8 @@ export class MCPDevlogAdapter {
   async completeDevlog(args: { id: string; summary?: string }): Promise<CallToolResult> {
     await this.ensureInitialized();
     
-    const entry = await this.devlogManager.completeDevlog(args.id, args.summary);
+    const id = this.parseId(args.id);
+    const entry = await this.devlogManager.completeDevlog(id, args.summary);
     
     return {
       content: [
@@ -271,7 +284,8 @@ export class MCPDevlogAdapter {
   async getContextForAI(args: { id: string }): Promise<CallToolResult> {
     await this.ensureInitialized();
     
-    const entry = await this.devlogManager.getContextForAI(args.id);
+    const id = this.parseId(args.id);
+    const entry = await this.devlogManager.getContextForAI(id);
     
     if (!entry) {
       return {
@@ -320,6 +334,7 @@ export class MCPDevlogAdapter {
   }): Promise<CallToolResult> {
     await this.ensureInitialized();
     
+    const id = this.parseId(args.id);
     const contextUpdate: any = {};
     
     if (args.summary) contextUpdate.currentSummary = args.summary;
@@ -331,7 +346,7 @@ export class MCPDevlogAdapter {
     contextUpdate.lastAIUpdate = new Date().toISOString();
     contextUpdate.contextVersion = (contextUpdate.contextVersion || 0) + 1;
 
-    const entry = await this.devlogManager.updateAIContext(args.id, contextUpdate);
+    const entry = await this.devlogManager.updateAIContext(id, contextUpdate);
     
     return {
       content: [

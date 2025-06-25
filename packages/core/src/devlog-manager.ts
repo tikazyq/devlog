@@ -124,10 +124,14 @@ export class DevlogManager {
       return existing;
     }
 
+    // Generate semantic key for reference
+    const key = this.generateKey(request.title, request.type);
+
     // Create new entry
     const now = new Date().toISOString();
     const entry: DevlogEntry = {
       id,
+      key,
       title: request.title,
       type: request.type,
       description: request.description,
@@ -474,9 +478,7 @@ export class DevlogManager {
    */
   async syncDevlog(id: DevlogId): Promise<DevlogEntry | null> {
     await this.ensureInitialized();
-    // Convert ID to string for integration service compatibility
-    const idStr = IdManager.idToString(id);
-    return await this.integrationService.syncEntry(idStr);
+    return await this.integrationService.syncEntry(id);
   }
 
   /**
@@ -513,17 +515,29 @@ export class DevlogManager {
       // Use integer ID system
       return await this.idManager.generateNextId();
     } else {
-      // Fall back to legacy hash-based system
-      const slug = title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "")
-        .substring(0, 50);
+      // Legacy system no longer supported - always use integers
+      throw new Error("Legacy string IDs are no longer supported. Use integer ID system.");
+    }
+  }
 
-      // Create hash from title and type for consistency
+  /**
+   * Generate semantic key for the entry (used for referencing and legacy compatibility)
+   */
+  private generateKey(title: string, type?: DevlogType): string {
+    const slug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .substring(0, 50);
+
+    // For consistency with legacy system, optionally include type-based hash
+    if (type && this.useIntegerIds) {
+      // Clean key without hash for new system
+      return slug;
+    } else {
+      // Legacy format with hash
       const content = type ? `${title}:${type}` : title;
       const hash = crypto.createHash("sha256").update(content).digest("hex").substring(0, 8);
-
       return `${slug}--${hash}`;
     }
   }

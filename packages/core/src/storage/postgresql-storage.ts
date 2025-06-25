@@ -2,7 +2,7 @@
  * PostgreSQL storage provider for production-grade devlog storage
  */
 
-import { DevlogEntry, DevlogFilter, DevlogStats } from "@devlog/types";
+import { DevlogEntry, DevlogFilter, DevlogStats, DevlogId } from "@devlog/types";
 import { StorageProvider } from "./storage-provider.js";
 
 export class PostgreSQLStorageProvider implements StorageProvider {
@@ -34,7 +34,8 @@ export class PostgreSQLStorageProvider implements StorageProvider {
     // Create tables and indexes
     await this.client.query(`
       CREATE TABLE IF NOT EXISTS devlog_entries (
-        id TEXT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
+        key_field TEXT UNIQUE NOT NULL,
         title TEXT NOT NULL,
         type TEXT NOT NULL,
         description TEXT NOT NULL,
@@ -54,6 +55,7 @@ export class PostgreSQLStorageProvider implements StorageProvider {
         notes JSONB
       );
 
+      CREATE INDEX IF NOT EXISTS idx_devlog_key ON devlog_entries(key_field);
       CREATE INDEX IF NOT EXISTS idx_devlog_status ON devlog_entries(status);
       CREATE INDEX IF NOT EXISTS idx_devlog_type ON devlog_entries(type);
       CREATE INDEX IF NOT EXISTS idx_devlog_priority ON devlog_entries(priority);
@@ -65,12 +67,12 @@ export class PostgreSQLStorageProvider implements StorageProvider {
     `);
   }
 
-  async exists(id: string): Promise<boolean> {
+  async exists(id: DevlogId): Promise<boolean> {
     const result = await this.client.query("SELECT 1 FROM devlog_entries WHERE id = $1", [id]);
     return result.rows.length > 0;
   }
 
-  async get(id: string): Promise<DevlogEntry | null> {
+  async get(id: DevlogId): Promise<DevlogEntry | null> {
     const result = await this.client.query("SELECT * FROM devlog_entries WHERE id = $1", [id]);
     
     if (result.rows.length === 0) return null;
@@ -81,11 +83,12 @@ export class PostgreSQLStorageProvider implements StorageProvider {
   async save(entry: DevlogEntry): Promise<void> {
     await this.client.query(`
       INSERT INTO devlog_entries (
-        id, title, type, description, status, priority, created_at, updated_at,
+        id, key_field, title, type, description, status, priority, created_at, updated_at,
         estimated_hours, actual_hours, assignee, tags, files, related_devlogs,
         context, ai_context, external_references, notes
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
       ON CONFLICT (id) DO UPDATE SET
+        key_field = EXCLUDED.key_field,
         title = EXCLUDED.title,
         type = EXCLUDED.type,
         description = EXCLUDED.description,
@@ -104,6 +107,7 @@ export class PostgreSQLStorageProvider implements StorageProvider {
         notes = EXCLUDED.notes
     `, [
       entry.id,
+      entry.key,
       entry.title,
       entry.type,
       entry.description,
@@ -124,7 +128,7 @@ export class PostgreSQLStorageProvider implements StorageProvider {
     ]);
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: DevlogId): Promise<void> {
     await this.client.query("DELETE FROM devlog_entries WHERE id = $1", [id]);
   }
 
@@ -242,6 +246,7 @@ export class PostgreSQLStorageProvider implements StorageProvider {
   private rowToDevlogEntry(row: any): DevlogEntry {
     return {
       id: row.id,
+      key: row.key_field,
       title: row.title,
       type: row.type,
       description: row.description,

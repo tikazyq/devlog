@@ -2,7 +2,7 @@
  * MySQL storage provider for production-grade devlog storage
  */
 
-import { DevlogEntry, DevlogFilter, DevlogStats } from "@devlog/types";
+import { DevlogEntry, DevlogFilter, DevlogStats, DevlogId } from "@devlog/types";
 import { StorageProvider } from "./storage-provider.js";
 
 export class MySQLStorageProvider implements StorageProvider {
@@ -31,7 +31,8 @@ export class MySQLStorageProvider implements StorageProvider {
     // Create tables and indexes
     await this.connection.execute(`
       CREATE TABLE IF NOT EXISTS devlog_entries (
-        id VARCHAR(255) PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        key_field VARCHAR(255) UNIQUE NOT NULL,
         title TEXT NOT NULL,
         type VARCHAR(50) NOT NULL,
         description TEXT NOT NULL,
@@ -50,6 +51,7 @@ export class MySQLStorageProvider implements StorageProvider {
         external_references JSON,
         notes JSON,
         
+        INDEX idx_devlog_key (key_field),
         INDEX idx_devlog_status (status),
         INDEX idx_devlog_type (type),
         INDEX idx_devlog_priority (priority),
@@ -61,12 +63,12 @@ export class MySQLStorageProvider implements StorageProvider {
     `);
   }
 
-  async exists(id: string): Promise<boolean> {
+  async exists(id: DevlogId): Promise<boolean> {
     const [rows] = await this.connection.execute("SELECT 1 FROM devlog_entries WHERE id = ?", [id]);
     return (rows as any[]).length > 0;
   }
 
-  async get(id: string): Promise<DevlogEntry | null> {
+  async get(id: DevlogId): Promise<DevlogEntry | null> {
     const [rows] = await this.connection.execute("SELECT * FROM devlog_entries WHERE id = ?", [id]);
     const results = rows as any[];
     
@@ -78,11 +80,12 @@ export class MySQLStorageProvider implements StorageProvider {
   async save(entry: DevlogEntry): Promise<void> {
     await this.connection.execute(`
       INSERT INTO devlog_entries (
-        id, title, type, description, status, priority, created_at, updated_at,
+        id, key_field, title, type, description, status, priority, created_at, updated_at,
         estimated_hours, actual_hours, assignee, tags, files, related_devlogs,
         context, ai_context, external_references, notes
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON DUPLICATE KEY UPDATE
+        key_field = VALUES(key_field),
         title = VALUES(title),
         type = VALUES(type),
         description = VALUES(description),
@@ -101,6 +104,7 @@ export class MySQLStorageProvider implements StorageProvider {
         notes = VALUES(notes)
     `, [
       entry.id,
+      entry.key,
       entry.title,
       entry.type,
       entry.description,
@@ -121,7 +125,7 @@ export class MySQLStorageProvider implements StorageProvider {
     ]);
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: DevlogId): Promise<void> {
     await this.connection.execute("DELETE FROM devlog_entries WHERE id = ?", [id]);
   }
 
@@ -234,6 +238,7 @@ export class MySQLStorageProvider implements StorageProvider {
   private rowToDevlogEntry(row: any): DevlogEntry {
     return {
       id: row.id,
+      key: row.key_field,
       title: row.title,
       type: row.type,
       description: row.description,

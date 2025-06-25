@@ -11,9 +11,9 @@ export type DevlogPriority = "low" | "medium" | "high" | "critical";
 export type NoteCategory = "progress" | "issue" | "solution" | "idea" | "reminder";
 
 /**
- * ID type for devlog entries - can be string (legacy) or number (new integer system)
+ * ID type for devlog entries - integer only for clean, user-friendly references
  */
-export type DevlogId = string | number;
+export type DevlogId = number;
 
 export interface DevlogNote {
   id: string;
@@ -26,6 +26,7 @@ export interface DevlogNote {
 
 export interface DevlogEntry {
   id: DevlogId;
+  key: string; // Original semantic key (e.g., "web-ui-issues-investigation")
   title: string;
   type: DevlogType;
   description: string;

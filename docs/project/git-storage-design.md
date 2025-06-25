@@ -65,18 +65,21 @@ The `LocalJsonStorageProvider` writes devlog entries as JSON files in the projec
 project-root/
 ├── .devlog/
 │   ├── entries/
-│   │   ├── entry-1.json      # Individual devlog entries
-│   │   ├── entry-2.json
-│   │   └── entry-3.json
-│   └── metadata.json         # Index and metadata
+│   │   ├── 0001-implement-local-storage.json    # Individual devlog entries
+│   │   ├── 0002-refactor-git-design.json
+│   │   ├── 0003-update-documentation.json
+│   │   └── 1000-large-project-entry.json       # Auto-scales to 4+ digits
+│   └── metadata.json                            # Index and metadata
 ├── src/
-├── .git/                     # Existing project git repo
+├── .git/                                        # Existing project git repo
 └── package.json
 ```
 
+> **Note**: File numbering automatically scales from 3-digit (001-999) to 4+ digits (1000+) as needed, ensuring consistent alphabetical ordering regardless of project size.
+
 #### File Structure
 
-**Entry Files** (`entries/entry-{id}.json`):
+**Entry Files** (`entries/0001-<slug>.json`):
 ```json
 {
   "id": "implement-local-storage",
@@ -104,7 +107,7 @@ project-root/
   "entries": [
     {
       "id": "implement-local-storage",
-      "file": "entries/entry-1.json",
+      "file": "entries/0001-implement-local-storage.json",
       "status": "in-progress",
       "updated": "2025-01-23T14:30:00Z"
     }
@@ -140,9 +143,10 @@ Since entries are regular files in the project repository:
 
 ```typescript
 interface LocalJsonConfig {
-  baseDir?: string;     // Default: '.devlog'
-  pretty?: boolean;     // Default: true (formatted JSON)
-  backup?: boolean;     // Default: false (git is backup)
+  baseDir?: string;       // Default: '.devlog'
+  pretty?: boolean;       // Default: true (formatted JSON)
+  backup?: boolean;       // Default: false (git is backup)
+  minPadding?: number;    // Default: 3 (minimum digits for numbering)
 }
 
 // devlog.config.json - with optional customization
@@ -150,9 +154,10 @@ interface LocalJsonConfig {
   "storage": {
     "strategy": "local-json",
     "config": {
-      "baseDir": ".devlogs",    // Custom directory
-      "pretty": true,           // Formatted JSON
-      "backup": false           // No additional backup
+      "baseDir": ".devlogs",      // Custom directory
+      "pretty": true,             // Formatted JSON
+      "backup": false,            // No additional backup
+      "minPadding": 4             // Start with 4-digit numbering (0001)
     }
   }
 }
@@ -165,6 +170,8 @@ The `LocalJsonStorageProvider` class provides full CRUD operations for devlog en
 ### Key Features
 
 - **Automatic Directory Creation**: Creates `.devlog/entries/` structure on first use
+- **Smart File Naming**: Files named as `0001-<slug>.json` with dynamic padding that grows as needed
+- **Scalable Numbering**: Starts with 3-digit padding (001-999), automatically expands to 4+ digits for larger projects
 - **Metadata Management**: Maintains index file for fast queries and statistics
 - **Error Handling**: Proper handling of file system errors and missing files
 - **Type Safety**: Full TypeScript support with proper interfaces

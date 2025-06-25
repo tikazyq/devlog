@@ -10,7 +10,7 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import * as crypto from "crypto";
 import * as os from "os";
-import { EnterpriseIntegration, StorageConfig } from "@devlog/types";
+import { EnterpriseIntegration, StorageConfig, StorageStrategy, LocalJsonConfig } from "@devlog/types";
 
 export interface SyncStrategy {
   sourceOfTruth: 'local' | 'external' | 'manual';
@@ -86,9 +86,18 @@ export class ConfigurationManager {
   async detectBestStorage(): Promise<StorageConfig> {
     // Check for new storage strategy environment variable
     if (process.env.DEVLOG_STORAGE_STRATEGY) {
-      const strategy = process.env.DEVLOG_STORAGE_STRATEGY as 'local-sqlite' | 'git-json' | 'hybrid-git';
+      const strategy = process.env.DEVLOG_STORAGE_STRATEGY as 'local-sqlite' | 'local-json' | 'git-json' | 'hybrid-git';
       
       switch (strategy) {
+        case 'local-json':
+          return {
+            strategy: 'local-json',
+            localJson: {
+              directory: process.env.DEVLOG_JSON_DIR || '.devlog',
+              filePattern: process.env.DEVLOG_FILE_PATTERN || '{id:03d}-{slug}.json'
+            }
+          };
+          
         case 'git-json':
           return {
             strategy: 'git-json',
@@ -187,15 +196,12 @@ export class ConfigurationManager {
       }
     }
 
-    // Default to new local-sqlite strategy
-    const workspace = await this.getWorkspaceStructure();
-    await this.initializeGlobalStructure();
-    await this.initializeWorkspaceStructure(workspace);
-    
+    // Default to local-json strategy (git-friendly, zero config)
     return {
-      strategy: 'local-sqlite',
-      sqlite: {
-        filePath: workspace.dbPath
+      strategy: 'local-json',
+      localJson: {
+        directory: '.devlog',
+        filePattern: '{id:03d}-{slug}.json'
       }
     };
   }

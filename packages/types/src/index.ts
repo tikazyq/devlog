@@ -233,8 +233,8 @@ export interface DiscoveryResult {
   searchParameters: DiscoverDevlogsRequest;
 }
 
-// Git Storage Configuration Types
-export type StorageStrategy = 'local-sqlite' | 'git-json' | 'hybrid-git';
+// Storage Configuration Types
+export type StorageStrategy = 'local-sqlite' | 'local-json' | 'git-json' | 'hybrid-git';
 
 export type ConflictResolution = 'local-wins' | 'remote-wins' | 'timestamp-wins' | 'interactive';
 
@@ -260,6 +260,11 @@ export interface LocalCacheConfig {
   filePath: string;        // e.g., "~/.devlog/cache/project-name.db"
 }
 
+export interface LocalJsonConfig {
+  directory?: string;      // default: ".devlog/"
+  filePattern?: string;    // default: "{id:03d}-{slug}.json"
+}
+
 export interface StorageConfig {
   strategy: StorageStrategy;
   
@@ -269,7 +274,10 @@ export interface StorageConfig {
     options?: Record<string, any>;
   };
   
-  // Git repository storage
+  // Local JSON storage (new - simple git-based approach)
+  localJson?: LocalJsonConfig;
+  
+  // Git repository storage (deprecated - overly complex)
   git?: GitStorageConfig;
   
   // Local cache for hybrid strategy

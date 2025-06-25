@@ -234,7 +234,7 @@ Create a new devlog entry for a task, feature, or bugfix. Will fail if an entry 
 }
 ```
 
-#### `find_or_create_devlog`
+#### `create_devlog`
 Find an existing devlog entry by title or create a new one if it doesn't exist. This is the recommended way to create devlog entries as it prevents duplicates.
 
 ```json

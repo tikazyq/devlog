@@ -20,6 +20,7 @@ export {
   type StorageProvider
 } from "./storage/storage-provider.js";
 export { SQLiteStorageProvider } from "./storage/sqlite-storage.js";
+export { LocalJsonStorageProvider, type LocalJsonConfig } from "./storage/local-json-storage.js";
 export { PostgreSQLStorageProvider } from "./storage/postgresql-storage.js";
 export { MySQLStorageProvider } from "./storage/mysql-storage.js";
 export { GitStorageProvider } from "./storage/git-storage-provider.js";

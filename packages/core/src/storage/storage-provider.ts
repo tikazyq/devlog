@@ -60,6 +60,11 @@ export interface StorageProvider {
    */
   isGitBased(): boolean;
 
+  /**
+   * Get the next available ID for a new entry
+   */
+  getNextId?(): Promise<DevlogId>;
+
   // Git-specific methods (optional - only implemented by git storage providers)
   
   /**
@@ -120,6 +125,13 @@ export class StorageProviderFactory {
         return new SQLiteStorageProvider(
           config.sqlite?.filePath || ":memory:", 
           config.sqlite?.options
+        );
+
+      case "local-json":
+        const { LocalJsonStorageProvider } = await import("./local-json-storage.js");
+        return new LocalJsonStorageProvider(
+          process.cwd(), // Use current working directory as project root
+          config.localJson || {}
         );
 
       case "git-json":

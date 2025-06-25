@@ -232,3 +232,65 @@ export interface DiscoveryResult {
   recommendation: string;
   searchParameters: DiscoverDevlogsRequest;
 }
+
+// Git Storage Configuration Types
+export type StorageStrategy = 'local-sqlite' | 'git-json' | 'hybrid-git';
+
+export type ConflictResolution = 'local-wins' | 'remote-wins' | 'timestamp-wins' | 'interactive';
+
+export interface GitCredentials {
+  type: 'token' | 'ssh' | 'basic';
+  token?: string;          // For GitHub/GitLab PAT
+  username?: string;       // For basic auth
+  password?: string;       // For basic auth
+  keyPath?: string;        // For SSH key path
+}
+
+export interface GitStorageConfig {
+  repository: string;      // "owner/repo" or full Git URL
+  branch?: string;         // default: "main"
+  path?: string;           // default: ".devlog/"
+  credentials?: GitCredentials;
+  autoSync?: boolean;      // default: true
+  conflictResolution?: ConflictResolution;
+}
+
+export interface LocalCacheConfig {
+  type: 'sqlite';
+  filePath: string;        // e.g., "~/.devlog/cache/project-name.db"
+}
+
+export interface StorageConfig {
+  strategy: StorageStrategy;
+  
+  // Local SQLite storage (existing)
+  sqlite?: {
+    filePath: string;
+    options?: Record<string, any>;
+  };
+  
+  // Git repository storage
+  git?: GitStorageConfig;
+  
+  // Local cache for hybrid strategy
+  cache?: LocalCacheConfig;
+  
+  // Legacy support
+  type?: "sqlite" | "postgres" | "mysql";
+  connectionString?: string;
+  filePath?: string;
+  options?: Record<string, any>;
+}
+
+export interface WorkspaceConfig {
+  workspaces?: Record<string, StorageConfig>;
+  defaultWorkspace?: string;
+}
+
+export interface GitSyncStatus {
+  status: 'synced' | 'ahead' | 'behind' | 'diverged' | 'error';
+  localCommits?: number;
+  remoteCommits?: number;
+  lastSync?: string;
+  error?: string;
+}

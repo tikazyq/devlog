@@ -15,7 +15,8 @@ import type {
   DevlogType,
   DevlogPriority,
   DevlogId,
-  EnterpriseIntegration
+  EnterpriseIntegration,
+  StorageConfig
 } from "@devlog/types";
 
 // Discovery-related interfaces
@@ -39,7 +40,7 @@ export interface DiscoveryResult {
   searchParameters: DiscoverDevlogsRequest;
 }
 
-import { StorageProvider, StorageConfig, StorageProviderFactory } from "./storage/storage-provider.js";
+import { StorageProvider, StorageProviderFactory } from "./storage/storage-provider.js";
 import { ConfigurationManager, SyncStrategy } from "./configuration-manager.js";
 import { IntegrationService } from "./integration-service.js";
 import { IdManager } from "./utils/id-manager.js";

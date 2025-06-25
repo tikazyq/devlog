@@ -243,6 +243,10 @@ export class PostgreSQLStorageProvider implements StorageProvider {
     return false;
   }
 
+  isGitBased(): boolean {
+    return false;
+  }
+
   private rowToDevlogEntry(row: any): DevlogEntry {
     return {
       id: row.id,

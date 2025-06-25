@@ -2,7 +2,7 @@
  * Abstract storage interface that supports different storage backends
  */
 
-import { DevlogEntry, DevlogFilter, DevlogStats, DevlogId } from "@devlog/types";
+import { DevlogEntry, DevlogFilter, DevlogStats, DevlogId, GitSyncStatus, ConflictResolution, StorageConfig } from "@devlog/types";
 
 export interface StorageProvider {
   /**
@@ -54,13 +54,38 @@ export interface StorageProvider {
    * Check if this storage provider can handle enterprise-managed entries
    */
   isRemoteStorage(): boolean;
-}
 
-export interface StorageConfig {
-  type: "sqlite" | "postgres" | "mysql";
-  connectionString?: string;
-  filePath?: string;
-  options?: Record<string, any>;
+  /**
+   * Check if the storage provider supports git operations
+   */
+  isGitBased(): boolean;
+
+  // Git-specific methods (optional - only implemented by git storage providers)
+  
+  /**
+   * Clone a git repository for storage
+   */
+  clone?(repository: string, branch?: string): Promise<void>;
+
+  /**
+   * Pull latest changes from remote repository
+   */
+  pull?(): Promise<void>;
+
+  /**
+   * Push local changes to remote repository
+   */
+  push?(message: string): Promise<void>;
+
+  /**
+   * Get current sync status with remote repository
+   */
+  getRemoteStatus?(): Promise<GitSyncStatus>;
+
+  /**
+   * Resolve conflicts with remote repository
+   */
+  resolveConflicts?(strategy: ConflictResolution): Promise<void>;
 }
 
 /**
@@ -68,21 +93,54 @@ export interface StorageConfig {
  */
 export class StorageProviderFactory {
   static async create(config: StorageConfig): Promise<StorageProvider> {
-    switch (config.type) {
-      case "sqlite":
+    // Handle legacy configurations
+    if (config.type) {
+      switch (config.type) {
+        case "sqlite":
+          const { SQLiteStorageProvider } = await import("./sqlite-storage.js");
+          return new SQLiteStorageProvider(config.filePath || ":memory:", config.options);
+
+        case "postgres":
+          const { PostgreSQLStorageProvider } = await import("./postgresql-storage.js");
+          return new PostgreSQLStorageProvider(config.connectionString!, config.options);
+
+        case "mysql":
+          const { MySQLStorageProvider } = await import("./mysql-storage.js");
+          return new MySQLStorageProvider(config.connectionString!, config.options);
+
+        default:
+          throw new Error(`Unsupported storage type: ${config.type}`);
+      }
+    }
+
+    // Handle new storage strategies
+    switch (config.strategy) {
+      case "local-sqlite":
         const { SQLiteStorageProvider } = await import("./sqlite-storage.js");
-        return new SQLiteStorageProvider(config.filePath || ":memory:", config.options);
+        return new SQLiteStorageProvider(
+          config.sqlite?.filePath || ":memory:", 
+          config.sqlite?.options
+        );
 
-      case "postgres":
-        const { PostgreSQLStorageProvider } = await import("./postgresql-storage.js");
-        return new PostgreSQLStorageProvider(config.connectionString!, config.options);
+      case "git-json":
+        if (!config.git) {
+          throw new Error("Git configuration is required for git-json strategy");
+        }
+        const { GitStorageProvider } = await import("./git-storage-provider.js");
+        return new GitStorageProvider(config.git);
 
-      case "mysql":
-        const { MySQLStorageProvider } = await import("./mysql-storage.js");
-        return new MySQLStorageProvider(config.connectionString!, config.options);
+      case "hybrid-git":
+        if (!config.git) {
+          throw new Error("Git configuration is required for hybrid-git strategy");
+        }
+        if (!config.cache) {
+          throw new Error("Cache configuration is required for hybrid-git strategy");
+        }
+        const { HybridStorageProvider } = await import("./hybrid-storage-provider.js");
+        return new HybridStorageProvider(config.git, config.cache);
 
       default:
-        throw new Error(`Unsupported storage type: ${config.type}`);
+        throw new Error(`Unsupported storage strategy: ${config.strategy}`);
     }
   }
 }

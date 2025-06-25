@@ -1,6 +1,7 @@
-# GitHub-First Storage Design Document
+# Git-Based Storage Design Document
 
-**Status:** In Development  
+**Status:** Design Complete  
+**Implementation:** [git-storage-roadmap.md](./git-storage-roadmap.md)  
 **Created:** June 25, 2025  
 **Author:** AI Agent  
 **Priority:** High  
@@ -8,29 +9,30 @@
 
 ## Overview
 
-This document outlines the design for a flexible GitHub integration that transforms GitHub from a rigid sync target into a primary storage solution for devlog entries. The goal is to enable seamless cross-workspace access to devlog data while maintaining GitHub's collaboration and version control benefits.
+This document outlines the design for a flexible git-based integration that transforms git repositories (GitHub, GitLab, etc.) from rigid sync targets into primary storage solutions for devlog entries. The goal is to enable seamless cross-workspace access to devlog data while maintaining git's collaboration and version control benefits.
 
 ## Problem Statement
 
 ### Current Issues
-- **Rigid Sync Model**: GitHub treated as external sync target, not primary storage
+- **Rigid Sync Model**: Git platforms treated as external sync targets, not primary storage
 - **Cross-Workspace Access**: No easy way to access devlog entries from multiple workspaces (home/work)
 - **Complex Setup**: Requires manual token configuration and project setup
 - **No Workspace Discovery**: Cannot discover existing devlog data when setting up new workspace
 - **Poor Conflict Resolution**: Limited handling of multi-device scenarios
 
 ### User Need
-> "I want to prioritize the integration to GitHub because I don't want to keep my devlog entries on local so that my workspace at home won't be able to access them."
+> "I want to prioritize the integration to git-based storage because I don't want to keep my devlog entries on local so that my workspace at home won't be able to access them."
 
 ## Solution Architecture
 
 ### Core Design Principles
 
-1. **GitHub-First Mentality**: Treat GitHub as primary storage, not just a sync target
+1. **Git-First Mentality**: Treat git repositories as primary storage, not just sync targets
 2. **Intuitive Setup**: One-command setup with automatic discovery
 3. **Flexible Storage**: Support multiple storage strategies based on user needs
 4. **Seamless Cross-Device**: Automatic workspace discovery and sync
 5. **Backward Compatibility**: Maintain support for existing workflows
+6. **Platform Agnostic**: Support GitHub, GitLab, and any git repository
 
 ### Storage Strategy Types
 

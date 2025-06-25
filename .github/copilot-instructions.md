@@ -5,10 +5,8 @@
 **This project uses ITSELF for development tracking. ALWAYS follow this workflow:**
 
 ### ⚠️ MANDATORY FIRST STEP: Always Discover Before Creating
-```
-🔍 BEFORE creating ANY devlog entry, ALWAYS run:
-mcp_devlog_discover_related_devlogs()
-```
+
+🔍 BEFORE creating ANY devlog entry, ALWAYS run: `discover_related_devlogs`
 
 **Why this matters:**
 - Prevents duplicate work and entries  
@@ -43,13 +41,13 @@ mcp_devlog_discover_related_devlogs()
 ## Essential SOPs
 
 ### Before Any Work
-1. **🔍 ALWAYS** run `mcp_devlog_discover_related_devlogs()` first
-2. **🔧 CHECK ERRORS** using `get_errors` tool before building/running
-3. **📊 CHECK STATUS** using `mcp_git_git_status()` to understand repo state
+1. **🔍 ALWAYS** run `discover_related_devlogs` first
+2. **🔧 CHECK ERRORS** using `problems` tool before building/running
+3. **📊 CHECK STATUS** using `git_status` to understand repo state
 
 ### Git Operations Priority
 **Use Git MCP tools as primary method:**
-- `mcp_git_git_status()`, `mcp_git_git_add()`, `mcp_git_git_commit()`, `mcp_git_git_push()`
+- `git_status`, `git_add`, `git_commit`, `git_push`
 - **Fallback to terminal only when MCP tools unavailable**
 
 ### Commit Early and Often

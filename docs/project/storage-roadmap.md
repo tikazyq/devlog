@@ -1,6 +1,6 @@
 # Local JSON Storage Implementation Roadmap
 
-**Related Design Doc:** [git-storage-design.md](./git-storage-design.md)  
+**Related Design Doc:** [storage-design.md](./storage-design.md)  
 **Devlog ID:** 1  
 **Objective:** Simplify storage to use local JSON files, remove git complexity  
 
@@ -80,7 +80,7 @@ This roadmap tracks the implementation of a simplified local JSON storage approa
 - [ ] Provide examples of configuration changes needed
 - [ ] Test migration scenarios
 
-## 🎯 PLANNED: Phase 3 - Production Features (Future)
+## 🎯 PLANNED: Phase 3 - Production Storage Features (Future)
 
 ### 3.1 Enhanced File Operations
 - [ ] File watching for external changes to devlog files
@@ -88,17 +88,17 @@ This roadmap tracks the implementation of a simplified local JSON storage approa
 - [ ] Schema validation and automatic migration
 - [ ] Large dataset performance optimization
 
-### 3.2 Integration Services (Optional)
-- [ ] Git integration service for automated git operations (separate from storage)
-- [ ] Cross-repository devlog discovery service
-- [ ] Automated branch and commit creation
-- [ ] Repository synchronization utilities
+### 3.2 Storage Utilities
+- [ ] Export/import utilities for different formats (JSON, CSV, XML)
+- [ ] Backup and restore functionality for local storage
+- [ ] Storage compaction and cleanup utilities
+- [ ] Cross-storage-provider migration tools
 
-### 3.3 Advanced Features
-- [ ] Export/import utilities for different formats
-- [ ] Backup and restore functionality  
-- [ ] Search indexing for fast text search
-- [ ] Plugin system for custom integrations
+### 3.3 Advanced Storage Features
+- [ ] Search indexing for fast text search across entries
+- [ ] Caching layer for improved performance
+- [ ] Storage analytics and usage metrics  
+- [ ] Automatic file organization and archiving
 
 ## Current Project Structure
 
@@ -156,9 +156,9 @@ project-root/
 ### Phase 3 Success Criteria 🎯 PLANNED
 - [ ] File watching and concurrent access safety implemented
 - [ ] Performance optimized for large datasets (100+ entries)
-- [ ] Git integration service provides optional advanced workflows
-- [ ] Cross-repository discovery works across multiple projects
 - [ ] Migration tools successfully convert from all storage providers
+- [ ] Schema validation and automatic migration working
+- [ ] Concurrent access safety with file locking implemented
 
 ## Architecture Changes Summary
 
@@ -174,13 +174,11 @@ project-root/
 - Git handled naturally by existing project repository
 - Storage and integration concerns properly separated
 
-### Future Integration Services (Optional)
-- GitIntegrationService for advanced git automation
-- Repository discovery and cross-workspace sync
-- Automated branch/commit creation
-- Repository management utilities
+## Related Documentation
 
-All complex git operations moved from storage layer to optional integration services, maintaining clear separation of concerns while providing advanced features when needed.
+For advanced git operations and external system integrations, see:
+- [Integration Services Design](./integration-services-design.md) - Architecture for external integrations
+- [Integration Services Roadmap](./integration-services-roadmap.md) - Implementation plan for git automation, GitHub, Jira, and Azure DevOps integrations
 
 ## Implementation Notes
 

@@ -1,7 +1,7 @@
 # Local JSON Storage Design Document
 
 **Status:** Implementation Complete ✅  
-**Implementation:** [git-storage-roadmap.md](./git-storage-roadmap.md)  
+**Implementation:** [storage-roadmap.md](./storage-roadmap.md)  
 **Created:** June 25, 2025  
 **Updated:** June 25, 2025 (Major Design Revision)  
 **Author:** AI Agent  
@@ -212,35 +212,11 @@ The `LocalJsonStorageProvider` class provides full CRUD operations for devlog en
 3. **Initialize Storage**: Provider will create `.devlog/` directory automatically
 4. **Commit Files**: Add `.devlog/` directory to git with your next commit
 
-## Future Integration Services
+## Related Documentation
 
-### Git Integration Service (Future)
-
-For advanced git automation (separate from storage):
-
-```typescript
-interface GitIntegrationService {
-  // Repository discovery and management
-  discoverRepositories(): Promise<Repository[]>;
-  cloneRepository(url: string, path: string): Promise<void>;
-  
-  // Branch and commit automation  
-  createFeatureBranch(devlogId: string): Promise<string>;
-  commitDevlogChanges(devlogId: string, message: string): Promise<string>;
-  
-  // Cross-repository devlog discovery
-  findRelatedDevlogs(keywords: string[]): Promise<DevlogEntry[]>;
-  syncAcrossRepositories(): Promise<void>;
-}
-```
-
-### Benefits of Separation
-
-1. **Storage Simplicity**: Files are just files, no git complexity
-2. **Integration Flexibility**: Advanced git features as optional services
-3. **Clear Boundaries**: Storage handles persistence, integrations handle workflows
-4. **Easy Testing**: File operations are easier to test than git operations
-5. **Reduced Dependencies**: No git libraries required for basic storage
+For information about integration services that work with this storage layer, see:
+- [Integration Services Design](./integration-services-design.md) - Architecture for external system integrations
+- [Integration Services Roadmap](./integration-services-roadmap.md) - Implementation plan for git, GitHub, Jira, and Azure DevOps integrations
 
 ## Success Criteria
 
@@ -261,12 +237,13 @@ interface GitIntegrationService {
 - [ ] Performance optimization for large datasets
 - [ ] Schema validation and versioning
 
-### Phase 3: Advanced Integration
+### Phase 3: Advanced Storage Features
 
-- [ ] Git integration service for advanced workflows
-- [ ] Cross-repository devlog discovery
-- [ ] Automated branch and commit creation
-- [ ] Repository synchronization across projects
+- [ ] Migration utilities from other storage providers
+- [ ] File watching for external changes
+- [ ] Concurrent access safety (file locking)
+- [ ] Performance optimization for large datasets
+- [ ] Schema validation and versioning
 
 ## Conclusion
 

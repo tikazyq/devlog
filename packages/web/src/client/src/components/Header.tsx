@@ -14,25 +14,17 @@ interface HeaderProps {
 
 export function Header({ connected, onRefresh, sidebarCollapsed, onSidebarToggle }: HeaderProps) {
   return (
-    <AntHeader style={{ 
-      padding: '0 24px', 
-      background: '#fff', 
-      borderBottom: '1px solid #f0f0f0',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between'
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+    <AntHeader className="header-container">
+      <div className="header-left">
         {onSidebarToggle && (
           <Button 
             type="text"
             icon={<MenuOutlined />}
             onClick={onSidebarToggle}
-            style={{ display: 'none' }}
             className="mobile-menu-button"
           />
         )}
-        <Typography.Title level={3} style={{ margin: 0, color: '#1f2937' }}>
+        <Typography.Title level={3} className="header-title">
           Devlog Dashboard
         </Typography.Title>
       </div>

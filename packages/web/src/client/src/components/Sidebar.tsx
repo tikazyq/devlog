@@ -47,10 +47,10 @@ export function Sidebar({ currentView, onViewChange, stats, collapsed = false }:
         borderRight: '1px solid #f0f0f0'
       }}
     >
-      <div style={{ padding: '24px 24px 16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-          <CodeOutlined style={{ fontSize: '24px', color: '#3b82f6' }} />
-          <Title level={3} style={{ margin: 0, color: '#1f2937' }}>
+      <div className="sidebar-header">
+        <div className="sidebar-brand">
+          <CodeOutlined className="sidebar-brand-icon" />
+          <Title level={3} className="sidebar-brand-title">
             Devlog
           </Title>
         </div>
@@ -66,11 +66,11 @@ export function Sidebar({ currentView, onViewChange, stats, collapsed = false }:
       />
 
       {stats && (
-        <div style={{ padding: '24px 16px' }}>
-          <Title level={5} style={{ marginBottom: '16px', color: '#6b7280' }}>
+        <div className="sidebar-stats">
+          <Title level={5} className="sidebar-stats-title">
             QUICK STATS
           </Title>
-          <Card size="small" style={{ background: '#fafafa' }}>
+          <Card size="small" className="sidebar-stats-card">
             <Row gutter={[16, 16]}>
               <Col span={24}>
                 <Statistic 

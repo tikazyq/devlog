@@ -28,7 +28,7 @@ async function startServer() {
   app.use(helmet());
   app.use(compression());
   app.use(cors({
-    origin: process.env.NODE_ENV === 'production' ? false : ['http://localhost:3000'],
+    origin: process.env.NODE_ENV === 'production' ? false : ['http://localhost:3000', 'http://localhost:3002'],
     credentials: true
   }));
   app.use(express.json());
@@ -78,7 +78,20 @@ async function startServer() {
 
   const PORT = process.env.PORT || 3001;
 
-  server.listen(PORT, () => {
+  server.listen(PORT, (err?: Error) => {
+    if (err) {
+      console.error('Failed to start server:', err);
+      if (err.message.includes('EADDRINUSE')) {
+        console.log('Port in use, trying alternative port...');
+        const altPort = parseInt(PORT.toString()) + 1;
+        server.listen(altPort, () => {
+          console.log(`🚀 Devlog Web Server running on port ${altPort}`);
+          console.log(`📊 Dashboard: http://localhost:${altPort}`);
+          console.log(`🔌 WebSocket: ws://localhost:${altPort}/ws`);
+        });
+      }
+      return;
+    }
     console.log(`🚀 Devlog Web Server running on port ${PORT}`);
     console.log(`📊 Dashboard: http://localhost:${PORT}`);
     console.log(`🔌 WebSocket: ws://localhost:${PORT}/ws`);

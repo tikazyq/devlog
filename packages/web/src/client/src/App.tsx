@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ConfigProvider, Layout, Alert, theme } from 'antd';
-import { DevlogEntry, DevlogStats } from '@devlog/types';
+import { ConfigProvider, Layout, Alert, theme, Spin } from 'antd';
+import { DevlogEntry, DevlogStats, DevlogId } from '@devlog/types';
 import { Dashboard } from './components/Dashboard';
 import { DevlogList } from './components/DevlogList';
 import { DevlogForm } from './components/DevlogForm';
@@ -68,7 +68,7 @@ function App() {
     }
   };
 
-  const handleDevlogDelete = async (id: string) => {
+  const handleDevlogDelete = async (id: DevlogId) => {
     try {
       await deleteDevlog(id);
       if (selectedDevlog?.id === id) {
@@ -154,10 +154,17 @@ function App() {
                 description={error}
                 type="error"
                 showIcon
+                closable
                 style={{ marginBottom: 16 }}
               />
             )}
-            {renderCurrentView()}
+            {loading && currentView === 'list' ? (
+              <div className="loading-container">
+                <Spin size="large" tip="Loading devlogs..." />
+              </div>
+            ) : (
+              renderCurrentView()
+            )}
           </Content>
         </Layout>
       </Layout>

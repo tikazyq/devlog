@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DevlogEntry } from '@devlog/types';
+import { DevlogEntry, DevlogId } from '@devlog/types';
 
 export function useDevlogs() {
   const [devlogs, setDevlogs] = useState<DevlogEntry[]>([]);
@@ -39,7 +39,7 @@ export function useDevlogs() {
     await fetchDevlogs();
   };
 
-  const updateDevlog = async (data: Partial<DevlogEntry> & { id: string }) => {
+  const updateDevlog = async (data: Partial<DevlogEntry> & { id: DevlogId }) => {
     const response = await fetch(`/api/devlogs/${data.id}`, {
       method: 'PUT',
       headers: {
@@ -55,7 +55,7 @@ export function useDevlogs() {
     await fetchDevlogs();
   };
 
-  const deleteDevlog = async (id: string) => {
+  const deleteDevlog = async (id: DevlogId) => {
     const response = await fetch(`/api/devlogs/${id}`, {
       method: 'DELETE',
     });

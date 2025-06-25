@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import component styles */
+@import './components/styles.css';
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -49,11 +52,16 @@ body {
   .ant-layout-sider {
     position: fixed !important;
     height: 100vh !important;
-    z-index: 100 !important;
+    z-index: 1000 !important;
+    transition: margin-left 0.3s ease !important;
   }
   
   .ant-layout-sider-collapsed {
     margin-left: -280px !important;
+  }
+  
+  .ant-layout-content {
+    margin-left: 0 !important;
   }
 }
 

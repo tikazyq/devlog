@@ -63,7 +63,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
 
   return (
     <div>
-      <div style={{ marginBottom: '24px' }}>
+      <div className="dashboard-header">
         <Title level={2}>Dashboard</Title>
         <Paragraph type="secondary">
           Overview of your development progress
@@ -72,7 +72,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
 
       {/* Stats Cards */}
       {!stats ? (
-        <Row gutter={[16, 16]} style={{ marginBottom: '32px' }}>
+        <Row gutter={[16, 16]} className="dashboard-stats-row">
           {[1, 2, 3, 4].map((i) => (
             <Col key={i} xs={24} sm={12} lg={6}>
               <Card>
@@ -83,52 +83,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
           ))}
         </Row>
       ) : (
-        <Row gutter={[16, 16]} style={{ marginBottom: '32px' }}>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="Total Devlogs"
-                value={stats.totalEntries}
-                prefix={<FileTextOutlined style={{ color: '#1890ff' }} />}
-                valueStyle={{ color: '#1890ff' }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="In Progress"
-                value={stats.byStatus['in-progress'] || 0}
-                prefix={<SyncOutlined spin style={{ color: '#faad14' }} />}
-                valueStyle={{ color: '#faad14' }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="Completed"
-                value={stats.byStatus['done'] || 0}
-                prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
-                valueStyle={{ color: '#52c41a' }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="Todo"
-                value={stats.byStatus['todo'] || 0}
-                prefix={<ClockCircleOutlined style={{ color: '#8c8c8c' }} />}
-                valueStyle={{ color: '#8c8c8c' }}
-              />
-            </Card>
-          </Col>
-        </Row>
-      )}
-      
-      {stats && (
-        <Row gutter={[16, 16]} style={{ marginBottom: '32px' }}>
+        <Row gutter={[16, 16]} className="dashboard-stats-row">
           <Col xs={24} sm={12} lg={6}>
             <Card>
               <Statistic
@@ -211,7 +166,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                   title={
                     <div>
                       <Text strong>{devlog.title}</Text>
-                      <div style={{ marginTop: '4px' }}>
+                      <div className="recent-devlogs-meta">
                         <Tag 
                           color={getStatusColor(devlog.status)} 
                           icon={getStatusIcon(devlog.status)}

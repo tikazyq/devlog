@@ -48,7 +48,6 @@ This project uses **itself** for development tracking. When working on devlog fe
 
 ### 4. Duplicate Prevention
 - Use `discover_related_devlogs` to thoroughly search for existing relevant work before creating new entries
-- Use `find_or_create_devlog` instead of `create_devlog`
 - Same title + same type = same entry (by design)
 - Different types can have same title (different IDs)
 

@@ -12,7 +12,7 @@ import {
   WarningOutlined 
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import { DevlogEntry } from '@devlog/types';
+import { DevlogEntry, DevlogId } from '@devlog/types';
 
 const { Title, Text } = Typography;
 
@@ -20,7 +20,7 @@ interface DevlogListProps {
   devlogs: DevlogEntry[];
   loading: boolean;
   onViewDevlog: (devlog: DevlogEntry) => void;
-  onDeleteDevlog: (id: string) => void;
+  onDeleteDevlog: (id: DevlogId) => void;
 }
 
 export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: DevlogListProps) {
@@ -71,13 +71,13 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       key: 'title',
       render: (title: string, record: DevlogEntry) => (
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-            <Text strong style={{ cursor: 'pointer' }} onClick={() => onViewDevlog(record)}>
+          <div className="devlog-title-container">
+            <Text strong className="devlog-title" onClick={() => onViewDevlog(record)}>
               {title}
             </Text>
             <Tag color="blue">{record.type}</Tag>
           </div>
-          <Text type="secondary" ellipsis style={{ fontSize: '12px' }}>
+          <Text type="secondary" ellipsis className="devlog-description">
             {record.description}
           </Text>
         </div>
@@ -159,7 +159,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+      <div className="loading-container">
         <Spin size="large" tip="Loading devlogs..." />
       </div>
     );
@@ -167,7 +167,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
 
   return (
     <div>
-      <div style={{ marginBottom: '24px' }}>
+      <div className="devlog-list-header">
         <Title level={2}>All Devlogs</Title>
         <Text type="secondary">{devlogs.length} total entries</Text>
       </div>

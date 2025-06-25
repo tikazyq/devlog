@@ -1,0 +1,42 @@
+{
+  "version": "1.0.0",
+  "entries": {
+    "1": {
+      "id": 1,
+      "title": "Implement User-Friendly Integer ID System",
+      "type": "refactor",
+      "status": "done",
+      "priority": "medium",
+      "createdAt": "2025-06-25T06:29:02.207Z",
+      "updatedAt": "2025-06-25T06:34:06.058Z",
+      "file": "001-implement-user-friendly-integer-id-system.json",
+      "slug": "implement-user-friendly-integer-id-system"
+    },
+    "7": {
+      "id": 7,
+      "title": "Design Flexible GitHub Integration for Cross-Workspace Devlog Access",
+      "type": "feature",
+      "status": "in-progress",
+      "priority": "high",
+      "createdAt": "2025-06-25T07:15:16.779Z",
+      "updatedAt": "2025-06-25T09:14:36.502Z",
+      "file": "007-design-flexible-github-integration-for-cross-works.json",
+      "slug": "design-flexible-github-integration-for-cross-works"
+    },
+    "10": {
+      "id": 10,
+      "title": "Test Git-JSON Storage Implementation",
+      "type": "task",
+      "status": "in-progress",
+      "priority": "high",
+      "createdAt": "2025-06-25T09:25:41.046Z",
+      "updatedAt": "2025-06-25T09:34:25.051Z",
+      "file": "010-test-git-json-storage-implementation.json",
+      "slug": "test-git-json-storage-implementation"
+    }
+  },
+  "nextId": 11,
+  "lastModified": "2025-06-25T09:42:46.275Z",
+  "createdAt": "2025-06-25T09:42:46.275Z",
+  "workspace": "devlog-migration"
+}

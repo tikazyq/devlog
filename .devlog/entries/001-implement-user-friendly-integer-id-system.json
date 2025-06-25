@@ -1,0 +1,50 @@
+{
+  "id": 1,
+  "key": "implement-user-friendly-integer-id-system",
+  "title": "Implement User-Friendly Integer ID System",
+  "type": "refactor",
+  "description": "Refactor the devlog ID system from current semantic hash-based IDs to user-friendly incrementable integers. The current system uses descriptive hash-based identifiers which are not scalable and harder for users to reference. Need to implement auto-incrementing integer IDs while maintaining data integrity and providing migration path.",
+  "status": "done",
+  "priority": "medium",
+  "createdAt": "2025-06-25T06:29:02.207Z",
+  "updatedAt": "2025-06-25T06:34:06.058Z",
+  "estimatedHours": null,
+  "actualHours": null,
+  "assignee": null,
+  "tags": [],
+  "files": [],
+  "relatedDevlogs": [],
+  "context": {
+    "businessContext": "Current semantic hash-based IDs (like 'web-ui-issues-investigation') are not scalable and create poor user experience. Users expect simple numeric IDs they can easily reference and remember (like #123). This is especially important for collaboration and issue tracking workflows.",
+    "technicalContext": "Current ID system uses deterministic hash-based generation (title + type). Need to replace with auto-incrementing integers stored persistently. This affects storage layer, API endpoints, UI components, and URL routing. Must ensure thread-safety and handle concurrent entry creation.",
+    "dependencies": [],
+    "decisions": [],
+    "acceptanceCriteria": [
+      "Replace hash-based IDs with incrementable integers (e.g., #1, #2, #3)",
+      "Maintain uniqueness and referential integrity",
+      "Update all UI components to display friendly IDs",
+      "Preserve existing data during migration",
+      "Update API endpoints to handle both old and new ID formats during transition",
+      "Ensure ID generation is thread-safe and handles concurrent creation"
+    ],
+    "risks": []
+  },
+  "aiContext": {
+    "currentSummary": "",
+    "keyInsights": [],
+    "openQuestions": [],
+    "relatedPatterns": [],
+    "suggestedNextSteps": [],
+    "lastAIUpdate": "2025-06-25T06:29:02.207Z",
+    "contextVersion": 1
+  },
+  "notes": [
+    {
+      "id": "d2586913-5d30-44fe-a8aa-f4a73ebd01b1",
+      "timestamp": "2025-06-25T06:29:19.763Z",
+      "category": "progress",
+      "content": "🚀 **Major Progress on ID System Implementation** (truncated for brevity)"
+    }
+  ],
+  "externalReferences": []
+}

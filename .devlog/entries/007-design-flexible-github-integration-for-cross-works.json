@@ -1,0 +1,68 @@
+{
+  "id": 7,
+  "key": "design-flexible-github-integration-for-cross-works",
+  "title": "Design Flexible GitHub Integration for Cross-Workspace Devlog Access",
+  "type": "feature",
+  "description": "Redesign the GitHub integration to be more flexible and intuitive, allowing seamless access to devlog entries across different workspaces (home/work) without the rigid current sync implementation. Focus on user-friendly workflows that prioritize GitHub as the source of truth for devlog data persistence.",
+  "status": "in-progress",
+  "priority": "high",
+  "createdAt": "2025-06-25T07:15:16.779Z",
+  "updatedAt": "2025-06-25T09:14:36.502Z",
+  "estimatedHours": null,
+  "actualHours": null,
+  "assignee": null,
+  "tags": [],
+  "files": [],
+  "relatedDevlogs": [],
+  "context": {
+    "businessContext": "User wants to access devlog entries from both home and work environments without losing data or having to manage complex synchronization. GitHub provides the ideal cloud storage solution for this use case, enabling seamless cross-device access while maintaining version control and collaboration benefits.",
+    "technicalContext": "Current implementation treats GitHub as just another external sync target alongside Jira/ADO. Need to redesign for GitHub-first approach where it acts as the primary storage/sync mechanism rather than just an issue tracker integration. Should support different storage strategies and workspace discovery patterns.",
+    "dependencies": [],
+    "decisions": [],
+    "acceptanceCriteria": [
+      "Support GitHub as primary storage backend option",
+      "Enable automatic workspace discovery and sync across devices",
+      "Provide intuitive setup flow for GitHub-first workflows",
+      "Maintain backward compatibility with current local-first approach",
+      "Support both personal and organizational GitHub repositories",
+      "Handle conflicts gracefully when working across multiple devices"
+    ],
+    "risks": []
+  },
+  "aiContext": {
+    "currentSummary": "Successfully completed Phase 1 of git storage implementation. All core functionality is working: GitStorageProvider, HybridStorageProvider, storage factory, git operations, and conflict resolution. The codebase builds cleanly and basic integration tests pass. Ready for Phase 2 which will focus on file structure, authentication, and repository management.",
+    "keyInsights": [
+      "The modular approach worked well - separated git operations, conflict resolution, and storage providers",
+      "Type safety helped catch configuration errors early",
+      "The factory pattern with validation prevents invalid configurations",
+      "Hybrid storage will be essential for offline functionality",
+      "Mocking git operations in tests is necessary for CI/CD environments"
+    ],
+    "openQuestions": [
+      "Should we implement custom .devlog file format or stick with standard JSON?",
+      "How to handle repository size limits for large teams?",
+      "What authentication methods should we prioritize (GitHub tokens, SSH keys, OAuth)?",
+      "Should we support git LFS for large attachment files?"
+    ],
+    "relatedPatterns": [],
+    "suggestedNextSteps": [
+      "Implement .devlog/entries file structure with proper indexing",
+      "Add GitHub/GitLab authentication flows",
+      "Create repository discovery and initialization wizards",
+      "Build comprehensive integration tests with real git repositories",
+      "Add migration utilities for existing SQLite users",
+      "Performance testing and optimization"
+    ],
+    "lastAIUpdate": "2025-06-25T08:09:41.535Z",
+    "contextVersion": 1
+  },
+  "notes": [
+    {
+      "id": "3b5a5ce4-d59d-4106-8533-04ec20bf176f",
+      "timestamp": "2025-06-25T07:20:53.826Z",
+      "category": "progress",
+      "content": "Created comprehensive design document focusing on Phase 1 & 2 implementation. Document covers storage provider interface redesign, GitHub repository storage, conflict resolution, and setup flows."
+    }
+  ],
+  "externalReferences": []
+}

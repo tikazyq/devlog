@@ -7,6 +7,7 @@ import { DevlogForm } from './components/DevlogForm';
 import { DevlogDetails } from './components/DevlogDetails';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { useDevlogs } from './hooks/useDevlogs';
 import { useWebSocket } from './hooks/useWebSocket';
 
@@ -18,6 +19,7 @@ function App() {
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [selectedDevlog, setSelectedDevlog] = useState<DevlogEntry | null>(null);
   const [stats, setStats] = useState<DevlogStats | null>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   const { devlogs, loading, error, refetch, createDevlog, updateDevlog, deleteDevlog } = useDevlogs();
   const { connected } = useWebSocket();
@@ -121,25 +123,29 @@ function App() {
   };
 
   return (
-    <ConfigProvider
-      theme={{
-        algorithm: theme.defaultAlgorithm,
-        token: {
-          colorPrimary: '#3b82f6',
-          borderRadius: 8,
-        },
-      }}
-    >
+    <ErrorBoundary>
+      <ConfigProvider
+        theme={{
+          algorithm: theme.defaultAlgorithm,
+          token: {
+            colorPrimary: '#3b82f6',
+            borderRadius: 8,
+          },
+        }}
+      >
       <Layout style={{ height: '100vh' }}>
         <Sidebar 
           currentView={currentView}
           onViewChange={handleViewChange}
           stats={stats}
+          collapsed={sidebarCollapsed}
         />
         <Layout>
           <Header 
             connected={connected}
             onRefresh={refetch}
+            sidebarCollapsed={sidebarCollapsed}
+            onSidebarToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
           />
           <Content style={{ margin: '24px', overflow: 'auto' }}>
             {error && (
@@ -155,7 +161,8 @@ function App() {
           </Content>
         </Layout>
       </Layout>
-    </ConfigProvider>
+      </ConfigProvider>
+    </ErrorBoundary>
   );
 }
 

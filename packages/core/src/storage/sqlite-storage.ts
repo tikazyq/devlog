@@ -2,8 +2,9 @@
  * SQLite storage provider for local devlog storage
  */
 
-import { DevlogEntry, DevlogFilter, DevlogStats, DevlogStatus, DevlogType, DevlogPriority } from "@devlog/types";
+import { DevlogEntry, DevlogFilter, DevlogStats, DevlogStatus, DevlogType, DevlogPriority, DevlogId } from "@devlog/types";
 import { StorageProvider } from "./storage-provider.js";
+import { IdManager } from "../utils/id-manager.js";
 
 export class SQLiteStorageProvider implements StorageProvider {
   private db: any = null;
@@ -137,17 +138,18 @@ export class SQLiteStorageProvider implements StorageProvider {
     console.log(`[SQLiteStorage] Initialization completed successfully`);
   }
 
-  async exists(id: string): Promise<boolean> {
-    console.log(`[SQLiteStorage] Checking if entry exists: ${id}`);
+  async exists(id: DevlogId): Promise<boolean> {
+    const idStr = IdManager.idToString(id);
+    console.log(`[SQLiteStorage] Checking if entry exists: ${idStr}`);
     if (!this.db) {
-      console.error(`[SQLiteStorage] Database not initialized when checking exists for: ${id}`);
+      console.error(`[SQLiteStorage] Database not initialized when checking exists for: ${idStr}`);
       throw new Error("Database not initialized");
     }
     
     try {
       const stmt = this.db.prepare("SELECT 1 FROM devlog_entries WHERE id = ?");
-      const result = stmt.get(id) !== undefined;
-      console.log(`[SQLiteStorage] Entry exists result for ${id}: ${result}`);
+      const result = stmt.get(idStr) !== undefined;
+      console.log(`[SQLiteStorage] Entry exists result for ${idStr}: ${result}`);
       return result;
     } catch (error: any) {
       console.error(`[SQLiteStorage] Error checking if entry exists:`, error);
@@ -155,23 +157,24 @@ export class SQLiteStorageProvider implements StorageProvider {
     }
   }
 
-  async get(id: string): Promise<DevlogEntry | null> {
-    console.log(`[SQLiteStorage] Getting entry: ${id}`);
+  async get(id: DevlogId): Promise<DevlogEntry | null> {
+    const idStr = IdManager.idToString(id);
+    console.log(`[SQLiteStorage] Getting entry: ${idStr}`);
     if (!this.db) {
-      console.error(`[SQLiteStorage] Database not initialized when getting: ${id}`);
+      console.error(`[SQLiteStorage] Database not initialized when getting: ${idStr}`);
       throw new Error("Database not initialized");
     }
     
     try {
       const stmt = this.db.prepare("SELECT * FROM devlog_entries WHERE id = ?");
-      const row = stmt.get(id) as any;
+      const row = stmt.get(idStr) as any;
       
       if (!row) {
-        console.log(`[SQLiteStorage] Entry not found: ${id}`);
+        console.log(`[SQLiteStorage] Entry not found: ${idStr}`);
         return null;
       }
       
-      console.log(`[SQLiteStorage] Found entry: ${id}`);
+      console.log(`[SQLiteStorage] Found entry: ${idStr}`);
       return this.rowToDevlogEntry(row);
     } catch (error: any) {
       console.error(`[SQLiteStorage] Error getting entry:`, error);
@@ -180,9 +183,10 @@ export class SQLiteStorageProvider implements StorageProvider {
   }
 
   async save(entry: DevlogEntry): Promise<void> {
-    console.log(`[SQLiteStorage] Saving entry: ${entry.id} - ${entry.title}`);
+    const idStr = IdManager.idToString(entry.id);
+    console.log(`[SQLiteStorage] Saving entry: ${idStr} - ${entry.title}`);
     if (!this.db) {
-      console.error(`[SQLiteStorage] Database not initialized when saving: ${entry.id}`);
+      console.error(`[SQLiteStorage] Database not initialized when saving: ${idStr}`);
       throw new Error("Database not initialized");
     }
     
@@ -196,7 +200,7 @@ export class SQLiteStorageProvider implements StorageProvider {
       `);
 
       stmt.run(
-        entry.id,
+        idStr,
         entry.title,
         entry.type,
         entry.description,
@@ -216,18 +220,19 @@ export class SQLiteStorageProvider implements StorageProvider {
         JSON.stringify(entry.notes)
       );
       
-      console.log(`[SQLiteStorage] Successfully saved entry: ${entry.id}`);
+      console.log(`[SQLiteStorage] Successfully saved entry: ${idStr}`);
     } catch (error: any) {
       console.error(`[SQLiteStorage] Error saving entry:`, error);
       throw error;
     }
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: DevlogId): Promise<void> {
+    const idStr = IdManager.idToString(id);
     if (!this.db) throw new Error("Database not initialized");
     
     const stmt = this.db.prepare("DELETE FROM devlog_entries WHERE id = ?");
-    stmt.run(id);
+    stmt.run(idStr);
   }
 
   async list(filter?: DevlogFilter): Promise<DevlogEntry[]> {
@@ -359,7 +364,7 @@ export class SQLiteStorageProvider implements StorageProvider {
 
   private rowToDevlogEntry(row: any): DevlogEntry {
     return {
-      id: row.id,
+      id: IdManager.stringToId(row.id),
       title: row.title,
       type: row.type,
       description: row.description,

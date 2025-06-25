@@ -14,7 +14,6 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
 }
 
 a {
@@ -35,6 +34,27 @@ body {
 #root {
   width: 100%;
   height: 100vh;
+}
+
+/* Mobile responsive styles */
+.mobile-menu-button {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-button {
+    display: inline-flex !important;
+  }
+  
+  .ant-layout-sider {
+    position: fixed !important;
+    height: 100vh !important;
+    z-index: 100 !important;
+  }
+  
+  .ant-layout-sider-collapsed {
+    margin-left: -280px !important;
+  }
 }
 
 @media (prefers-color-scheme: light) {

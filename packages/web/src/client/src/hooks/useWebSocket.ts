@@ -5,8 +5,12 @@ export function useWebSocket() {
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
+    // In development, use the correct backend port
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
+    const isDev = process.env.NODE_ENV === 'development' || window.location.port === '3000';
+    const wsUrl = isDev 
+      ? `${protocol}//localhost:3001/ws`
+      : `${protocol}//${window.location.host}/ws`;
     
     const connect = () => {
       const ws = new WebSocket(wsUrl);

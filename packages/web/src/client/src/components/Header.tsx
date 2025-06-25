@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Button, Space, Badge, Typography } from 'antd';
-import { ReloadOutlined, WifiOutlined } from '@ant-design/icons';
+import { ReloadOutlined, WifiOutlined, MenuOutlined } from '@ant-design/icons';
 
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
@@ -8,9 +8,11 @@ const { Text } = Typography;
 interface HeaderProps {
   connected: boolean;
   onRefresh: () => void;
+  sidebarCollapsed?: boolean;
+  onSidebarToggle?: () => void;
 }
 
-export function Header({ connected, onRefresh }: HeaderProps) {
+export function Header({ connected, onRefresh, sidebarCollapsed, onSidebarToggle }: HeaderProps) {
   return (
     <AntHeader style={{ 
       padding: '0 24px', 
@@ -20,9 +22,20 @@ export function Header({ connected, onRefresh }: HeaderProps) {
       alignItems: 'center',
       justifyContent: 'space-between'
     }}>
-      <Typography.Title level={3} style={{ margin: 0, color: '#1f2937' }}>
-        Devlog Dashboard
-      </Typography.Title>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        {onSidebarToggle && (
+          <Button 
+            type="text"
+            icon={<MenuOutlined />}
+            onClick={onSidebarToggle}
+            style={{ display: 'none' }}
+            className="mobile-menu-button"
+          />
+        )}
+        <Typography.Title level={3} style={{ margin: 0, color: '#1f2937' }}>
+          Devlog Dashboard
+        </Typography.Title>
+      </div>
       
       <Space size="middle">
         <Space size="small">

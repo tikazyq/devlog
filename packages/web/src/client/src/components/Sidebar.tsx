@@ -14,9 +14,10 @@ interface SidebarProps {
   currentView: string;
   onViewChange: (view: any, devlog?: any) => void;
   stats: any;
+  collapsed?: boolean;
 }
 
-export function Sidebar({ currentView, onViewChange, stats }: SidebarProps) {
+export function Sidebar({ currentView, onViewChange, stats, collapsed = false }: SidebarProps) {
   const menuItems = [
     { 
       key: 'dashboard', 
@@ -38,6 +39,9 @@ export function Sidebar({ currentView, onViewChange, stats }: SidebarProps) {
   return (
     <Sider 
       width={280} 
+      collapsed={collapsed}
+      collapsedWidth={0}
+      breakpoint="md"
       style={{ 
         background: '#fff',
         borderRight: '1px solid #f0f0f0'
@@ -71,21 +75,21 @@ export function Sidebar({ currentView, onViewChange, stats }: SidebarProps) {
               <Col span={24}>
                 <Statistic 
                   title="Total" 
-                  value={stats.total || 0} 
+                  value={stats.totalEntries || 0} 
                   valueStyle={{ fontSize: '16px' }}
                 />
               </Col>
               <Col span={12}>
                 <Statistic 
                   title="In Progress" 
-                  value={stats.inProgress || 0}
+                  value={stats.byStatus?.['in-progress'] || 0}
                   valueStyle={{ fontSize: '14px', color: '#1890ff' }}
                 />
               </Col>
               <Col span={12}>
                 <Statistic 
                   title="Completed" 
-                  value={stats.completed || 0}
+                  value={stats.byStatus?.done || 0}
                   valueStyle={{ fontSize: '14px', color: '#52c41a' }}
                 />
               </Col>

@@ -22,7 +22,7 @@
             "command": "uvx",
             "args": [
                 "mcp-sqlite",
-                ".devlog/devlogs.db"
+                "/home/marvin/.devlog/workspaces/default/devlog.db"
             ]
         }
     }

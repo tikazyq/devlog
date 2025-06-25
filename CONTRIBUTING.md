@@ -8,7 +8,7 @@ This is a monorepo containing development logging tools and utilities. This docu
 /
 ├── package.json                 # Root workspace configuration
 ├── packages/
-│   ├── mcp-server/             # MCP server for development logging
+│   ├── mcp/             # MCP server for development logging
 │   │   ├── package.json        # Package-specific dependencies and scripts
 │   │   ├── src/               # Source code
 │   │   └── build/             # Compiled output
@@ -84,9 +84,8 @@ When adding a new package to the monorepo:
 
 1. Create a new directory in `packages/`
 2. Add a `package.json` with a scoped name (e.g., `@devlog/package-name`)
-3. Add TypeScript configuration with `"composite": true`
-4. Update the root `tsconfig.json` to include the new package reference
-5. Update this document
+3. Update the root `tsconfig.json` to include the new package reference
+4. Update this document
 
 ## Architecture Decisions
 
@@ -113,7 +112,6 @@ The project uses pnpm workspaces with TypeScript project references for efficien
 
 - `pnpm-workspace.yaml` defines the workspace structure
 - Root `tsconfig.json` references all packages
-- Each package has `"composite": true` for incremental builds
 - `pnpm` manages dependencies and scripts efficiently
 
 ### pnpm Workspace Commands

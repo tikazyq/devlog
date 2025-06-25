@@ -14,6 +14,7 @@ import type {
   DevlogStatus,
   DevlogType,
   DevlogPriority,
+  DevlogId,
   EnterpriseIntegration
 } from "@devlog/types";
 
@@ -41,20 +42,24 @@ export interface DiscoveryResult {
 import { StorageProvider, StorageConfig, StorageProviderFactory } from "./storage/storage-provider.js";
 import { ConfigurationManager, SyncStrategy } from "./configuration-manager.js";
 import { IntegrationService } from "./integration-service.js";
+import { IdManager } from "./utils/id-manager.js";
 
 export interface DevlogManagerOptions {
   workspaceRoot?: string;
   storage?: StorageConfig;
   integrations?: EnterpriseIntegration;
   syncStrategy?: SyncStrategy;
+  useIntegerIds?: boolean; // Flag to enable new integer ID system
 }
 
 export class DevlogManager {
   private storageProvider!: StorageProvider;
   private integrationService!: IntegrationService;
+  private idManager!: IdManager;
   private readonly workspaceRoot: string;
   private readonly integrations?: EnterpriseIntegration;
   private readonly syncStrategy?: SyncStrategy;
+  private readonly useIntegerIds: boolean;
   private readonly configManager: ConfigurationManager;
   private initialized = false;
 
@@ -62,6 +67,7 @@ export class DevlogManager {
     this.workspaceRoot = options.workspaceRoot || process.cwd();
     this.integrations = options.integrations;
     this.syncStrategy = options.syncStrategy;
+    this.useIntegerIds = options.useIntegerIds ?? true; // Default to new system
     this.configManager = new ConfigurationManager(this.workspaceRoot);
   }
 
@@ -74,6 +80,13 @@ export class DevlogManager {
     const storageConfig = await this.determineStorageConfig();
     this.storageProvider = await StorageProviderFactory.create(storageConfig);
     await this.storageProvider.initialize();
+
+    // Initialize ID manager with storage provider's data directory
+    const dataDir = storageConfig.type === 'sqlite' && storageConfig.filePath 
+      ? storageConfig.filePath.replace(/[^\/]*$/, '') // Get directory from file path
+      : this.workspaceRoot;
+    this.idManager = new IdManager(dataDir);
+    await this.idManager.initializeCounter();
 
     // Initialize integration service if integrations are configured
     const integrations = this.integrations || (await this.configManager.detectEnterpriseIntegrations());
@@ -103,7 +116,7 @@ export class DevlogManager {
     await this.ensureInitialized();
 
     // Use provided ID if available, otherwise generate one
-    const id = request.id || this.generateId(request.title, request.type);
+    const id = request.id || await this.generateId(request.title, request.type);
     
     // Check if entry already exists
     const existing = await this.storageProvider.get(id);
@@ -155,7 +168,7 @@ export class DevlogManager {
   /**
    * Get a devlog entry by ID
    */
-  async getDevlog(id: string): Promise<DevlogEntry | null> {
+  async getDevlog(id: DevlogId): Promise<DevlogEntry | null> {
     await this.ensureInitialized();
     return await this.storageProvider.get(id);
   }
@@ -207,7 +220,7 @@ export class DevlogManager {
   /**
    * Add a note to a devlog entry
    */
-  async addNote(id: string, content: string, category: DevlogNote["category"] = "progress"): Promise<DevlogEntry> {
+  async addNote(id: DevlogId, content: string, category: DevlogNote["category"] = "progress"): Promise<DevlogEntry> {
     await this.ensureInitialized();
 
     const existing = await this.storageProvider.get(id);
@@ -259,7 +272,7 @@ export class DevlogManager {
   /**
    * Delete a devlog entry
    */
-  async deleteDevlog(id: string): Promise<void> {
+  async deleteDevlog(id: DevlogId): Promise<void> {
     await this.ensureInitialized();
     
     const existing = await this.storageProvider.get(id);
@@ -273,7 +286,7 @@ export class DevlogManager {
   /**
    * Complete a devlog entry and archive it
    */
-  async completeDevlog(id: string, summary?: string): Promise<DevlogEntry> {
+  async completeDevlog(id: DevlogId, summary?: string): Promise<DevlogEntry> {
     const updated = await this.updateDevlog({
       id,
       status: "done"
@@ -289,7 +302,7 @@ export class DevlogManager {
   /**
    * Get AI context for a devlog entry
    */
-  async getContextForAI(id: string): Promise<DevlogEntry | null> {
+  async getContextForAI(id: DevlogId): Promise<DevlogEntry | null> {
     await this.ensureInitialized();
     return await this.storageProvider.get(id);
   }
@@ -311,7 +324,7 @@ export class DevlogManager {
   /**
    * Update AI context for a devlog entry
    */
-  async updateAIContext(id: string, context: Partial<DevlogEntry["aiContext"]>): Promise<DevlogEntry> {
+  async updateAIContext(id: DevlogId, context: Partial<DevlogEntry["aiContext"]>): Promise<DevlogEntry> {
     await this.ensureInitialized();
 
     const existing = await this.storageProvider.get(id);
@@ -459,9 +472,11 @@ export class DevlogManager {
   /**
    * Manually sync a devlog entry with external systems
    */
-  async syncDevlog(id: string): Promise<DevlogEntry | null> {
+  async syncDevlog(id: DevlogId): Promise<DevlogEntry | null> {
     await this.ensureInitialized();
-    return await this.integrationService.syncEntry(id);
+    // Convert ID to string for integration service compatibility
+    const idStr = IdManager.idToString(id);
+    return await this.integrationService.syncEntry(idStr);
   }
 
   /**
@@ -493,18 +508,23 @@ export class DevlogManager {
     return !!(this.integrations?.jira || this.integrations?.ado || this.integrations?.github);
   }
 
-  private generateId(title: string, type?: DevlogType): string {
-    // Create a clean slug from the title
-    const slug = title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .substring(0, 50);
+  private async generateId(title: string, type?: DevlogType): Promise<DevlogId> {
+    if (this.useIntegerIds) {
+      // Use integer ID system
+      return await this.idManager.generateNextId();
+    } else {
+      // Fall back to legacy hash-based system
+      const slug = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .substring(0, 50);
 
-    // Create hash from title and type for consistency
-    const content = type ? `${title}:${type}` : title;
-    const hash = crypto.createHash("sha256").update(content).digest("hex").substring(0, 8);
+      // Create hash from title and type for consistency
+      const content = type ? `${title}:${type}` : title;
+      const hash = crypto.createHash("sha256").update(content).digest("hex").substring(0, 8);
 
-    return `${slug}--${hash}`;
+      return `${slug}--${hash}`;
+    }
   }
 }

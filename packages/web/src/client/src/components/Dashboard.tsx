@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, Card, Row, Col, List, Tag, Avatar, Statistic, Empty } from 'antd';
+import { Typography, Card, Row, Col, List, Tag, Avatar, Statistic, Empty, Skeleton } from 'antd';
 import { 
   FileTextOutlined, 
   SyncOutlined, 
@@ -71,6 +71,62 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
       </div>
 
       {/* Stats Cards */}
+      {!stats ? (
+        <Row gutter={[16, 16]} style={{ marginBottom: '32px' }}>
+          {[1, 2, 3, 4].map((i) => (
+            <Col key={i} xs={24} sm={12} lg={6}>
+              <Card>
+                <Skeleton.Input active size="small" style={{ width: '60%', marginBottom: '8px' }} />
+                <Skeleton.Input active size="large" style={{ width: '40%' }} />
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      ) : (
+        <Row gutter={[16, 16]} style={{ marginBottom: '32px' }}>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Total Devlogs"
+                value={stats.totalEntries}
+                prefix={<FileTextOutlined style={{ color: '#1890ff' }} />}
+                valueStyle={{ color: '#1890ff' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="In Progress"
+                value={stats.byStatus['in-progress'] || 0}
+                prefix={<SyncOutlined spin style={{ color: '#faad14' }} />}
+                valueStyle={{ color: '#faad14' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Completed"
+                value={stats.byStatus['done'] || 0}
+                prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
+                valueStyle={{ color: '#52c41a' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Todo"
+                value={stats.byStatus['todo'] || 0}
+                prefix={<ClockCircleOutlined style={{ color: '#8c8c8c' }} />}
+                valueStyle={{ color: '#8c8c8c' }}
+              />
+            </Card>
+          </Col>
+        </Row>
+      )}
+      
       {stats && (
         <Row gutter={[16, 16]} style={{ marginBottom: '32px' }}>
           <Col xs={24} sm={12} lg={6}>

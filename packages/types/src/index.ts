@@ -10,6 +10,11 @@ export type DevlogPriority = "low" | "medium" | "high" | "critical";
 
 export type NoteCategory = "progress" | "issue" | "solution" | "idea" | "reminder";
 
+/**
+ * ID type for devlog entries - can be string (legacy) or number (new integer system)
+ */
+export type DevlogId = string | number;
+
 export interface DevlogNote {
   id: string;
   timestamp: string;
@@ -20,7 +25,7 @@ export interface DevlogNote {
 }
 
 export interface DevlogEntry {
-  id: string;
+  id: DevlogId;
   title: string;
   type: DevlogType;
   description: string;
@@ -118,7 +123,7 @@ export interface DevlogStats {
 }
 
 export interface CreateDevlogRequest {
-  id?: string;
+  id?: DevlogId;
   title: string;
   type: DevlogType;
   description: string;
@@ -136,7 +141,7 @@ export interface CreateDevlogRequest {
 }
 
 export interface UpdateDevlogRequest {
-  id: string;
+  id: DevlogId;
   title?: string;
   description?: string;
   status?: DevlogStatus;

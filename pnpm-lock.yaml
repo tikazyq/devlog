@@ -53,7 +53,7 @@ importers:
         specifier: ^2.1.9
         version: 2.1.9(@types/node@20.19.1)(@vitest/ui@2.1.9)
 
-  packages/mcp-server:
+  packages/mcp:
     dependencies:
       '@devlog/core':
         specifier: workspace:*

@@ -2,7 +2,7 @@
  * Abstract storage interface that supports different storage backends
  */
 
-import { DevlogEntry, DevlogFilter, DevlogStats } from "@devlog/types";
+import { DevlogEntry, DevlogFilter, DevlogStats, DevlogId } from "@devlog/types";
 
 export interface StorageProvider {
   /**
@@ -13,12 +13,12 @@ export interface StorageProvider {
   /**
    * Check if an entry exists
    */
-  exists(id: string): Promise<boolean>;
+  exists(id: DevlogId): Promise<boolean>;
 
   /**
    * Get a single devlog entry by ID
    */
-  get(id: string): Promise<DevlogEntry | null>;
+  get(id: DevlogId): Promise<DevlogEntry | null>;
 
   /**
    * Save or update a devlog entry
@@ -28,7 +28,7 @@ export interface StorageProvider {
   /**
    * Delete a devlog entry
    */
-  delete(id: string): Promise<void>;
+  delete(id: DevlogId): Promise<void>;
 
   /**
    * List all devlog entries with optional filtering

@@ -1,80 +1,72 @@
 # Devlog Project - Copilot Instructions
 
+## 🚨 CRITICAL: Devlog Creation Workflow (READ FIRST!)
+
+**This project uses ITSELF for development tracking. ALWAYS follow this workflow:**
+
+### ⚠️ MANDATORY FIRST STEP: Always Discover Before Creating
+```
+🔍 BEFORE creating ANY devlog entry, ALWAYS run:
+mcp_devlog_discover_related_devlogs()
+```
+
+**Why this matters:**
+- Prevents duplicate work and entries  
+- Builds upon existing insights and progress
+- Maintains project continuity and context
+
+### ✅ Required Devlog Creation Steps
+1. **🔍 DISCOVER FIRST**: Use `discover_related_devlogs` to find existing relevant work
+2. **📖 REVIEW**: Analyze discovered entries to understand context and avoid overlaps  
+3. **✅ CREATE ONLY IF NEEDED**: Create new devlog entry using MCP tools only if no overlapping work exists
+4. **📝 TRACK PROGRESS**: Update entries with notes and status changes via MCP functions
+5. **🔗 LINK WORK**: Reference devlog IDs in commits and documentation
+
+### 🎯 Standard Entry Format
+```json
+{
+  "title": "Brief, descriptive title",
+  "type": "feature|bug|task|refactor|docs", 
+  "description": "Detailed description with context",
+  "priority": "low|medium|high|critical"
+}
+```
+
 ## Early Development Stage Guidelines
 
 **IMPORTANT**: This project is in early development. We prioritize clean, modern architecture over backwards compatibility.
 
-### Legacy Code Management
-- **Remove obsolete code**: Don't preserve legacy implementations when refactoring
-- **Modernize aggressively**: Prefer current best practices over maintaining old patterns  
-- **Clean slate approach**: It's better to rewrite than to patch outdated code
-- **Breaking changes are acceptable**: We're not bound by API compatibility during this phase
-- **Focus on the future**: Design for where we want to be, not where we've been
-
 ### Development Philosophy
 - **Quality over continuity**: A well-architected solution is more valuable than preserving broken legacy code
-- **Rapid iteration**: Make bold changes to improve the codebase structure
+- **Rapid iteration**: Make bold changes to improve the codebase structure  
 - **Technical debt elimination**: Actively remove code that doesn't serve the current vision
 - **Modern tooling**: Always use the latest stable versions and best practices
-- **Proper testing over temp scripts**: Use structured test cases (Vitest) instead of creating temporary scripts for testing functionality
+- **Breaking changes are acceptable**: We're not bound by API compatibility during this phase
 
-## Dogfooding Guidelines
+## Detailed Dogfooding Guidelines
 
-This project uses **itself** for development tracking. When working on devlog features, ALWAYS:
-
-### 1. Use Devlog for All Development Work
-- **Always discover first**: Use `discover_related_devlogs` to find existing relevant work before creating new entries
-- Create devlog entries for new features, bugs, or improvements using `@devlog/mcp` only after thorough discovery
-- Track progress with notes and status updates through the MCP server tools
-
-### 2. Standard Entry Format
-```json
-{
-  "title": "Brief, descriptive title",
-  "type": "feature|bug|task|refactor|docs",
-  "description": "Detailed description with context",
-  "priority": "low|medium|high|critical",
-  "tags": ["relevant", "tags"]
-}
-```
-
-### 3. Key Practices
-- **Always discover first**: Use `discover_related_devlogs` before creating new entries to prevent duplicate work
-- **Review related work**: Analyze discovered entries to build upon existing insights and avoid overlapping efforts
-- **Update progress** as work continues through devlog MCP functions
-- **Document decisions** and technical details in notes using `add_devlog_note`
-- **Use enterprise integrations** when configured via MCP sync functions
-- **Demonstrate new features** by using them through the MCP interface
-
-### 4. Duplicate Prevention
-- Use `discover_related_devlogs` to thoroughly search for existing relevant work before creating new entries
-- Same title + same type = same entry (by design)
-- Different types can have same title (different IDs)
-
-### 5. Architecture Principles
-- **Standardized IDs**: All devlog entries use deterministic hash-based IDs for consistency
+### Core Principles
 - **MCP Integration**: Primary interface for AI assistants is through MCP server tools
-- **Storage Flexibility**: Support for both local JSON files and enterprise integrations
 - **Duplicate Prevention**: Built-in safeguards against creating duplicate entries
+- **Self-Documentation**: Use devlog features to track their own development
 
-### 6. When Adding New Features
-1. **Discover first**: Use `discover_related_devlogs` to find existing relevant work
-2. Create devlog entry for the feature using MCP server only if no overlapping work exists
+### When Adding New Features
+1. **🔍 DISCOVER FIRST**: Use `discover_related_devlogs` to find existing relevant work
+2. Create devlog entry using MCP server only if no overlapping work exists  
 3. Use the feature to track its own development
 4. Update the entry as you implement via MCP functions
 5. Document the feature in the entry notes using MCP tools
-6. Demo the feature by using it through the MCP interface
 
-This ensures the devlog system is continuously tested and improved through real-world usage.
+### Legacy Code Management  
+- **Remove obsolete code**: Don't preserve legacy implementations when refactoring
+- **Modernize aggressively**: Prefer current best practices over maintaining old patterns
+- **Clean slate approach**: It's better to rewrite than to patch outdated code
 
 ## Testing Best Practices
 
 ### 1. Prefer Structured Tests Over Temporary Scripts
-- **Use Vitest framework**: Create proper test cases instead of ad-hoc scripts for testing functionality
-- **Avoid temp scripts in tracked directories**: Don't create temporary `.mjs` files in `scripts/`, `src/`, or other tracked locations
-- **Use `tmp/` for debugging only**: When debugging or quick testing is needed, use the `tmp/` directory (gitignored)
-- **Comprehensive test coverage**: Write unit tests, integration tests, and end-to-end tests as needed
-- **Maintainable testing**: Tests should be part of the CI/CD pipeline and easily runnable
+- **Use Vitest framework**: Create proper test cases instead of ad-hoc scripts  
+- **Use `tmp/` for debugging only**: When debugging is needed, use the `tmp/` directory (gitignored)
 - **Clean up legacy**: Remove temporary scripts once proper tests are in place
 
 ### 2. Test Organization

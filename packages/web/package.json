@@ -16,9 +16,14 @@
   "dependencies": {
     "@devlog/core": "workspace:*",
     "@devlog/types": "workspace:*",
+    "highlight.js": "11.11.1",
     "next": "^14.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-markdown": "10.1.0",
+    "rehype-highlight": "7.0.2",
+    "rehype-sanitize": "6.0.0",
+    "remark-gfm": "4.0.1",
     "ws": "^8.14.2"
   },
   "devDependencies": {

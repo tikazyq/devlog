@@ -36,6 +36,7 @@ import {
   WarningOutlined,
 } from '@ant-design/icons';
 import { DevlogEntry } from '@devlog/types';
+import { MarkdownRenderer } from './MarkdownRenderer';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -412,20 +413,17 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
 
             <div style={{ marginBottom: '24px' }}>
               <Title level={4}>Description</Title>
-              <Paragraph style={{ fontSize: '16px', lineHeight: '1.6' }}>
-                {devlog.description}
-              </Paragraph>
+              <MarkdownRenderer content={devlog.description} />
             </div>
 
             {devlog.context?.businessContext && (
               <div style={{ marginBottom: '24px' }}>
                 <Title level={4}>Business Context</Title>
                 <Alert
-                  message={devlog.context.businessContext}
+                  message={<MarkdownRenderer content={devlog.context.businessContext} />}
                   type="info"
                   showIcon
                   icon={<InfoCircleOutlined />}
-                  style={{ fontSize: '16px' }}
                 />
               </div>
             )}
@@ -434,11 +432,10 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
               <div style={{ marginBottom: '24px' }}>
                 <Title level={4}>Technical Context</Title>
                 <Alert
-                  message={devlog.context.technicalContext}
+                  message={<MarkdownRenderer content={devlog.context.technicalContext} />}
                   type="warning"
                   showIcon
                   icon={<ToolOutlined />}
-                  style={{ fontSize: '16px' }}
                 />
               </div>
             )}
@@ -574,7 +571,7 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
                   {devlog.aiContext.currentSummary && (
                     <div style={{ marginBottom: '16px' }}>
                       <Text strong>Summary:</Text>
-                      <Paragraph>{devlog.aiContext.currentSummary}</Paragraph>
+                      <MarkdownRenderer content={devlog.aiContext.currentSummary} />
                     </div>
                   )}
                   
@@ -682,7 +679,7 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
                   {devlog.notes.map((note) => (
                     <Timeline.Item key={note.id}>
                       <div style={{ marginBottom: '8px' }}>
-                        <Text>{note.content}</Text>
+                        <MarkdownRenderer content={note.content} />
                       </div>
                       <Text type="secondary" style={{ fontSize: '12px' }}>
                         {note.category} • {new Date(note.timestamp).toLocaleString()}

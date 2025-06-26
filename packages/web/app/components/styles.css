@@ -22,10 +22,55 @@
 
 .devlog-title {
     cursor: pointer;
+    max-width: 200px;
+    display: block;
 }
 
 .devlog-description {
     font-size: 12px;
+    max-width: 200px;
+    display: block;
+}
+
+.devlog-key {
+    font-size: 11px;
+    font-family: monospace;
+    max-width: 150px;
+    display: block;
+}
+
+.devlog-assignee {
+    font-size: 12px;
+}
+
+.devlog-tag-small {
+    font-size: 10px;
+    margin: 1px;
+}
+
+.devlog-hours {
+    font-size: 11px;
+}
+
+.devlog-date-small {
+    font-size: 11px;
+}
+
+/* Table improvements */
+.devlog-table-container {
+    overflow-x: auto;
+}
+
+.devlog-table-container .ant-table-thead > tr > th.ant-table-cell-fix-left,
+.devlog-table-container .ant-table-tbody > tr > td.ant-table-cell-fix-left {
+    background: #fff;
+    z-index: 1;
+}
+
+.devlog-table-container .ant-table-thead > tr > th.ant-table-cell-fix-right,
+.devlog-table-container .ant-table-tbody > tr > td.ant-table-cell-fix-right {
+    background: #fff;
+    z-index: 1;
 }
 
 /* Dashboard styles */

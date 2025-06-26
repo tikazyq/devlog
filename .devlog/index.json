@@ -7,9 +7,45 @@
       "type": "feature",
       "priority": "medium",
       "createdAt": "2025-06-26T14:26:46.312Z",
-      "updatedAt": "2025-06-26T14:44:17.813Z"
+      "updatedAt": "2025-06-26T15:01:57.150Z"
+    },
+    "3": {
+      "filename": "003-implement-markdown-rendering-for-devlog-detail-fie.json",
+      "title": "Implement markdown rendering for devlog detail fields",
+      "status": "done",
+      "type": "feature",
+      "priority": "medium",
+      "createdAt": "2025-06-26T14:53:07.773Z",
+      "updatedAt": "2025-06-26T15:02:06.460Z"
+    },
+    "4": {
+      "filename": "004-fix-visual-elements-in-markdown-rendering-alerts-a.json",
+      "title": "Fix visual elements in markdown rendering - alerts and list styling",
+      "status": "done",
+      "type": "bugfix",
+      "priority": "high",
+      "createdAt": "2025-06-26T15:03:37.661Z",
+      "updatedAt": "2025-06-26T15:05:29.877Z"
+    },
+    "5": {
+      "filename": "005-fix-unbalanced-margins-in-alert-markdown-content.json",
+      "title": "Fix unbalanced margins in Alert markdown content",
+      "status": "done",
+      "type": "bugfix",
+      "priority": "medium",
+      "createdAt": "2025-06-26T15:07:21.013Z",
+      "updatedAt": "2025-06-26T15:08:33.216Z"
+    },
+    "6": {
+      "filename": "006-add-missing-fields-to-devloglist-table-component.json",
+      "title": "Add missing fields to DevlogList table component",
+      "status": "testing",
+      "type": "bugfix",
+      "priority": "medium",
+      "createdAt": "2025-06-26T15:15:39.185Z",
+      "updatedAt": "2025-06-26T15:27:03.117Z"
     }
   },
-  "lastId": 2,
+  "lastId": 6,
   "version": "1.0.0"
 }

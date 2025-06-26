@@ -124,7 +124,6 @@ export interface DevlogStats {
 }
 
 export interface CreateDevlogRequest {
-  id?: DevlogId;
   title: string;
   type: DevlogType;
   description: string;

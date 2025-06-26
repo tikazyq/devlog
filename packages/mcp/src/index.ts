@@ -41,10 +41,6 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        id: {
-          type: 'string',
-          description: 'Unique identifier for the devlog entry',
-        },
         title: {
           type: 'string',
           description: 'Title of the task/feature/bugfix',
@@ -127,8 +123,8 @@ const tools: Tool[] = [
       type: 'object',
       properties: {
         id: {
-          type: 'string',
-          description: 'ID of the devlog entry to update',
+          type: 'number',
+          description: 'Numeric ID of the devlog entry to update',
         },
         status: {
           type: 'string',
@@ -167,8 +163,8 @@ const tools: Tool[] = [
       type: 'object',
       properties: {
         id: {
-          type: 'string',
-          description: 'ID of the devlog entry to retrieve',
+          type: 'number',
+          description: 'Numeric ID of the devlog entry to retrieve',
         },
       },
       required: ['id'],
@@ -219,8 +215,8 @@ const tools: Tool[] = [
       type: 'object',
       properties: {
         id: {
-          type: 'string',
-          description: 'ID of the devlog entry',
+          type: 'number',
+          description: 'Numeric ID of the devlog entry',
         },
         note: {
           type: 'string',
@@ -243,8 +239,8 @@ const tools: Tool[] = [
       type: 'object',
       properties: {
         id: {
-          type: 'string',
-          description: 'ID of the devlog entry',
+          type: 'number',
+          description: 'Numeric ID of the devlog entry',
         },
         decision: {
           type: 'string',
@@ -274,8 +270,8 @@ const tools: Tool[] = [
       type: 'object',
       properties: {
         id: {
-          type: 'string',
-          description: 'ID of the devlog entry to complete',
+          type: 'number',
+          description: 'Numeric ID of the devlog entry to complete',
         },
         summary: {
           type: 'string',
@@ -306,8 +302,8 @@ const tools: Tool[] = [
       type: 'object',
       properties: {
         id: {
-          type: 'string',
-          description: 'ID of the devlog entry to get context for',
+          type: 'number',
+          description: 'Numeric ID of the devlog entry to get context for',
         },
       },
       required: ['id'],
@@ -320,8 +316,8 @@ const tools: Tool[] = [
       type: 'object',
       properties: {
         id: {
-          type: 'string',
-          description: 'ID of the devlog entry to update',
+          type: 'number',
+          description: 'Numeric ID of the devlog entry to update',
         },
         summary: {
           type: 'string',

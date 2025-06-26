@@ -4,13 +4,22 @@
  */
 
 import { LocalJsonStorageProvider } from "../packages/core/src/storage/local-json-storage.js";
+import { findProjectRoot } from "../packages/core/src/storage/storage-provider.js";
 import { DevlogEntry, DevlogType, DevlogStatus, DevlogPriority } from "../packages/types/src/index.js";
 
 async function demonstrateLocalJsonStorage() {
   console.log("🚀 Demonstrating LocalJsonStorageProvider");
   
+  // Find the actual project root
+  const projectRoot = await findProjectRoot();
+  if (!projectRoot) {
+    throw new Error('Could not detect project root');
+  }
+  
+  console.log(`📁 Using project root: ${projectRoot}`);
+  
   // Create storage provider - no configuration needed!
-  const storage = new LocalJsonStorageProvider(process.cwd());
+  const storage = new LocalJsonStorageProvider(projectRoot);
   
   // Initialize - creates .devlog/ directory structure
   await storage.initialize();

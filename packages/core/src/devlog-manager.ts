@@ -117,14 +117,8 @@ export class DevlogManager {
   async findOrCreateDevlog(request: CreateDevlogRequest): Promise<DevlogEntry> {
     await this.ensureInitialized();
 
-    // Use provided ID if available, otherwise generate one
-    const id = request.id || (await this.generateId(request.title, request.type));
-
-    // Check if entry already exists
-    const existing = await this.storageProvider.get(id);
-    if (existing) {
-      return existing;
-    }
+    // Always generate a new ID automatically
+    const id = await this.generateId(request.title, request.type);
 
     // Generate semantic key for reference
     const key = this.generateKey(request.title, request.type);

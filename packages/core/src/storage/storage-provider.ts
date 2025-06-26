@@ -11,6 +11,8 @@ import {
   GitSyncStatus,
   StorageConfig,
 } from '@devlog/types';
+import * as path from 'path';
+import * as fs from 'fs/promises';
 
 export interface StorageProvider {
   /**
@@ -137,8 +139,12 @@ export class StorageProviderFactory {
 
       case 'local-json':
         const { LocalJsonStorageProvider } = await import('./local-json-storage.js');
+        const projectRoot = await findProjectRoot();
+        if (!projectRoot) {
+          throw new Error('Could not detect project root. Please run from within a project directory or specify the path explicitly.');
+        }
         return new LocalJsonStorageProvider(
-          process.cwd(), // Use current working directory as project root
+          projectRoot,
           config.localJson || {},
         );
 
@@ -163,4 +169,93 @@ export class StorageProviderFactory {
         throw new Error(`Unsupported storage strategy: ${config.strategy}`);
     }
   }
+}
+
+/**
+ * Find the project root directory by looking for common project indicators
+ * @param startPath Starting directory (defaults to current working directory)
+ * @returns The project root path or null if not found
+ */
+export async function findProjectRoot(startPath: string = process.cwd()): Promise<string | null> {
+  let currentDir = path.resolve(startPath);
+
+  while (currentDir !== path.dirname(currentDir)) {
+    // Check for strong monorepo indicators first (these take priority)
+    const strongIndicators = [
+      path.join(currentDir, 'pnpm-workspace.yaml'),
+      path.join(currentDir, 'lerna.json'),
+      path.join(currentDir, 'nx.json'),
+      path.join(currentDir, 'rush.json'),
+    ];
+
+    for (const indicator of strongIndicators) {
+      try {
+        await fs.access(indicator);
+        return currentDir;
+      } catch {
+        // Continue checking
+      }
+    }
+
+    // Check for devlog-specific config
+    try {
+      await fs.access(path.join(currentDir, 'devlog.config.json'));
+      return currentDir;
+    } catch {
+      // Continue checking
+    }
+
+    // Check for git root (but continue searching if we find a monorepo indicator later)
+    const gitDir = path.join(currentDir, '.git');
+    let gitRoot: string | null = null;
+    try {
+      await fs.access(gitDir);
+      gitRoot = currentDir;
+    } catch {
+      // Continue checking
+    }
+
+    // Check if this directory contains workspace packages
+    const packagesDir = path.join(currentDir, 'packages');
+    try {
+      await fs.access(packagesDir);
+      const packagesStat = await fs.stat(packagesDir);
+      if (packagesStat.isDirectory()) {
+        // This looks like a monorepo root
+        return currentDir;
+      }
+    } catch {
+      // Continue checking
+    }
+
+    // If we found a git root but no strong indicators, use it as fallback
+    if (gitRoot) {
+      // Look ahead to see if there's a monorepo indicator in parent directories
+      let tempDir = path.dirname(currentDir);
+      let foundMonorepoAbove = false;
+      
+      while (tempDir !== path.dirname(tempDir)) {
+        for (const indicator of strongIndicators) {
+          try {
+            await fs.access(path.join(tempDir, indicator));
+            foundMonorepoAbove = true;
+            break;
+          } catch {
+            // Continue checking
+          }
+        }
+        if (foundMonorepoAbove) break;
+        tempDir = path.dirname(tempDir);
+      }
+      
+      // If no monorepo found above, use git root
+      if (!foundMonorepoAbove) {
+        return gitRoot;
+      }
+    }
+
+    currentDir = path.dirname(currentDir);
+  }
+
+  return null;
 }

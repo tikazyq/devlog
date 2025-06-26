@@ -1,15 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ['@devlog/core', '@devlog/types'],
+  experimental: {
+    serverComponentsExternalPackages: [],
+  },
   webpack: (config, { isServer }) => {
-    // Allow importing of workspace packages
+    // Handle the workspace packages properly
     if (isServer) {
-      // Handle externals for server-side rendering
+      // Ensure these packages are treated as externals for server-side
       config.externals = config.externals || [];
-      config.externals.push({
-        '@devlog/core': 'commonjs @devlog/core',
-        '@devlog/types': 'commonjs @devlog/types',
-      });
+      // Allow these packages to be bundled and transpiled instead of externalized
     }
     
     return config;

@@ -15,8 +15,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const devlogManager = getDevlogManager();
-    await devlogManager.initialize();
+    const devlogManager = await getDevlogManager();
 
     const id = parseDevlogId(params.id);
     const devlog = await devlogManager.getDevlog(id);
@@ -38,8 +37,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const devlogManager = getDevlogManager();
-    await devlogManager.initialize();
+    const devlogManager = await getDevlogManager();
 
     const id = parseDevlogId(params.id);
     const data = await request.json();
@@ -57,8 +55,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const devlogManager = getDevlogManager();
-    await devlogManager.initialize();
+    const devlogManager = await getDevlogManager();
 
     const id = parseDevlogId(params.id);
     await devlogManager.deleteDevlog(id);

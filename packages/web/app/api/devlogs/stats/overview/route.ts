@@ -4,8 +4,7 @@ import { getDevlogManager } from '../../../../lib/devlog-manager';
 // GET /api/devlogs/stats/overview - Get devlog statistics
 export async function GET(request: NextRequest) {
   try {
-    const devlogManager = getDevlogManager();
-    await devlogManager.initialize();
+    const devlogManager = await getDevlogManager();
 
     const stats = await devlogManager.getStats();
     return NextResponse.json(stats);

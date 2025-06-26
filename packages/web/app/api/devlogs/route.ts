@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDevlogManager } from '../../lib/devlog-manager';
-import { DevlogFilter } from '@devlog/types';
 
 // GET /api/devlogs - List all devlogs
 export async function GET(request: NextRequest) {
   try {
-    const devlogManager = getDevlogManager();
-    await devlogManager.initialize();
+    const devlogManager = await getDevlogManager();
 
     const { searchParams } = new URL(request.url);
-    const filter: DevlogFilter = {};
+    const filter: any = {};
 
     // Parse query parameters
     if (searchParams.get('status')) filter.status = searchParams.get('status') as any;
@@ -27,8 +25,7 @@ export async function GET(request: NextRequest) {
 // POST /api/devlogs - Create new devlog
 export async function POST(request: NextRequest) {
   try {
-    const devlogManager = getDevlogManager();
-    await devlogManager.initialize();
+    const devlogManager = await getDevlogManager();
 
     const data = await request.json();
     const devlog = await devlogManager.createDevlog(data);

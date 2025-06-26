@@ -18,9 +18,7 @@ import type {
   UpdateDevlogRequest,
 } from '@devlog/types';
 import { StorageProvider, StorageProviderFactory } from './storage/storage-provider.js';
-import { ConfigurationManager, SyncStrategy } from './configuration-manager.js';
-import { IntegrationService } from './integration-service.js';
-import { IdManager } from './utils/id-manager.js';
+import { ConfigurationManager } from './configuration-manager.js';
 
 // Discovery-related interfaces
 export interface DiscoverDevlogsRequest {
@@ -46,28 +44,24 @@ export interface DiscoveryResult {
 export interface DevlogManagerOptions {
   workspaceRoot?: string;
   storage?: StorageConfig;
-  integrations?: EnterpriseIntegration;
-  syncStrategy?: SyncStrategy;
-  useIntegerIds?: boolean; // Flag to enable new integer ID system
+  // integrations?: EnterpriseIntegration;
+  // syncStrategy?: SyncStrategy;
 }
 
 export class DevlogManager {
   private storageProvider!: StorageProvider;
-  private integrationService!: IntegrationService;
-  private idManager!: IdManager;
-  private readonly workspaceRoot: string;
-  private readonly integrations?: EnterpriseIntegration;
-  private readonly syncStrategy?: SyncStrategy;
-  private readonly useIntegerIds: boolean;
+  // TODO: Uncomment when integrations are implemented
+  // private integrationService!: IntegrationService;
+  // private readonly integrations?: EnterpriseIntegration;
+  // private readonly syncStrategy?: SyncStrategy;
   private readonly configManager: ConfigurationManager;
   private initialized = false;
 
-  constructor(private options: DevlogManagerOptions = {}) {
-    this.workspaceRoot = options.workspaceRoot || process.cwd();
-    this.integrations = options.integrations;
-    this.syncStrategy = options.syncStrategy;
-    this.useIntegerIds = options.useIntegerIds ?? true; // Default to new system
-    this.configManager = new ConfigurationManager(this.workspaceRoot);
+  constructor() {
+    // TODO: integrations and syncStrategy can be configured later
+    // this.integrations = options.integrations;
+    // this.syncStrategy = options.syncStrategy;
+    this.configManager = new ConfigurationManager();
   }
 
   /**
@@ -76,57 +70,38 @@ export class DevlogManager {
   async initialize(): Promise<void> {
     if (this.initialized) return;
 
-    const storageConfig = await this.determineStorageConfig();
-    this.storageProvider = await StorageProviderFactory.create(storageConfig);
+    const config = await this.configManager.loadConfig();
+    console.debug('Initialized devlog config', config);
+
+    this.storageProvider = await StorageProviderFactory.create(config.storage);
     await this.storageProvider.initialize();
 
-    // Initialize ID manager with storage provider's data directory
-    const dataDir =
-      storageConfig.type === 'sqlite' && storageConfig.filePath
-        ? storageConfig.filePath.replace(/[^\/]*$/, '') // Get directory from file path
-        : this.workspaceRoot;
-    this.idManager = new IdManager(dataDir);
-    await this.idManager.initializeCounter();
-
-    // Initialize integration service if integrations are configured
-    const integrations =
-      this.integrations || (await this.configManager.detectEnterpriseIntegrations());
-    const syncStrategy =
-      this.syncStrategy || (await this.configManager.detectSyncStrategy(integrations));
-
-    this.integrationService = new IntegrationService(
-      this.storageProvider,
-      integrations,
-      syncStrategy,
-    );
+    // TODO: Initialize integration service if integrations are configured
+    // const integrations =
+    //   this.integrations || (await this.configManager.detectEnterpriseIntegrations());
+    // const syncStrategy =
+    //   this.syncStrategy || (await this.configManager.detectSyncStrategy(integrations));
+    // this.integrationService = new IntegrationService(
+    //   this.storageProvider,
+    //   integrations,
+    //   syncStrategy,
+    // );
 
     this.initialized = true;
   }
 
   /**
-   * Create a new devlog entry or find existing one with same title and type
-   * Alias for findOrCreateDevlog to provide a cleaner API
+   * Create a new devlog entry
    */
   async createDevlog(request: CreateDevlogRequest): Promise<DevlogEntry> {
-    return this.findOrCreateDevlog(request);
-  }
-
-  /**
-   * Create a new devlog entry or find existing one with same title and type
-   */
-  async findOrCreateDevlog(request: CreateDevlogRequest): Promise<DevlogEntry> {
     await this.ensureInitialized();
 
-    // Always generate a new ID automatically
-    const id = await this.generateId(request.title, request.type);
-
     // Generate semantic key for reference
-    const key = this.generateKey(request.title, request.type);
+    const key = this.generateKey(request.title);
 
     // Create new entry
     const now = new Date().toISOString();
     const entry: DevlogEntry = {
-      id,
       key,
       title: request.title,
       type: request.type,
@@ -161,7 +136,8 @@ export class DevlogManager {
     };
 
     // Save with integration sync
-    await this.integrationService.saveWithSync(entry);
+    await this.storageProvider.save(entry);
+
     return entry;
   }
 
@@ -213,7 +189,7 @@ export class DevlogManager {
       updated.notes.push(note);
     }
 
-    await this.integrationService.saveWithSync(updated);
+    await this.storageProvider.save(updated);
     return updated;
   }
 
@@ -245,7 +221,7 @@ export class DevlogManager {
       updatedAt: new Date().toISOString(),
     };
 
-    await this.integrationService.saveWithSync(updated);
+    await this.storageProvider.save(updated);
     return updated;
   }
 
@@ -480,21 +456,6 @@ export class DevlogManager {
     };
   }
 
-  /**
-   * Manually sync a devlog entry with external systems
-   */
-  async syncDevlog(id: DevlogId): Promise<DevlogEntry | null> {
-    await this.ensureInitialized();
-    return await this.integrationService.syncEntry(id);
-  }
-
-  /**
-   * Get sync status for a devlog entry
-   */
-  getSyncStatus(entry: DevlogEntry) {
-    return this.integrationService.getSyncStatus(entry);
-  }
-
   // Private methods
 
   private async ensureInitialized(): Promise<void> {
@@ -503,49 +464,14 @@ export class DevlogManager {
     }
   }
 
-  private async determineStorageConfig(): Promise<StorageConfig> {
-    if (this.options.storage) {
-      return this.options.storage;
-    }
-
-    // Use ConfigurationManager to detect the best storage configuration
-    // This will automatically handle ~/.devlog folder creation and usage
-    return await this.configManager.detectBestStorage();
-  }
-
-  private hasEnterpriseIntegrations(): boolean {
-    return !!(this.integrations?.jira || this.integrations?.ado || this.integrations?.github);
-  }
-
-  private async generateId(title: string, type?: DevlogType): Promise<DevlogId> {
-    if (this.useIntegerIds) {
-      // Use integer ID system
-      return await this.idManager.generateNextId();
-    } else {
-      // Legacy system no longer supported - always use integers
-      throw new Error('Legacy string IDs are no longer supported. Use integer ID system.');
-    }
-  }
-
   /**
    * Generate semantic key for the entry (used for referencing and legacy compatibility)
    */
-  private generateKey(title: string, type?: DevlogType): string {
-    const slug = title
+  private generateKey(title: string): string {
+    return title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '')
       .substring(0, 50);
-
-    // For consistency with legacy system, optionally include type-based hash
-    if (type && this.useIntegerIds) {
-      // Clean key without hash for new system
-      return slug;
-    } else {
-      // Legacy format with hash
-      const content = type ? `${title}:${type}` : title;
-      const hash = crypto.createHash('sha256').update(content).digest('hex').substring(0, 8);
-      return `${slug}--${hash}`;
-    }
   }
 }

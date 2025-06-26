@@ -3,17 +3,15 @@
  */
 
 import * as crypto from 'crypto';
-import { ConfigurationManager, type DevlogConfig, DevlogManager } from '@devlog/core';
+import { type DevlogConfig, DevlogManager } from '@devlog/core';
 import { CreateDevlogRequest, DevlogStatus, DevlogType, UpdateDevlogRequest } from '@devlog/types';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 export class MCPDevlogAdapter {
   private devlogManager: DevlogManager;
-  private configManager: ConfigurationManager;
   private config: DevlogConfig | null = null;
 
-  constructor(workspaceRoot?: string) {
-    this.configManager = new ConfigurationManager(workspaceRoot);
+  constructor() {
     this.devlogManager = new DevlogManager();
   }
 
@@ -21,19 +19,14 @@ export class MCPDevlogAdapter {
    * Initialize the adapter with appropriate storage configuration
    */
   async initialize(): Promise<void> {
-    this.config = await this.configManager.loadConfig();
-    this.devlogManager = new DevlogManager({
-      workspaceRoot: this.config.workspaceRoot,
-      storage: this.config.storage,
-      integrations: this.config.integrations,
-    });
+    this.devlogManager = new DevlogManager();
     await this.devlogManager.initialize();
   }
 
   async createDevlog(args: CreateDevlogRequest): Promise<CallToolResult> {
     await this.ensureInitialized();
 
-    const entry = await this.devlogManager.findOrCreateDevlog(args);
+    const entry = await this.devlogManager.createDevlog(args);
 
     return {
       content: [
@@ -439,289 +432,5 @@ export class MCPDevlogAdapter {
         },
       ],
     };
-  }
-
-  // Phase 2: Git Repository Management Tools
-
-  /**
-   * Initialize a new git-based devlog repository
-   */
-  async initializeGitRepository(args: {
-    repository: string;
-    branch?: string;
-    workspaceName?: string;
-    autoSync?: boolean;
-  }): Promise<CallToolResult> {
-    await this.ensureInitialized();
-
-    try {
-      const { GitRepositoryManager } = await import('@devlog/core');
-
-      const gitConfig = {
-        repository: args.repository,
-        branch: args.branch || 'main',
-        autoSync: args.autoSync !== false,
-        conflictResolution: 'timestamp-wins' as const,
-      };
-
-      const repoManager = new GitRepositoryManager(gitConfig);
-      const repoInfo = await repoManager.initializeRepository(args.workspaceName);
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text:
-              `✅ **Git Repository Initialized Successfully**\n\n` +
-              `📦 **Repository**: ${repoInfo.name}\n` +
-              `🔗 **URL**: ${repoInfo.url}\n` +
-              `📁 **Local Path**: ${repoInfo.path}\n` +
-              `🌿 **Branch**: ${repoInfo.branch}\n` +
-              `🏷️ **Workspace**: ${repoInfo.workspaceName || 'default'}\n\n` +
-              `The repository has been set up with the complete .devlog directory structure:\n` +
-              `- \`.devlog/entries/\` - JSON entry files\n` +
-              `- \`.devlog/index.json\` - Entry metadata and index\n` +
-              `- \`.devlog/config.json\` - Repository configuration\n` +
-              `- \`.gitignore\` - Excludes SQLite cache files\n\n` +
-              `You can now create devlog entries that will be stored as JSON files in the git repository.`,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `❌ **Failed to initialize git repository**\n\nError: ${error}`,
-          },
-        ],
-        isError: true,
-      };
-    }
-  }
-
-  /**
-   * Discover existing devlog repositories
-   */
-  async discoverGitRepositories(
-    args: {
-      includeRemotes?: boolean;
-      platforms?: string[];
-    } = {},
-  ): Promise<CallToolResult> {
-    await this.ensureInitialized();
-
-    try {
-      const { GitRepositoryManager } = await import('@devlog/core');
-
-      // Use a basic config for discovery
-      const gitConfig = {
-        repository: '', // Not needed for discovery
-        branch: 'main',
-      };
-
-      const repoManager = new GitRepositoryManager(gitConfig);
-      const repositories = await repoManager.discoverRepositories({
-        includeRemotes: args.includeRemotes,
-        platforms: args.platforms as ('github' | 'gitlab' | 'generic')[],
-      });
-
-      if (repositories.length === 0) {
-        return {
-          content: [
-            {
-              type: 'text',
-              text:
-                `🔍 **No devlog repositories found**\n\n` +
-                `No existing devlog repositories were discovered. You can:\n` +
-                `1. Initialize a new repository with \`initializeGitRepository\`\n` +
-                `2. Clone an existing repository with \`cloneGitRepository\``,
-            },
-          ],
-        };
-      }
-
-      const repoList = repositories
-        .map(
-          (repo) =>
-            `📦 **${repo.name}**\n` +
-            `   🔗 URL: ${repo.url}\n` +
-            `   📁 Path: ${repo.path}\n` +
-            `   🌿 Branch: ${repo.branch}\n` +
-            `   🏷️ Workspace: ${repo.workspaceName || 'default'}\n` +
-            `   📅 Last Modified: ${repo.lastModified || 'Unknown'}\n`,
-        )
-        .join('\n');
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `🔍 **Discovered ${repositories.length} devlog repositories**\n\n${repoList}`,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `❌ **Failed to discover repositories**\n\nError: ${error}`,
-          },
-        ],
-        isError: true,
-      };
-    }
-  }
-
-  /**
-   * Clone an existing devlog repository
-   */
-  async cloneGitRepository(args: {
-    repository: string;
-    branch?: string;
-    workspaceName?: string;
-  }): Promise<CallToolResult> {
-    await this.ensureInitialized();
-
-    try {
-      const { GitRepositoryManager } = await import('@devlog/core');
-
-      const gitConfig = {
-        repository: args.repository,
-        branch: args.branch || 'main',
-      };
-
-      const repoManager = new GitRepositoryManager(gitConfig);
-      const repoInfo = await repoManager.cloneRepository(args.repository, args.workspaceName);
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text:
-              `✅ **Repository cloned successfully**\n\n` +
-              `📦 **Repository**: ${repoInfo.name}\n` +
-              `🔗 **URL**: ${repoInfo.url}\n` +
-              `📁 **Local Path**: ${repoInfo.path}\n` +
-              `🌿 **Branch**: ${repoInfo.branch}\n` +
-              `🏷️ **Workspace**: ${repoInfo.workspaceName || 'default'}\n\n` +
-              `The repository is now available for use. You can access existing devlog entries and create new ones.`,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `❌ **Failed to clone repository**\n\nError: ${error}`,
-          },
-        ],
-        isError: true,
-      };
-    }
-  }
-
-  /**
-   * Validate git repository structure
-   */
-  async validateGitRepository(args: { path?: string }): Promise<CallToolResult> {
-    await this.ensureInitialized();
-
-    try {
-      const { GitRepositoryManager } = await import('@devlog/core');
-
-      const gitConfig = {
-        repository: '', // Not needed for validation
-        branch: 'main',
-      };
-
-      const repoManager = new GitRepositoryManager(gitConfig);
-      const repoPath = args.path || this.config?.workspaceRoot || process.cwd();
-      const validation = await repoManager.validateRepository(repoPath);
-
-      if (validation.valid) {
-        return {
-          content: [
-            {
-              type: 'text',
-              text:
-                `✅ **Repository validation passed**\n\n` +
-                `The repository at \`${repoPath}\` has a valid devlog structure.`,
-            },
-          ],
-        };
-      } else {
-        const issuesList = validation.issues.map((issue) => `• ${issue}`).join('\n');
-        const canFixText = validation.canFix
-          ? '\n\n🔧 **These issues can be automatically fixed** using the `fixGitRepository` tool.'
-          : '\n\n⚠️ **Manual intervention required** for some issues.';
-
-        return {
-          content: [
-            {
-              type: 'text',
-              text:
-                `⚠️ **Repository validation failed**\n\n` +
-                `**Issues found:**\n${issuesList}${canFixText}`,
-            },
-          ],
-        };
-      }
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `❌ **Failed to validate repository**\n\nError: ${error}`,
-          },
-        ],
-        isError: true,
-      };
-    }
-  }
-
-  /**
-   * Fix common git repository issues
-   */
-  async fixGitRepository(args: { path?: string }): Promise<CallToolResult> {
-    await this.ensureInitialized();
-
-    try {
-      const { GitRepositoryManager } = await import('@devlog/core');
-
-      const gitConfig = {
-        repository: '', // Not needed for fixes
-        branch: 'main',
-      };
-
-      const repoManager = new GitRepositoryManager(gitConfig);
-      const repoPath = args.path || this.config?.workspaceRoot || process.cwd();
-
-      await repoManager.fixRepository(repoPath);
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text:
-              `✅ **Repository fixed successfully**\n\n` +
-              `The devlog repository structure at \`${repoPath}\` has been repaired. ` +
-              `Missing directories and files have been created, and changes have been committed to git.`,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `❌ **Failed to fix repository**\n\nError: ${error}`,
-          },
-        ],
-        isError: true,
-      };
-    }
   }
 }

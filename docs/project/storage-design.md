@@ -165,7 +165,7 @@ interface LocalJsonConfig {
 
 ## Implementation Details
 
-The `LocalJsonStorageProvider` class provides full CRUD operations for devlog entries as JSON files, with automatic metadata management and zero-configuration setup. See the implementation in `packages/core/src/storage/local-json-storage.ts`.
+The `LocalJsonStorageProvider` class provides full CRUD operations for devlog entries as JSON files, with automatic metadata management and zero-configuration setup. See the implementation in `packages/core/src/storage/json-storage.ts`.
 
 ### Key Features
 

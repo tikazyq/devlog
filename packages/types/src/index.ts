@@ -25,8 +25,8 @@ export interface DevlogNote {
 }
 
 export interface DevlogEntry {
-  id: DevlogId;
-  key: string; // Original semantic key (e.g., "web-ui-issues-investigation")
+  id?: DevlogId;
+  key: string; // Semantic key (e.g., "web-ui-issues-investigation")
   title: string;
   type: DevlogType;
   description: string;
@@ -259,18 +259,20 @@ export interface LocalCacheConfig {
   filePath: string; // e.g., "~/.devlog/cache/project-name.db"
 }
 
-export interface LocalJsonConfig {
+export interface JsonConfig {
   directory?: string; // default: ".devlog/"
   filePattern?: string; // default: "{id:03d}-{slug}.json"
+  minPadding?: number; // default: 3 (minimum padding for IDs in filenames)
+  global?: boolean; // default: true (if true, uses a global directory, i.e. "~/.devlog", otherwise uses project root)
 }
 
 export interface StorageConfig {
   type: StorageType;
 
-  // JSON storage
-  json?: LocalJsonConfig;
+  // JSON storage config
+  json?: JsonConfig;
 
-  // Connection support
+  // Database connection config
   connectionString?: string;
   options?: Record<string, any>;
 }

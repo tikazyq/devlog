@@ -60,7 +60,7 @@ test('DevlogManager uses ~/.devlog folder for SQLite storage', async () => {
 test('ConfigurationManager detects best storage as local-json by default', async () => {
   const configManager = new ConfigurationManager();
 
-  const storageConfig = await configManager.detectBestStorage();
+  const storageConfig = await configManager.getDefaultStorageConfig();
 
   expect(storageConfig.type).toBe('local-json');
   expect(storageConfig.json).toBeDefined();
@@ -74,7 +74,7 @@ test('ConfigurationManager uses local-json storage without global structure', as
   const configManager = new ConfigurationManager();
 
   // This should detect local-json storage without needing global structure
-  const storageConfig = await configManager.detectBestStorage();
+  const storageConfig = await configManager.getDefaultStorageConfig();
 
   expect(storageConfig.type).toBe('local-json');
 

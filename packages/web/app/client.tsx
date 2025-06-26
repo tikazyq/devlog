@@ -109,7 +109,7 @@ export default function AppClient() {
           <DevlogDetails
             devlog={selectedDevlog}
             onUpdate={handleDevlogUpdate}
-            onDelete={() => handleDevlogDelete(selectedDevlog.id)}
+            onDelete={() => handleDevlogDelete(selectedDevlog.id!)}
             onBack={() => setCurrentView('list')}
           />
         ) : (

@@ -1,12 +1,11 @@
-// Use dynamic import to avoid ESM/CommonJS conflicts
-let devlogManager: any = null;
+import { DevlogManager } from '@devlog/core';
 
-export async function getDevlogManager() {
+let devlogManager: DevlogManager | null = null;
+
+export async function getDevlogManager(): Promise<DevlogManager> {
   if (!devlogManager) {
     const { DevlogManager } = await import('@devlog/core');
-    devlogManager = new DevlogManager({
-      workspaceRoot: process.cwd(),
-    });
+    devlogManager = new DevlogManager();
     await devlogManager.initialize();
   }
   return devlogManager;

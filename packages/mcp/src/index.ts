@@ -31,7 +31,7 @@ const server = new Server(
 );
 
 // Initialize the adapter
-const adapter = new MCPDevlogAdapter(process.cwd());
+const adapter = new MCPDevlogAdapter();
 
 // Tool definitions
 const tools: Tool[] = [

@@ -4,7 +4,7 @@
  * the project's existing git repository for versioning and collaboration.
  */
 
-import {
+import type {
   DevlogEntry,
   DevlogFilter,
   DevlogId,
@@ -12,34 +12,29 @@ import {
   DevlogStats,
   DevlogStatus,
   DevlogType,
+  JsonConfig,
 } from '@devlog/types';
-import { StorageProvider } from './storage-provider.js';
+import { StorageProvider } from './storage-provider';
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import { getDevlogDirFromJsonConfig } from './utils';
 
-export interface LocalJsonConfig {
-  directory?: string; // default: ".devlog/"
-  filePattern?: string; // default: "{id:auto}-{slug}.json" - auto-sizing padding
-  minPadding?: number; // default: 3 (001, 002, etc.)
-}
-
-export class LocalJsonStorageProvider implements StorageProvider {
-  private config: Required<LocalJsonConfig>;
-  private projectRoot: string;
-  private devlogDir: string;
-  private entriesDir: string;
-  private indexPath: string;
+export class JsonStorageProvider implements StorageProvider {
+  private readonly config: Required<JsonConfig>;
+  private readonly devlogDir: string;
+  private readonly entriesDir: string;
+  private readonly indexPath: string;
   private initialized = false;
 
-  constructor(projectRoot: string, config: LocalJsonConfig = {}) {
-    this.projectRoot = projectRoot;
+  constructor(config: JsonConfig = {}) {
     this.config = {
       directory: config.directory || '.devlog',
       filePattern: config.filePattern || '{id:auto}-{slug}.json',
       minPadding: config.minPadding || 3,
+      global: config.global !== undefined ? config.global : true, // Default to true for global storage
     };
 
-    this.devlogDir = path.join(this.projectRoot, this.config.directory);
+    this.devlogDir = getDevlogDirFromJsonConfig(this.config);
     this.entriesDir = path.join(this.devlogDir, 'entries');
     this.indexPath = path.join(this.devlogDir, 'index.json');
   }
@@ -86,6 +81,11 @@ export class LocalJsonStorageProvider implements StorageProvider {
 
   async save(entry: DevlogEntry): Promise<void> {
     await this.initialize();
+
+    // New entry if it doesn't have an ID
+    if (!entry.id) {
+      entry.id = await this.getNextId();
+    }
 
     const index = await this.loadIndex();
     const slug = this.createSlug(entry.title);
@@ -207,15 +207,6 @@ export class LocalJsonStorageProvider implements StorageProvider {
     // No cleanup needed for file-based storage
   }
 
-  isRemoteStorage(): boolean {
-    return false;
-  }
-
-  isGitBased(): boolean {
-    // This IS git-based, but in a simple way - files are part of the project repo
-    return true;
-  }
-
   /**
    * Get the next available ID for a new entry
    */
@@ -226,6 +217,7 @@ export class LocalJsonStorageProvider implements StorageProvider {
 
   private async loadIndex(): Promise<DevlogIndex> {
     try {
+      console.debug('Loading devlog index from', this.indexPath);
       const content = await fs.readFile(this.indexPath, 'utf-8');
       return JSON.parse(content);
     } catch {
@@ -271,10 +263,7 @@ temp/
     const requiredDigits = Math.max(this.config.minPadding, maxId.toString().length);
     const paddedId = id.toString().padStart(requiredDigits, '0');
 
-    return this.config.filePattern
-      .replace('{id:auto}', paddedId)
-      .replace('{id:03d}', id.toString().padStart(3, '0')) // Legacy support
-      .replace('{slug}', slug);
+    return this.config.filePattern.replace('{id:auto}', paddedId).replace('{slug}', slug);
   }
 }
 

@@ -27,7 +27,7 @@ This roadmap tracks the implementation of a simplified local JSON storage approa
 ### Files Implemented
 
 ```
-✅ packages/core/src/storage/local-json-storage.ts (new)
+✅ packages/core/src/storage/json-storage.ts (new)
 ✅ packages/types/src/index.ts (updated)
 ✅ packages/core/src/configuration-manager.ts (updated)
 ✅ packages/core/src/storage/storage-provider.ts (updated)

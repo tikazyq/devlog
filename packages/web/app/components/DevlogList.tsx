@@ -153,7 +153,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
           <Popconfirm
             title="Delete Devlog"
             description="Are you sure you want to delete this devlog?"
-            onConfirm={() => onDeleteDevlog(record.id)}
+            onConfirm={() => onDeleteDevlog(record.id!)}
             okText="Yes"
             cancelText="No"
           >

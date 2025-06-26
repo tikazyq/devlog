@@ -77,7 +77,7 @@ export class StorageProviderFactory {
 
       case 'json':
       default:
-        const { JsonStorageProvider } = await import('./json-storage');
+        const { JsonStorageProvider } = await import('./json-storage.js');
         return new JsonStorageProvider(config.json || {});
     }
   }

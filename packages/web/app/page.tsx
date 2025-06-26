@@ -1,5 +1,5 @@
-import AppClient from './client';
+import { DashboardPage } from './DashboardPage';
 
 export default function Home() {
-  return <AppClient />;
+  return <DashboardPage />;
 }

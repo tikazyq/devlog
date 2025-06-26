@@ -97,3 +97,31 @@ body {
     max-width: 1000px;
     margin: 0 auto;
 }
+
+/* App Layout styles */
+.app-layout {
+    height: 100vh;
+}
+
+.app-content {
+    margin: 24px;
+    overflow: auto;
+}
+
+.app-error-alert {
+    margin-bottom: 16px;
+}
+
+/* Navigation styles */
+.navigation-breadcrumb {
+    margin: 16px 0;
+}
+
+/* Loading container */
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+    flex-direction: column;
+}

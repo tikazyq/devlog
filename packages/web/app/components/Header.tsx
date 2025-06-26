@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Badge, Button, Layout, Space, Typography } from 'antd';
 import { MenuOutlined, ReloadOutlined, WifiOutlined } from '@ant-design/icons';

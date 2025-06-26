@@ -7,10 +7,10 @@ export function useWebSocket() {
   useEffect(() => {
     // In development, use the correct backend port
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const isDev = process.env.NODE_ENV === 'development' || window.location.port === '3000';
+    const isDev = process.env.NODE_ENV === 'development';
     const wsUrl = isDev
-      ? `${protocol}//localhost:3001/ws`
-      : `${protocol}//${window.location.host}/ws`;
+      ? `${protocol}//localhost:3000/api/ws`
+      : `${protocol}//${window.location.host}/api/ws`;
 
     const connect = () => {
       const ws = new WebSocket(wsUrl);

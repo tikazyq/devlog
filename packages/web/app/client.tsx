@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
-import { Alert, ConfigProvider, Layout, Spin, theme } from 'antd';
+import { Alert, Layout, Spin, theme } from 'antd';
 import { DevlogEntry, DevlogId, DevlogStats } from '@devlog/types';
 import { Dashboard } from './components/Dashboard';
 import { DevlogList } from './components/DevlogList';
@@ -15,7 +17,7 @@ const { Content } = Layout;
 
 type View = 'dashboard' | 'list' | 'create' | 'details';
 
-function App() {
+export default function AppClient() {
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [selectedDevlog, setSelectedDevlog] = useState<DevlogEntry | null>(null);
   const [stats, setStats] = useState<DevlogStats | null>(null);
@@ -120,53 +122,41 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <ConfigProvider
-        theme={{
-          algorithm: theme.defaultAlgorithm,
-          token: {
-            colorPrimary: '#3b82f6',
-            borderRadius: 8,
-          },
-        }}
-      >
-        <Layout style={{ height: '100vh' }}>
-          <Sidebar
-            currentView={currentView}
-            onViewChange={handleViewChange}
-            stats={stats}
-            collapsed={sidebarCollapsed}
+      <Layout style={{ height: '100vh' }}>
+        <Sidebar
+          currentView={currentView}
+          onViewChange={handleViewChange}
+          stats={stats}
+          collapsed={sidebarCollapsed}
+        />
+        <Layout>
+          <Header
+            connected={connected}
+            onRefresh={refetch}
+            sidebarCollapsed={sidebarCollapsed}
+            onSidebarToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
           />
-          <Layout>
-            <Header
-              connected={connected}
-              onRefresh={refetch}
-              sidebarCollapsed={sidebarCollapsed}
-              onSidebarToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-            />
-            <Content style={{ margin: '24px', overflow: 'auto' }}>
-              {error && (
-                <Alert
-                  message="Error"
-                  description={error}
-                  type="error"
-                  showIcon
-                  closable
-                  style={{ marginBottom: 16 }}
-                />
-              )}
-              {loading && currentView === 'list' ? (
-                <div className="loading-container">
-                  <Spin size="large" tip="Loading devlogs..." />
-                </div>
-              ) : (
-                renderCurrentView()
-              )}
-            </Content>
-          </Layout>
+          <Content style={{ margin: '24px', overflow: 'auto' }}>
+            {error && (
+              <Alert
+                message="Error"
+                description={error}
+                type="error"
+                showIcon
+                closable
+                style={{ marginBottom: 16 }}
+              />
+            )}
+            {loading && currentView === 'list' ? (
+              <div className="loading-container">
+                <Spin size="large" tip="Loading devlogs..." />
+              </div>
+            ) : (
+              renderCurrentView()
+            )}
+          </Content>
         </Layout>
-      </ConfigProvider>
+      </Layout>
     </ErrorBoundary>
   );
 }
-
-export default App;

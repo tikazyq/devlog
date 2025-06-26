@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Card, Col, Layout, Menu, Row, Statistic, Typography } from 'antd';
 import { CodeOutlined, DashboardOutlined, FileTextOutlined, PlusOutlined } from '@ant-design/icons';

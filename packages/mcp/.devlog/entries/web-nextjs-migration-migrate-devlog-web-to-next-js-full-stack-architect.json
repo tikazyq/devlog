@@ -1,0 +1,47 @@
+{
+  "id": "web-nextjs-migration",
+  "key": "migrate-devlog-web-to-next-js-full-stack-architect",
+  "title": "Migrate @devlog/web to Next.js Full-Stack Architecture",
+  "type": "refactor",
+  "description": "Replace the current Vite + Express setup in @devlog/web with Next.js for unified full-stack development. The current architecture uses separate client (Vite/React) and server (Express) processes with WebSocket support. Need to migrate to Next.js App Router with API routes while preserving existing functionality.",
+  "status": "in-progress",
+  "priority": "medium",
+  "createdAt": "2025-06-26T01:52:32.907Z",
+  "updatedAt": "2025-06-26T01:53:25.636Z",
+  "tags": [],
+  "notes": [
+    {
+      "id": "eb1d70a0-c3b9-48a6-b201-ae0048d1fb2f",
+      "timestamp": "2025-06-26T01:53:25.637Z",
+      "category": "progress",
+      "content": "Starting migration to Next.js. Current architecture analysis complete: Vite+React client with Express API server, WebSocket support, Ant Design + TailwindCSS UI."
+    }
+  ],
+  "files": [],
+  "relatedDevlogs": [],
+  "context": {
+    "businessContext": "Simplify development workflow and improve developer experience by using a single framework for both frontend and backend. Next.js provides better integration, built-in optimizations, and simplified deployment.",
+    "technicalContext": "Current setup: Vite dev server on port 3000 proxying to Express API server on port 3001, with WebSocket support for real-time updates. Uses React + Ant Design + TailwindCSS for UI. Express server handles API routes and serves devlog data from @devlog/core package.",
+    "dependencies": [],
+    "decisions": [],
+    "acceptanceCriteria": [
+      "All existing API functionality preserved",
+      "WebSocket support maintained",
+      "React components and UI preserved",
+      "TailwindCSS and Ant Design integration maintained",
+      "Development workflow simplified to single command",
+      "TypeScript support maintained",
+      "Integration with @devlog/core package preserved"
+    ],
+    "risks": []
+  },
+  "aiContext": {
+    "currentSummary": "",
+    "keyInsights": [],
+    "openQuestions": [],
+    "relatedPatterns": [],
+    "suggestedNextSteps": [],
+    "lastAIUpdate": "2025-06-26T01:52:32.907Z",
+    "contextVersion": 1
+  }
+}

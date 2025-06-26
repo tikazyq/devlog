@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Button, Card, Col, Form, Input, Row, Select, Space, Typography } from 'antd';
 import { CloseOutlined, SaveOutlined } from '@ant-design/icons';

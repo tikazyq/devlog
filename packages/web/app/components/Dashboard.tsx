@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Avatar, Card, Col, Empty, List, Row, Skeleton, Statistic, Tag, Typography } from 'antd';
 import {

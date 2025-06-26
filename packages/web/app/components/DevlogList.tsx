@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Button, Card, Empty, Popconfirm, Space, Spin, Table, Tag, Typography } from 'antd';
 import {

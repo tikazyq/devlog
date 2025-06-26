@@ -1,4 +1,4 @@
-import { WebSocketServer, WebSocket } from 'ws';
+import { WebSocket, WebSocketServer } from 'ws';
 import { DevlogManager } from '@devlog/core';
 
 interface WebSocketMessage {
@@ -18,37 +18,41 @@ export function setupWebSocket(wss: WebSocketServer, devlogManager: DevlogManage
   wss.on('connection', (ws: WebSocket) => {
     const client: ClientConnection = {
       ws,
-      subscriptions: new Set()
+      subscriptions: new Set(),
     };
-    
+
     clients.add(client);
     console.log('New WebSocket connection established');
 
     ws.on('message', async (data: Buffer) => {
       try {
         const message: WebSocketMessage = JSON.parse(data.toString());
-        
+
         switch (message.type) {
           case 'subscribe':
             if (message.channel) {
               client.subscriptions.add(message.channel);
-              ws.send(JSON.stringify({
-                type: 'subscribed',
-                channel: message.channel
-              }));
+              ws.send(
+                JSON.stringify({
+                  type: 'subscribed',
+                  channel: message.channel,
+                }),
+              );
             }
             break;
-            
+
           case 'unsubscribe':
             if (message.channel) {
               client.subscriptions.delete(message.channel);
-              ws.send(JSON.stringify({
-                type: 'unsubscribed',
-                channel: message.channel
-              }));
+              ws.send(
+                JSON.stringify({
+                  type: 'unsubscribed',
+                  channel: message.channel,
+                }),
+              );
             }
             break;
-            
+
           case 'ping':
             ws.send(JSON.stringify({ type: 'pong' }));
             break;
@@ -69,10 +73,12 @@ export function setupWebSocket(wss: WebSocketServer, devlogManager: DevlogManage
     });
 
     // Send initial connection success
-    ws.send(JSON.stringify({
-      type: 'connected',
-      timestamp: new Date().toISOString()
-    }));
+    ws.send(
+      JSON.stringify({
+        type: 'connected',
+        timestamp: new Date().toISOString(),
+      }),
+    );
   });
 
   // Broadcast updates to subscribed clients
@@ -81,10 +87,10 @@ export function setupWebSocket(wss: WebSocketServer, devlogManager: DevlogManage
       type: 'update',
       channel,
       data,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
-    clients.forEach(client => {
+    clients.forEach((client) => {
       if (client.subscriptions.has(channel) && client.ws.readyState === WebSocket.OPEN) {
         client.ws.send(message);
       }

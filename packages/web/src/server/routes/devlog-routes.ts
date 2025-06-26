@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { DevlogManager } from '@devlog/core';
-import { CreateDevlogRequest, UpdateDevlogRequest, DevlogFilter } from '@devlog/types';
+import { CreateDevlogRequest, DevlogFilter, UpdateDevlogRequest } from '@devlog/types';
 
 // Utility function to parse ID from string parameter
 function parseDevlogId(idParam: string): number {
@@ -18,7 +18,7 @@ export function devlogRoutes(devlogManager: DevlogManager): Router {
   router.get('/', async (req, res) => {
     try {
       const filter: DevlogFilter = {};
-      
+
       // Parse query parameters
       if (req.query.status) filter.status = req.query.status as any;
       if (req.query.type) filter.type = req.query.type as any;

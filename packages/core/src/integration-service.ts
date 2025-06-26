@@ -2,10 +2,10 @@
  * Integration service that handles synchronization between local storage and external systems
  */
 
-import { DevlogEntry, EnterpriseIntegration, ExternalReference, DevlogId } from "@devlog/types";
-import { StorageProvider } from "./storage/storage-provider.js";
-import { EnterpriseSync } from "./integrations/enterprise-sync.js";
-import { SyncStrategy } from "./configuration-manager.js";
+import { DevlogEntry, DevlogId, EnterpriseIntegration, ExternalReference } from '@devlog/types';
+import { StorageProvider } from './storage/storage-provider.js';
+import { EnterpriseSync } from './integrations/enterprise-sync.js';
+import { SyncStrategy } from './configuration-manager.js';
 
 export interface ConflictData {
   localChanges: Partial<DevlogEntry>;
@@ -30,8 +30,8 @@ export class IntegrationService {
     private syncStrategy: SyncStrategy = {
       sourceOfTruth: 'local',
       conflictResolution: 'local-wins',
-      autoSync: false
-    }
+      autoSync: false,
+    },
   ) {
     if (integrations) {
       this.enterpriseSync = new EnterpriseSync(integrations);
@@ -50,36 +50,36 @@ export class IntegrationService {
     // Always save to local storage first (source of truth)
     const savedEntry = { ...entry };
     await this.storage.save(savedEntry);
-    
+
     // Sync to external systems if configured
     if (this.enterpriseSync && this.syncStrategy.autoSync) {
       try {
         const externalRefs = await this.syncToExternal(savedEntry);
         savedEntry.externalReferences = externalRefs;
         savedEntry.updatedAt = new Date().toISOString();
-        
+
         // Update with external references
         await this.storage.save(savedEntry);
-        
+
         return savedEntry;
       } catch (error) {
         // Log sync failure but don't fail the save
         console.warn(`Sync failed for entry ${savedEntry.id}:`, error);
-        
+
         // Mark as sync failed but keep the entry
         savedEntry.notes = savedEntry.notes || [];
         savedEntry.notes.push({
           id: `sync-error-${Date.now()}`,
           timestamp: new Date().toISOString(),
           category: 'issue',
-          content: `Sync failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+          content: `Sync failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         });
-        
+
         await this.storage.save(savedEntry);
         return savedEntry;
       }
     }
-    
+
     return savedEntry;
   }
 
@@ -96,7 +96,7 @@ export class IntegrationService {
       const externalRefs = await this.syncToExternal(entry);
       entry.externalReferences = externalRefs;
       entry.updatedAt = new Date().toISOString();
-      
+
       await this.storage.save(entry);
       return entry;
     } catch (error) {
@@ -126,7 +126,7 @@ export class IntegrationService {
     }
 
     const intervalMs = this.syncStrategy.syncInterval * 60 * 1000;
-    
+
     this.backgroundSyncTimer = setInterval(async () => {
       await this.reconcileAllEntries();
     }, intervalMs);
@@ -153,7 +153,7 @@ export class IntegrationService {
     try {
       // Get all entries that might need reconciliation
       const entries = await this.storage.list();
-      
+
       for (const entry of entries) {
         // Only reconcile entries that have external references or are meant to sync
         if (entry.externalReferences && entry.externalReferences.length > 0) {
@@ -175,7 +175,7 @@ export class IntegrationService {
     // 3. Detect conflicts
     // 4. Resolve conflicts based on strategy
     // 5. Update local storage
-    
+
     console.log(`Reconciling entry ${entry.id} - implementation pending`);
   }
 
@@ -193,17 +193,17 @@ export class IntegrationService {
     }
 
     // Check if all configured integrations have references
-    const hasJira = !this.integrations.jira || 
-      entry.externalReferences.some(ref => ref.system === 'jira');
-    const hasAdo = !this.integrations.ado || 
-      entry.externalReferences.some(ref => ref.system === 'ado');
-    const hasGitHub = !this.integrations.github || 
-      entry.externalReferences.some(ref => ref.system === 'github');
+    const hasJira =
+      !this.integrations.jira || entry.externalReferences.some((ref) => ref.system === 'jira');
+    const hasAdo =
+      !this.integrations.ado || entry.externalReferences.some((ref) => ref.system === 'ado');
+    const hasGitHub =
+      !this.integrations.github || entry.externalReferences.some((ref) => ref.system === 'github');
 
     if (hasJira && hasAdo && hasGitHub) {
-      return { 
+      return {
         status: 'synced',
-        lastSyncAt: entry.updatedAt
+        lastSyncAt: entry.updatedAt,
       };
     }
 

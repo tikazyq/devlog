@@ -2,8 +2,8 @@
  * PostgreSQL storage provider for production-grade devlog storage
  */
 
-import { DevlogEntry, DevlogFilter, DevlogStats, DevlogId } from "@devlog/types";
-import { StorageProvider } from "./storage-provider.js";
+import { DevlogEntry, DevlogFilter, DevlogId, DevlogStats } from '@devlog/types';
+import { StorageProvider } from './storage-provider.js';
 
 export class PostgreSQLStorageProvider implements StorageProvider {
   private connectionString: string;
@@ -18,19 +18,21 @@ export class PostgreSQLStorageProvider implements StorageProvider {
   async initialize(): Promise<void> {
     // Dynamic import to make pg optional
     try {
-      const pgModule = await import("pg" as any);
+      const pgModule = await import('pg' as any);
       const { Client } = pgModule;
-      
+
       this.client = new Client({
         connectionString: this.connectionString,
-        ...this.options
+        ...this.options,
       });
 
       await this.client.connect();
     } catch (error) {
-      throw new Error("pg is required for PostgreSQL storage. Install it with: npm install pg @types/pg");
+      throw new Error(
+        'pg is required for PostgreSQL storage. Install it with: npm install pg @types/pg',
+      );
     }
-    
+
     // Create tables and indexes
     await this.client.query(`
       CREATE TABLE IF NOT EXISTS devlog_entries (
@@ -68,20 +70,21 @@ export class PostgreSQLStorageProvider implements StorageProvider {
   }
 
   async exists(id: DevlogId): Promise<boolean> {
-    const result = await this.client.query("SELECT 1 FROM devlog_entries WHERE id = $1", [id]);
+    const result = await this.client.query('SELECT 1 FROM devlog_entries WHERE id = $1', [id]);
     return result.rows.length > 0;
   }
 
   async get(id: DevlogId): Promise<DevlogEntry | null> {
-    const result = await this.client.query("SELECT * FROM devlog_entries WHERE id = $1", [id]);
-    
+    const result = await this.client.query('SELECT * FROM devlog_entries WHERE id = $1', [id]);
+
     if (result.rows.length === 0) return null;
-    
+
     return this.rowToDevlogEntry(result.rows[0]);
   }
 
   async save(entry: DevlogEntry): Promise<void> {
-    await this.client.query(`
+    await this.client.query(
+      `
       INSERT INTO devlog_entries (
         id, key_field, title, type, description, status, priority, created_at, updated_at,
         estimated_hours, actual_hours, assignee, tags, files, related_devlogs,
@@ -105,35 +108,37 @@ export class PostgreSQLStorageProvider implements StorageProvider {
         ai_context = EXCLUDED.ai_context,
         external_references = EXCLUDED.external_references,
         notes = EXCLUDED.notes
-    `, [
-      entry.id,
-      entry.key,
-      entry.title,
-      entry.type,
-      entry.description,
-      entry.status,
-      entry.priority,
-      entry.createdAt,
-      entry.updatedAt,
-      entry.estimatedHours,
-      entry.actualHours,
-      entry.assignee,
-      JSON.stringify(entry.tags),
-      JSON.stringify(entry.files),
-      JSON.stringify(entry.relatedDevlogs),
-      JSON.stringify(entry.context),
-      JSON.stringify(entry.aiContext),
-      JSON.stringify(entry.externalReferences || []),
-      JSON.stringify(entry.notes)
-    ]);
+    `,
+      [
+        entry.id,
+        entry.key,
+        entry.title,
+        entry.type,
+        entry.description,
+        entry.status,
+        entry.priority,
+        entry.createdAt,
+        entry.updatedAt,
+        entry.estimatedHours,
+        entry.actualHours,
+        entry.assignee,
+        JSON.stringify(entry.tags),
+        JSON.stringify(entry.files),
+        JSON.stringify(entry.relatedDevlogs),
+        JSON.stringify(entry.context),
+        JSON.stringify(entry.aiContext),
+        JSON.stringify(entry.externalReferences || []),
+        JSON.stringify(entry.notes),
+      ],
+    );
   }
 
   async delete(id: DevlogId): Promise<void> {
-    await this.client.query("DELETE FROM devlog_entries WHERE id = $1", [id]);
+    await this.client.query('DELETE FROM devlog_entries WHERE id = $1', [id]);
   }
 
   async list(filter?: DevlogFilter): Promise<DevlogEntry[]> {
-    let query = "SELECT * FROM devlog_entries";
+    let query = 'SELECT * FROM devlog_entries';
     const conditions: string[] = [];
     const params: any[] = [];
     let paramCount = 0;
@@ -183,42 +188,51 @@ export class PostgreSQLStorageProvider implements StorageProvider {
     }
 
     if (conditions.length > 0) {
-      query += " WHERE " + conditions.join(" AND ");
+      query += ' WHERE ' + conditions.join(' AND ');
     }
 
-    query += " ORDER BY updated_at DESC";
+    query += ' ORDER BY updated_at DESC';
 
     const result = await this.client.query(query, params);
     return result.rows.map((row: any) => this.rowToDevlogEntry(row));
   }
 
   async search(query: string): Promise<DevlogEntry[]> {
-    const result = await this.client.query(`
+    const result = await this.client.query(
+      `
       SELECT * FROM devlog_entries
       WHERE to_tsvector('english', title || ' ' || description) @@ plainto_tsquery('english', $1)
       ORDER BY ts_rank(to_tsvector('english', title || ' ' || description), plainto_tsquery('english', $1)) DESC
-    `, [query]);
-    
+    `,
+      [query],
+    );
+
     return result.rows.map((row: any) => this.rowToDevlogEntry(row));
   }
 
   async getStats(): Promise<DevlogStats> {
-    const totalResult = await this.client.query("SELECT COUNT(*) as count FROM devlog_entries");
+    const totalResult = await this.client.query('SELECT COUNT(*) as count FROM devlog_entries');
     const total = parseInt(totalResult.rows[0].count);
 
-    const statusResult = await this.client.query("SELECT status, COUNT(*) as count FROM devlog_entries GROUP BY status");
+    const statusResult = await this.client.query(
+      'SELECT status, COUNT(*) as count FROM devlog_entries GROUP BY status',
+    );
     const byStatus: any = {};
     statusResult.rows.forEach((row: any) => {
       byStatus[row.status] = parseInt(row.count);
     });
 
-    const typeResult = await this.client.query("SELECT type, COUNT(*) as count FROM devlog_entries GROUP BY type");
+    const typeResult = await this.client.query(
+      'SELECT type, COUNT(*) as count FROM devlog_entries GROUP BY type',
+    );
     const byType: any = {};
     typeResult.rows.forEach((row: any) => {
       byType[row.type] = parseInt(row.count);
     });
 
-    const priorityResult = await this.client.query("SELECT priority, COUNT(*) as count FROM devlog_entries GROUP BY priority");
+    const priorityResult = await this.client.query(
+      'SELECT priority, COUNT(*) as count FROM devlog_entries GROUP BY priority',
+    );
     const byPriority: any = {};
     priorityResult.rows.forEach((row: any) => {
       byPriority[row.priority] = parseInt(row.count);
@@ -228,7 +242,7 @@ export class PostgreSQLStorageProvider implements StorageProvider {
       totalEntries: total,
       byStatus,
       byType,
-      byPriority
+      byPriority,
     };
   }
 
@@ -267,7 +281,7 @@ export class PostgreSQLStorageProvider implements StorageProvider {
       context: row.context || {},
       aiContext: row.ai_context || {},
       notes: row.notes || [],
-      externalReferences: row.external_references || []
+      externalReferences: row.external_references || [],
     };
   }
 }

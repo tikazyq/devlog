@@ -1,37 +1,37 @@
 import React, { useState } from 'react';
-import { 
-  Typography, 
-  Card, 
-  Button, 
-  Space, 
-  Tag, 
-  Form, 
-  Input, 
-  Select, 
-  Row, 
-  Col, 
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
   Divider,
-  Timeline,
+  Form,
+  Input,
   Popconfirm,
-  Alert
+  Row,
+  Select,
+  Space,
+  Tag,
+  Timeline,
+  Typography,
 } from 'antd';
-import { 
-  ArrowLeftOutlined, 
-  EditOutlined, 
-  DeleteOutlined, 
-  SaveOutlined, 
-  CloseOutlined,
-  CheckCircleOutlined,
-  SyncOutlined,
-  StopOutlined,
-  ClockCircleOutlined,
-  MinusCircleOutlined,
-  ExclamationCircleOutlined,
-  WarningOutlined,
-  InfoCircleOutlined,
+import {
+  ArrowLeftOutlined,
+  BookOutlined,
   BugOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  ExclamationCircleOutlined,
+  InfoCircleOutlined,
+  MinusCircleOutlined,
+  SaveOutlined,
+  StopOutlined,
+  SyncOutlined,
   ToolOutlined,
-  BookOutlined
+  WarningOutlined,
 } from '@ant-design/icons';
 import { DevlogEntry } from '@devlog/types';
 
@@ -57,72 +57,104 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'done': return 'success';
-      case 'in-progress': return 'processing';
-      case 'blocked': return 'error';
-      case 'review': return 'warning';
-      case 'testing': return 'cyan';
-      case 'todo': return 'default';
-      default: return 'default';
+      case 'done':
+        return 'success';
+      case 'in-progress':
+        return 'processing';
+      case 'blocked':
+        return 'error';
+      case 'review':
+        return 'warning';
+      case 'testing':
+        return 'cyan';
+      case 'todo':
+        return 'default';
+      default:
+        return 'default';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'done': return <CheckCircleOutlined />;
-      case 'in-progress': return <SyncOutlined spin />;
-      case 'blocked': return <StopOutlined />;
-      case 'review': return <ExclamationCircleOutlined />;
-      case 'testing': return <ToolOutlined />;
-      case 'todo': return <ClockCircleOutlined />;
-      default: return <MinusCircleOutlined />;
+      case 'done':
+        return <CheckCircleOutlined />;
+      case 'in-progress':
+        return <SyncOutlined spin />;
+      case 'blocked':
+        return <StopOutlined />;
+      case 'review':
+        return <ExclamationCircleOutlined />;
+      case 'testing':
+        return <ToolOutlined />;
+      case 'todo':
+        return <ClockCircleOutlined />;
+      default:
+        return <MinusCircleOutlined />;
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'critical': return 'red';
-      case 'high': return 'orange';
-      case 'medium': return 'gold';
-      case 'low': return 'green';
-      default: return 'default';
+      case 'critical':
+        return 'red';
+      case 'high':
+        return 'orange';
+      case 'medium':
+        return 'gold';
+      case 'low':
+        return 'green';
+      default:
+        return 'default';
     }
   };
 
   const getPriorityIcon = (priority: string) => {
     switch (priority) {
-      case 'critical': return <ExclamationCircleOutlined />;
-      case 'high': return <WarningOutlined />;
-      case 'medium': return <InfoCircleOutlined />;
-      case 'low': return <CheckCircleOutlined />;
-      default: return <MinusCircleOutlined />;
+      case 'critical':
+        return <ExclamationCircleOutlined />;
+      case 'high':
+        return <WarningOutlined />;
+      case 'medium':
+        return <InfoCircleOutlined />;
+      case 'low':
+        return <CheckCircleOutlined />;
+      default:
+        return <MinusCircleOutlined />;
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'feature': return '✨';
-      case 'bugfix': return <BugOutlined />;
-      case 'task': return '📋';
-      case 'refactor': return <ToolOutlined />;
-      case 'docs': return <BookOutlined />;
-      default: return '📝';
+      case 'feature':
+        return '✨';
+      case 'bugfix':
+        return <BugOutlined />;
+      case 'task':
+        return '📋';
+      case 'refactor':
+        return <ToolOutlined />;
+      case 'docs':
+        return <BookOutlined />;
+      default:
+        return '📝';
     }
   };
 
   return (
     <div>
-      <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Button 
-          type="text" 
-          icon={<ArrowLeftOutlined />} 
-          onClick={onBack}
-          size="large"
-        >
+      <div
+        style={{
+          marginBottom: '24px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <Button type="text" icon={<ArrowLeftOutlined />} onClick={onBack} size="large">
           Back to List
         </Button>
         <Space>
-          <Button 
+          <Button
             type={isEditing ? 'default' : 'primary'}
             icon={isEditing ? <CloseOutlined /> : <EditOutlined />}
             onClick={() => setIsEditing(!isEditing)}
@@ -157,7 +189,7 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
               priority: devlog.priority,
               description: devlog.description,
               businessContext: devlog.context?.businessContext || '',
-              technicalContext: devlog.context?.technicalContext || ''
+              technicalContext: devlog.context?.technicalContext || '',
             }}
           >
             <Row gutter={[16, 0]}>
@@ -230,19 +262,13 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
               </Col>
 
               <Col span={24}>
-                <Form.Item
-                  name="businessContext"
-                  label="Business Context"
-                >
+                <Form.Item name="businessContext" label="Business Context">
                   <TextArea rows={3} showCount maxLength={300} />
                 </Form.Item>
               </Col>
 
               <Col span={24}>
-                <Form.Item
-                  name="technicalContext"
-                  label="Technical Context"
-                >
+                <Form.Item name="technicalContext" label="Technical Context">
                   <TextArea rows={3} showCount maxLength={300} />
                 </Form.Item>
               </Col>
@@ -252,9 +278,7 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
 
             <Form.Item style={{ marginBottom: 0 }}>
               <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-                <Button onClick={() => setIsEditing(false)}>
-                  Cancel
-                </Button>
+                <Button onClick={() => setIsEditing(false)}>Cancel</Button>
                 <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
                   Save Changes
                 </Button>
@@ -264,27 +288,34 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
         ) : (
           <div>
             <div style={{ marginBottom: '24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  marginBottom: '16px',
+                }}
+              >
                 <Title level={2} style={{ margin: 0 }}>
                   {devlog.title}
                 </Title>
                 <Space>
-                  <Tag 
-                    color={getStatusColor(devlog.status)} 
+                  <Tag
+                    color={getStatusColor(devlog.status)}
                     icon={getStatusIcon(devlog.status)}
                     style={{ fontSize: '14px', padding: '4px 12px' }}
                   >
                     {devlog.status}
                   </Tag>
-                  <Tag 
+                  <Tag
                     color={getPriorityColor(devlog.priority)}
                     icon={getPriorityIcon(devlog.priority)}
                     style={{ fontSize: '14px', padding: '4px 12px' }}
                   >
                     {devlog.priority}
                   </Tag>
-                  <Tag 
-                    color="blue" 
+                  <Tag
+                    color="blue"
                     icon={getTypeIcon(devlog.type)}
                     style={{ fontSize: '14px', padding: '4px 12px' }}
                   >
@@ -292,10 +323,10 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
                   </Tag>
                 </Space>
               </div>
-              
+
               <Text type="secondary">
-                Created: {new Date(devlog.createdAt).toLocaleString()} • 
-                Updated: {new Date(devlog.updatedAt).toLocaleString()}
+                Created: {new Date(devlog.createdAt).toLocaleString()} • Updated:{' '}
+                {new Date(devlog.updatedAt).toLocaleString()}
               </Text>
             </div>
 

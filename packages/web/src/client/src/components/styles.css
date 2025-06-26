@@ -2,166 +2,166 @@
 
 /* Loading states */
 .loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
 }
 
 /* DevlogList styles */
 .devlog-list-header {
-  margin-bottom: 24px;
+    margin-bottom: 24px;
 }
 
 .devlog-title-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
 }
 
 .devlog-title {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .devlog-description {
-  font-size: 12px;
+    font-size: 12px;
 }
 
 /* Dashboard styles */
 .dashboard-header {
-  margin-bottom: 24px;
+    margin-bottom: 24px;
 }
 
 .dashboard-stats-row {
-  margin-bottom: 32px;
+    margin-bottom: 32px;
 }
 
 .recent-devlogs-meta {
-  margin-top: 4px;
+    margin-top: 4px;
 }
 
 /* DevlogDetails styles */
 .devlog-details-header {
-  margin-bottom: 24px;
+    margin-bottom: 24px;
 }
 
 .devlog-details-actions {
-  margin-bottom: 24px;
+    margin-bottom: 24px;
 }
 
 .devlog-details-content {
-  margin-bottom: 24px;
+    margin-bottom: 24px;
 }
 
 .devlog-section {
-  margin-bottom: 24px;
+    margin-bottom: 24px;
 }
 
 .devlog-form-actions {
-  margin-top: 24px;
+    margin-top: 24px;
 }
 
 /* Header styles */
 .header-container {
-  padding: 0 24px;
-  background: #fff;
-  border-bottom: 1px solid #f0f0f0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+    padding: 0 24px;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
 .header-title {
-  margin: 0;
-  color: #1f2937;
+    margin: 0;
+    color: #1f2937;
 }
 
 /* Sidebar styles */
 .sidebar-header {
-  padding: 24px 24px 16px;
+    padding: 24px 24px 16px;
 }
 
 .sidebar-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
 }
 
 .sidebar-brand-icon {
-  font-size: 24px;
-  color: #3b82f6;
+    font-size: 24px;
+    color: #3b82f6;
 }
 
 .sidebar-brand-title {
-  margin: 0;
-  color: #1f2937;
+    margin: 0;
+    color: #1f2937;
 }
 
 .sidebar-stats {
-  padding: 24px 16px;
+    padding: 24px 16px;
 }
 
 .sidebar-stats-title {
-  margin-bottom: 16px;
-  color: #6b7280;
+    margin-bottom: 16px;
+    color: #6b7280;
 }
 
 .sidebar-stats-card {
-  background: #fafafa;
+    background: #fafafa;
 }
 
 /* Responsive improvements */
 @media (max-width: 768px) {
-  .dashboard-stats-row .ant-col {
-    margin-bottom: 16px;
-  }
-  
-  .header-container {
-    padding: 0 16px;
-  }
-  
-  .header-left {
-    gap: 12px;
-  }
-  
-  .sidebar-header {
-    padding: 16px;
-  }
-  
-  .sidebar-stats {
-    padding: 16px 12px;
-  }
+    .dashboard-stats-row .ant-col {
+        margin-bottom: 16px;
+    }
+
+    .header-container {
+        padding: 0 16px;
+    }
+
+    .header-left {
+        gap: 12px;
+    }
+
+    .sidebar-header {
+        padding: 16px;
+    }
+
+    .sidebar-stats {
+        padding: 16px 12px;
+    }
 }
 
 /* Improved focus states */
 .devlog-title:hover {
-  color: #1890ff;
+    color: #1890ff;
 }
 
 .devlog-title:focus {
-  outline: 2px solid #1890ff;
-  outline-offset: 2px;
+    outline: 2px solid #1890ff;
+    outline-offset: 2px;
 }
 
 /* Better spacing for mobile */
 @media (max-width: 576px) {
-  .devlog-list-header {
-    margin-bottom: 16px;
-  }
-  
-  .dashboard-header {
-    margin-bottom: 16px;
-  }
-  
-  .devlog-details-header {
-    margin-bottom: 16px;
-  }
+    .devlog-list-header {
+        margin-bottom: 16px;
+    }
+
+    .dashboard-header {
+        margin-bottom: 16px;
+    }
+
+    .devlog-details-header {
+        margin-bottom: 16px;
+    }
 }

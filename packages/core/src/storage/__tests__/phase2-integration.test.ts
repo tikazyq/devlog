@@ -3,8 +3,8 @@
  * Tests repository structure, file operations, and repository management
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { DevlogEntry, DevlogContext } from '@devlog/types';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { DevlogContext, DevlogEntry } from '@devlog/types';
 import { GitStorageProvider } from '../git-storage-provider.js';
 import { RepositoryStructure } from '../../utils/repository-structure.js';
 import { GitRepositoryManager } from '../../utils/git-repository-manager.js';
@@ -19,7 +19,7 @@ const createEmptyContext = (): DevlogContext => ({
   dependencies: [],
   decisions: [],
   acceptanceCriteria: [],
-  risks: []
+  risks: [],
 });
 
 // Helper function to create a test entry
@@ -43,11 +43,11 @@ const createTestEntry = (overrides: Partial<DevlogEntry> = {}): DevlogEntry => (
     relatedPatterns: [],
     suggestedNextSteps: [],
     lastAIUpdate: new Date().toISOString(),
-    contextVersion: 1
+    contextVersion: 1,
   },
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-  ...overrides
+  ...overrides,
 });
 
 describe('Phase 2 Git Storage Integration', () => {
@@ -62,22 +62,22 @@ describe('Phase 2 Git Storage Integration', () => {
     // Create temporary directory for testing
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'devlog-phase2-test-'));
     repoPath = path.join(tempDir, 'test-repo');
-    
+
     gitConfig = {
       repository: 'test/repo',
       branch: 'main',
       path: '.devlog/',
       autoSync: false, // Disable auto-sync for tests
-      conflictResolution: 'timestamp-wins' as const
+      conflictResolution: 'timestamp-wins' as const,
     };
 
     // Initialize git repository manually (since we can't clone in tests)
     await fs.mkdir(repoPath, { recursive: true });
     await fs.mkdir(path.join(repoPath, '.git'), { recursive: true });
-    
+
     repoStructure = new RepositoryStructure(repoPath, gitConfig);
     repoManager = new GitRepositoryManager(gitConfig);
-    
+
     // Mock the repository path for testing
     storage = new GitStorageProvider(gitConfig);
     (storage as any).repositoryPath = repoPath;
@@ -117,7 +117,7 @@ describe('Phase 2 Git Storage Integration', () => {
         version: '1.0',
         entries: {},
         nextId: 1,
-        workspace: 'test-workspace'
+        workspace: 'test-workspace',
       });
 
       // Check .gitignore
@@ -136,7 +136,7 @@ describe('Phase 2 Git Storage Integration', () => {
         title: 'Test Feature Implementation',
         type: 'feature',
         status: 'in-progress',
-        priority: 'high'
+        priority: 'high',
       });
 
       const filename = repoStructure.generateEntryFilename(entry);
@@ -155,7 +155,7 @@ describe('Phase 2 Git Storage Integration', () => {
         type: 'task',
         status: 'todo',
         priority: 'medium',
-        tags: ['test']
+        tags: ['test'],
       });
 
       await repoStructure.updateIndex(entry);
@@ -168,7 +168,7 @@ describe('Phase 2 Git Storage Integration', () => {
         status: 'todo',
         priority: 'medium',
         file: '001-test-entry.json',
-        slug: 'test-entry'
+        slug: 'test-entry',
       });
       expect(index.nextId).toBe(2);
 
@@ -196,7 +196,7 @@ describe('Phase 2 Git Storage Integration', () => {
     beforeEach(async () => {
       // Initialize the repository structure
       await repoStructure.initialize('test-workspace');
-      
+
       // Mock initialization for storage provider
       (storage as any).initialized = true;
     });
@@ -215,18 +215,18 @@ describe('Phase 2 Git Storage Integration', () => {
           dependencies: [],
           decisions: [],
           acceptanceCriteria: [],
-          risks: []
+          risks: [],
         },
         notes: [
           {
             id: 'note-1',
             timestamp: new Date().toISOString(),
             category: 'progress',
-            content: 'Test note'
-          }
+            content: 'Test note',
+          },
         ],
         tags: ['test', 'storage'],
-        files: ['test.ts']
+        files: ['test.ts'],
       });
 
       await storage.save(entry);
@@ -242,14 +242,14 @@ describe('Phase 2 Git Storage Integration', () => {
       const indexPath = path.join(repoPath, '.devlog', 'index.json');
       const indexContent = await fs.readFile(indexPath, 'utf-8');
       const index = JSON.parse(indexContent);
-      
+
       expect(index.entries[1]).toMatchObject({
         id: 1,
         title: 'Test Feature',
         type: 'feature',
         status: 'in-progress',
         priority: 'high',
-        file: '001-test-feature.json'
+        file: '001-test-feature.json',
       });
     });
 
@@ -260,7 +260,7 @@ describe('Phase 2 Git Storage Integration', () => {
         type: 'bugfix',
         status: 'done',
         priority: 'low',
-        description: 'Test retrieval'
+        description: 'Test retrieval',
       });
 
       await storage.save(entry);
@@ -279,7 +279,7 @@ describe('Phase 2 Git Storage Integration', () => {
           priority: 'high',
           description: 'First test entry',
           createdAt: '2025-01-01T00:00:00Z',
-          updatedAt: '2025-01-01T00:00:00Z'
+          updatedAt: '2025-01-01T00:00:00Z',
         }),
         createTestEntry({
           id: 2,
@@ -289,8 +289,8 @@ describe('Phase 2 Git Storage Integration', () => {
           priority: 'medium',
           description: 'Second test entry',
           createdAt: '2025-01-02T00:00:00Z',
-          updatedAt: '2025-01-02T00:00:00Z'
-        })
+          updatedAt: '2025-01-02T00:00:00Z',
+        }),
       ];
 
       for (const entry of entries) {
@@ -310,24 +310,24 @@ describe('Phase 2 Git Storage Integration', () => {
         type: 'task',
         status: 'todo',
         priority: 'low',
-        description: 'This will be deleted'
+        description: 'This will be deleted',
       });
 
       await storage.save(entry);
-      
+
       // Verify entry exists
       expect(await storage.exists(3)).toBe(true);
-      
+
       // Delete entry
       await storage.delete(3);
-      
+
       // Verify entry is gone
       expect(await storage.exists(3)).toBe(false);
-      
+
       // Verify file is deleted
       const entryPath = path.join(repoPath, '.devlog', 'entries', '003-to-be-deleted.json');
       await expect(fs.access(entryPath)).rejects.toThrow();
-      
+
       // Verify index is updated
       const indexPath = path.join(repoPath, '.devlog', 'index.json');
       const indexContent = await fs.readFile(indexPath, 'utf-8');
@@ -354,13 +354,13 @@ describe('Phase 2 Git Storage Integration', () => {
 
     it('should detect repository information', async () => {
       await repoStructure.initialize('test-workspace');
-      
+
       const repoInfo = await repoManager.getRepositoryInfo(repoPath);
       expect(repoInfo).toMatchObject({
         name: 'test-repo',
         path: repoPath,
         isDevlogRepo: true,
-        workspaceName: 'test-workspace'
+        workspaceName: 'test-workspace',
       });
     });
   });
@@ -372,17 +372,17 @@ describe('Phase 2 Git Storage Integration', () => {
 
       const entry = await storage.get(999);
       expect(entry).toBeNull();
-      
+
       expect(await storage.exists(999)).toBe(false);
     });
 
     it('should handle corrupted index files', async () => {
       await repoStructure.initialize();
-      
+
       // Corrupt the index file
       const indexPath = path.join(repoPath, '.devlog', 'index.json');
       await fs.writeFile(indexPath, 'invalid json');
-      
+
       // Should handle gracefully
       await expect(repoStructure.readIndex()).rejects.toThrow('Index file not found or corrupted');
     });

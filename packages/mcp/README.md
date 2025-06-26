@@ -36,29 +36,38 @@ npm run test
 ## Available Tools
 
 ### `create_devlog`
+
 Create a new devlog entry for a task, feature, or bugfix.
 
 ### `update_devlog`
+
 Update an existing devlog entry with progress, notes, or status changes.
 
 ### `get_devlog`
+
 Retrieve a specific devlog entry by ID.
 
 ### `list_devlogs`
+
 List devlog entries with optional filtering by status, type, or priority.
 
 ### `search_devlogs`
+
 Search devlog entries by keywords in title, description, or notes.
 
 ### `get_active_context`
+
 Get a summary of current active work for AI context.
 
 ### `archive_devlog`
+
 Archive a completed devlog entry.
 
 ### `get_devlog_stats`
+
 Get statistics about devlog entries.
 
 ## Configuration
 
-The MCP server stores all data locally in a `.devlog` directory within your project. No external configuration is required.
+The MCP server stores all data locally in a `.devlog` directory within your project. No external configuration is
+required.

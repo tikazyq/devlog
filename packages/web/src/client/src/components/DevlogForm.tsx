@@ -1,6 +1,6 @@
 import React from 'react';
-import { Typography, Card, Form, Input, Select, Button, Space, Row, Col } from 'antd';
-import { SaveOutlined, CloseOutlined } from '@ant-design/icons';
+import { Button, Card, Col, Form, Input, Row, Select, Space, Typography } from 'antd';
+import { CloseOutlined, SaveOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -46,13 +46,10 @@ export function DevlogForm({ onSubmit, onCancel }: DevlogFormProps) {
                 label="Title"
                 rules={[
                   { required: true, message: 'Please enter a title' },
-                  { min: 3, message: 'Title must be at least 3 characters' }
+                  { min: 3, message: 'Title must be at least 3 characters' },
                 ]}
               >
-                <Input 
-                  placeholder="Brief, descriptive title"
-                  size="large"
-                />
+                <Input placeholder="Brief, descriptive title" size="large" />
               </Form.Item>
             </Col>
 
@@ -93,7 +90,7 @@ export function DevlogForm({ onSubmit, onCancel }: DevlogFormProps) {
                 label="Description"
                 rules={[
                   { required: true, message: 'Please enter a description' },
-                  { min: 10, message: 'Description must be at least 10 characters' }
+                  { min: 10, message: 'Description must be at least 10 characters' },
                 ]}
               >
                 <TextArea
@@ -138,23 +135,19 @@ export function DevlogForm({ onSubmit, onCancel }: DevlogFormProps) {
 
           <Form.Item style={{ marginTop: '32px', marginBottom: 0 }}>
             <Space size="middle" style={{ width: '100%', justifyContent: 'flex-end' }}>
-              <Button 
-                size="large" 
-                onClick={handleReset}
-                style={{ minWidth: '100px' }}
-              >
+              <Button size="large" onClick={handleReset} style={{ minWidth: '100px' }}>
                 Reset
               </Button>
-              <Button 
-                size="large" 
+              <Button
+                size="large"
                 onClick={onCancel}
                 icon={<CloseOutlined />}
                 style={{ minWidth: '100px' }}
               >
                 Cancel
               </Button>
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 size="large"
                 htmlType="submit"
                 icon={<SaveOutlined />}

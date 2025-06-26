@@ -2,7 +2,7 @@
  * Tests for GitStorageProvider
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GitStorageProvider } from '../git-storage-provider.js';
 import { DevlogEntry } from '@devlog/types';
 import * as fs from 'fs/promises';
@@ -33,7 +33,7 @@ const mockEntry: DevlogEntry = {
     dependencies: [],
     decisions: [],
     acceptanceCriteria: [],
-    risks: []
+    risks: [],
   },
   aiContext: {
     currentSummary: 'Test summary',
@@ -42,8 +42,8 @@ const mockEntry: DevlogEntry = {
     relatedPatterns: [],
     suggestedNextSteps: [],
     lastAIUpdate: '2025-06-25T10:00:00Z',
-    contextVersion: 1
-  }
+    contextVersion: 1,
+  },
 };
 
 describe('GitStorageProvider', () => {
@@ -53,29 +53,29 @@ describe('GitStorageProvider', () => {
   beforeEach(async () => {
     // Create temporary directory for testing
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'devlog-test-'));
-    
+
     // Mock git operations
     vi.doMock('../utils/git-operations.js', () => ({
       GitOperations: vi.fn().mockImplementation(() => ({
         clone: vi.fn().mockResolvedValue(undefined),
         pull: vi.fn().mockResolvedValue(undefined),
         push: vi.fn().mockResolvedValue(undefined),
-        getStatus: vi.fn().mockResolvedValue({ status: 'synced' })
-      }))
+        getStatus: vi.fn().mockResolvedValue({ status: 'synced' }),
+      })),
     }));
 
     // Mock conflict resolver
     vi.doMock('../utils/conflict-resolver.js', () => ({
       ConflictResolver: vi.fn().mockImplementation(() => ({
-        resolveConflicts: vi.fn().mockResolvedValue(undefined)
-      }))
+        resolveConflicts: vi.fn().mockResolvedValue(undefined),
+      })),
     }));
 
     provider = new GitStorageProvider({
       repository: 'test/repo',
       branch: 'main',
       path: '.devlog/',
-      autoSync: false // Disable auto-sync for testing
+      autoSync: false, // Disable auto-sync for testing
     });
   });
 
@@ -117,7 +117,7 @@ describe('GitStorageProvider', () => {
     it('should check if entries exist', async () => {
       // Mock file exists
       const mockAccess = vi.spyOn(fs, 'access').mockResolvedValue();
-      
+
       const exists = await provider.exists(1);
       expect(exists).toBe(true);
     });
@@ -125,10 +125,10 @@ describe('GitStorageProvider', () => {
     it('should handle non-existent entries', async () => {
       // Mock file doesn't exist
       const mockAccess = vi.spyOn(fs, 'access').mockRejectedValue(new Error('File not found'));
-      
+
       const exists = await provider.exists(999);
       const entry = await provider.get(999);
-      
+
       expect(exists).toBe(false);
       expect(entry).toBeNull();
     });
@@ -155,7 +155,9 @@ describe('GitStorageProvider', () => {
 
     it('should delete entries', async () => {
       const mockUnlink = vi.spyOn(fs, 'unlink').mockResolvedValue();
-      const mockReadFile = vi.spyOn(fs, 'readFile').mockResolvedValue(JSON.stringify({ entries: {}, nextId: 1 }));
+      const mockReadFile = vi
+        .spyOn(fs, 'readFile')
+        .mockResolvedValue(JSON.stringify({ entries: {}, nextId: 1 }));
       const mockWriteFile = vi.spyOn(fs, 'writeFile').mockResolvedValue();
 
       await provider.delete(1);
@@ -193,7 +195,7 @@ describe('GitStorageProvider', () => {
       const mockReadFile = vi.spyOn(fs, 'readFile').mockResolvedValue(JSON.stringify(mockEntry));
 
       const stats = await provider.getStats();
-      
+
       expect(stats.totalEntries).toBe(1);
       expect(stats.byStatus.todo).toBe(1);
       expect(stats.byType.feature).toBe(1);

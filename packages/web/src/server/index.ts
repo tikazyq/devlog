@@ -1,23 +1,18 @@
 // Load environment variables from .env file
-import { config } from "dotenv";
-config();
-
-import express from 'express';
-import cors from 'cors';
+import { config } from 'dotenv';
+import * as express from 'express';
+import * as cors from 'cors';
 import helmet from 'helmet';
-import compression from 'compression';
+import * as compression from 'compression';
 import { createServer } from 'http';
 import { WebSocketServer } from 'ws';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import * as fs from 'fs';
+import * as path from 'path';
 
-import { DevlogManager, ConfigurationManager } from '@devlog/core';
+import { ConfigurationManager, DevlogManager } from '@devlog/core';
 import { devlogRoutes } from './routes/devlog-routes.js';
 import { setupWebSocket } from './websocket.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+config();
 
 async function startServer() {
   const app = express();
@@ -27,29 +22,34 @@ async function startServer() {
   // Middleware
   app.use(helmet());
   app.use(compression());
-  app.use(cors({
-    origin: process.env.NODE_ENV === 'production' ? false : ['http://localhost:3000', 'http://localhost:3002'],
-    credentials: true
-  }));
+  app.use(
+    cors({
+      origin:
+        process.env.NODE_ENV === 'production'
+          ? false
+          : ['http://localhost:3000', 'http://localhost:3002'],
+      credentials: true,
+    }),
+  );
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
   // Initialize DevlogManager using ConfigurationManager for consistency with MCP server
   console.log(`Web server working directory: ${process.cwd()}`);
-  
+
   const configManager = new ConfigurationManager(process.cwd());
   const config = await configManager.loadConfig();
-  
+
   console.log(`Web server using storage config:`, {
     type: config.storage.type,
     ...(config.storage.type === 'sqlite' && { filePath: config.storage.filePath }),
-    workspaceRoot: config.workspaceRoot
+    workspaceRoot: config.workspaceRoot,
   });
-  
+
   const devlogManager = new DevlogManager({
     workspaceRoot: config.workspaceRoot,
     storage: config.storage,
-    integrations: config.integrations
+    integrations: config.integrations,
   });
 
   // Initialize the devlog manager
@@ -104,7 +104,6 @@ async function startServer() {
       process.exit(0);
     });
   });
-
 }
 
 // Start the server

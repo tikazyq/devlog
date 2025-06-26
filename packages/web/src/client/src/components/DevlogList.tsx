@@ -1,15 +1,15 @@
 import React from 'react';
-import { Typography, Card, Table, Tag, Button, Space, Popconfirm, Spin, Empty } from 'antd';
-import { 
-  EyeOutlined, 
-  DeleteOutlined, 
+import { Button, Card, Empty, Popconfirm, Space, Spin, Table, Tag, Typography } from 'antd';
+import {
   CheckCircleOutlined,
-  SyncOutlined,
-  StopOutlined,
   ClockCircleOutlined,
-  MinusCircleOutlined,
+  DeleteOutlined,
   ExclamationCircleOutlined,
-  WarningOutlined 
+  EyeOutlined,
+  MinusCircleOutlined,
+  StopOutlined,
+  SyncOutlined,
+  WarningOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { DevlogEntry, DevlogId } from '@devlog/types';
@@ -26,41 +26,61 @@ interface DevlogListProps {
 export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: DevlogListProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'done': return 'success';
-      case 'in-progress': return 'processing';
-      case 'blocked': return 'error';
-      case 'todo': return 'default';
-      default: return 'default';
+      case 'done':
+        return 'success';
+      case 'in-progress':
+        return 'processing';
+      case 'blocked':
+        return 'error';
+      case 'todo':
+        return 'default';
+      default:
+        return 'default';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'done': return <CheckCircleOutlined />;
-      case 'in-progress': return <SyncOutlined spin />;
-      case 'blocked': return <StopOutlined />;
-      case 'todo': return <ClockCircleOutlined />;
-      default: return <MinusCircleOutlined />;
+      case 'done':
+        return <CheckCircleOutlined />;
+      case 'in-progress':
+        return <SyncOutlined spin />;
+      case 'blocked':
+        return <StopOutlined />;
+      case 'todo':
+        return <ClockCircleOutlined />;
+      default:
+        return <MinusCircleOutlined />;
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'critical': return 'red';
-      case 'high': return 'orange';
-      case 'medium': return 'gold';
-      case 'low': return 'green';
-      default: return 'default';
+      case 'critical':
+        return 'red';
+      case 'high':
+        return 'orange';
+      case 'medium':
+        return 'gold';
+      case 'low':
+        return 'green';
+      default:
+        return 'default';
     }
   };
 
   const getPriorityIcon = (priority: string) => {
     switch (priority) {
-      case 'critical': return <ExclamationCircleOutlined />;
-      case 'high': return <WarningOutlined />;
-      case 'medium': return <MinusCircleOutlined />;
-      case 'low': return <CheckCircleOutlined />;
-      default: return <MinusCircleOutlined />;
+      case 'critical':
+        return <ExclamationCircleOutlined />;
+      case 'high':
+        return <WarningOutlined />;
+      case 'medium':
+        return <MinusCircleOutlined />;
+      case 'low':
+        return <CheckCircleOutlined />;
+      default:
+        return <MinusCircleOutlined />;
     }
   };
 
@@ -89,10 +109,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       dataIndex: 'status',
       key: 'status',
       render: (status: string) => (
-        <Tag 
-          color={getStatusColor(status)} 
-          icon={getStatusIcon(status)}
-        >
+        <Tag color={getStatusColor(status)} icon={getStatusIcon(status)}>
           {status}
         </Tag>
       ),
@@ -103,10 +120,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       dataIndex: 'priority',
       key: 'priority',
       render: (priority: string) => (
-        <Tag 
-          color={getPriorityColor(priority)}
-          icon={getPriorityIcon(priority)}
-        >
+        <Tag color={getPriorityColor(priority)} icon={getPriorityIcon(priority)}>
           {priority}
         </Tag>
       ),
@@ -117,9 +131,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       dataIndex: 'updatedAt',
       key: 'updatedAt',
       render: (updatedAt: string) => (
-        <Text type="secondary">
-          {new Date(updatedAt).toLocaleDateString()}
-        </Text>
+        <Text type="secondary">{new Date(updatedAt).toLocaleDateString()}</Text>
       ),
       width: '15%',
     },
@@ -143,11 +155,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
             okText="Yes"
             cancelText="No"
           >
-            <Button
-              danger
-              size="small"
-              icon={<DeleteOutlined />}
-            >
+            <Button danger size="small" icon={<DeleteOutlined />}>
               Delete
             </Button>
           </Popconfirm>
@@ -174,10 +182,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
 
       <Card>
         {devlogs.length === 0 ? (
-          <Empty 
-            description="No devlogs found"
-            style={{ padding: '40px' }}
-          />
+          <Empty description="No devlogs found" style={{ padding: '40px' }} />
         ) : (
           <Table
             columns={columns}
@@ -187,8 +192,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
               pageSize: 10,
               showSizeChanger: true,
               showQuickJumper: true,
-              showTotal: (total, range) => 
-                `${range[0]}-${range[1]} of ${total} devlogs`,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} devlogs`,
             }}
             size="middle"
           />

@@ -3,21 +3,24 @@
  * This provides a flexible architecture supporting multiple storage backends
  */
 
-import * as crypto from "crypto";
+import * as crypto from 'crypto';
 import type {
-  DevlogEntry, 
-  DevlogNote, 
   CreateDevlogRequest,
-  UpdateDevlogRequest,
+  DevlogEntry,
   DevlogFilter,
+  DevlogId,
+  DevlogNote,
   DevlogStats,
   DevlogStatus,
   DevlogType,
-  DevlogPriority,
-  DevlogId,
   EnterpriseIntegration,
-  StorageConfig
-} from "@devlog/types";
+  StorageConfig,
+  UpdateDevlogRequest,
+} from '@devlog/types';
+import { StorageProvider, StorageProviderFactory } from './storage/storage-provider.js';
+import { ConfigurationManager, SyncStrategy } from './configuration-manager.js';
+import { IntegrationService } from './integration-service.js';
+import { IdManager } from './utils/id-manager.js';
 
 // Discovery-related interfaces
 export interface DiscoverDevlogsRequest {
@@ -39,11 +42,6 @@ export interface DiscoveryResult {
   recommendation: string;
   searchParameters: DiscoverDevlogsRequest;
 }
-
-import { StorageProvider, StorageProviderFactory } from "./storage/storage-provider.js";
-import { ConfigurationManager, SyncStrategy } from "./configuration-manager.js";
-import { IntegrationService } from "./integration-service.js";
-import { IdManager } from "./utils/id-manager.js";
 
 export interface DevlogManagerOptions {
   workspaceRoot?: string;
@@ -83,20 +81,23 @@ export class DevlogManager {
     await this.storageProvider.initialize();
 
     // Initialize ID manager with storage provider's data directory
-    const dataDir = storageConfig.type === 'sqlite' && storageConfig.filePath 
-      ? storageConfig.filePath.replace(/[^\/]*$/, '') // Get directory from file path
-      : this.workspaceRoot;
+    const dataDir =
+      storageConfig.type === 'sqlite' && storageConfig.filePath
+        ? storageConfig.filePath.replace(/[^\/]*$/, '') // Get directory from file path
+        : this.workspaceRoot;
     this.idManager = new IdManager(dataDir);
     await this.idManager.initializeCounter();
 
     // Initialize integration service if integrations are configured
-    const integrations = this.integrations || (await this.configManager.detectEnterpriseIntegrations());
-    const syncStrategy = this.syncStrategy || (await this.configManager.detectSyncStrategy(integrations));
-    
+    const integrations =
+      this.integrations || (await this.configManager.detectEnterpriseIntegrations());
+    const syncStrategy =
+      this.syncStrategy || (await this.configManager.detectSyncStrategy(integrations));
+
     this.integrationService = new IntegrationService(
       this.storageProvider,
       integrations,
-      syncStrategy
+      syncStrategy,
     );
 
     this.initialized = true;
@@ -117,8 +118,8 @@ export class DevlogManager {
     await this.ensureInitialized();
 
     // Use provided ID if available, otherwise generate one
-    const id = request.id || await this.generateId(request.title, request.type);
-    
+    const id = request.id || (await this.generateId(request.title, request.type));
+
     // Check if entry already exists
     const existing = await this.storageProvider.get(id);
     if (existing) {
@@ -136,8 +137,8 @@ export class DevlogManager {
       title: request.title,
       type: request.type,
       description: request.description,
-      status: "todo" as DevlogStatus,
-      priority: request.priority || "medium",
+      status: 'todo' as DevlogStatus,
+      priority: request.priority || 'medium',
       createdAt: now,
       updatedAt: now,
       estimatedHours: request.estimatedHours,
@@ -147,22 +148,22 @@ export class DevlogManager {
       files: [],
       relatedDevlogs: [],
       context: {
-        businessContext: request.businessContext || "",
-        technicalContext: request.technicalContext || "",
+        businessContext: request.businessContext || '',
+        technicalContext: request.technicalContext || '',
         dependencies: [],
         decisions: [],
         acceptanceCriteria: request.acceptanceCriteria || [],
-        risks: []
+        risks: [],
       },
       aiContext: {
-        currentSummary: "",
+        currentSummary: '',
         keyInsights: request.initialInsights || [],
         openQuestions: [],
         relatedPatterns: request.relatedPatterns || [],
         suggestedNextSteps: [],
         lastAIUpdate: now,
-        contextVersion: 1
-      }
+        contextVersion: 1,
+      },
     };
 
     // Save with integration sync
@@ -191,7 +192,7 @@ export class DevlogManager {
 
     const updated: DevlogEntry = {
       ...existing,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     // Update basic fields
@@ -210,10 +211,10 @@ export class DevlogManager {
       const note: DevlogNote = {
         id: crypto.randomUUID(),
         timestamp: new Date().toISOString(),
-        category: request.noteCategory || "progress",
+        category: request.noteCategory || 'progress',
         content: request.progress,
         files: request.files,
-        codeChanges: request.codeChanges
+        codeChanges: request.codeChanges,
       };
       updated.notes.push(note);
     }
@@ -225,7 +226,11 @@ export class DevlogManager {
   /**
    * Add a note to a devlog entry
    */
-  async addNote(id: DevlogId, content: string, category: DevlogNote["category"] = "progress"): Promise<DevlogEntry> {
+  async addNote(
+    id: DevlogId,
+    content: string,
+    category: DevlogNote['category'] = 'progress',
+  ): Promise<DevlogEntry> {
     await this.ensureInitialized();
 
     const existing = await this.storageProvider.get(id);
@@ -237,13 +242,13 @@ export class DevlogManager {
       id: crypto.randomUUID(),
       timestamp: new Date().toISOString(),
       category,
-      content
+      content,
     };
 
     const updated: DevlogEntry = {
       ...existing,
       notes: [...existing.notes, note],
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     await this.integrationService.saveWithSync(updated);
@@ -279,12 +284,12 @@ export class DevlogManager {
    */
   async deleteDevlog(id: DevlogId): Promise<void> {
     await this.ensureInitialized();
-    
+
     const existing = await this.storageProvider.get(id);
     if (!existing) {
       throw new Error(`Devlog entry with ID '${id}' not found`);
     }
-    
+
     await this.storageProvider.delete(id);
   }
 
@@ -294,11 +299,11 @@ export class DevlogManager {
   async completeDevlog(id: DevlogId, summary?: string): Promise<DevlogEntry> {
     const updated = await this.updateDevlog({
       id,
-      status: "done"
+      status: 'done',
     });
 
     if (summary) {
-      return await this.addNote(id, `Completed: ${summary}`, "progress");
+      return await this.addNote(id, `Completed: ${summary}`, 'progress');
     }
 
     return updated;
@@ -317,11 +322,11 @@ export class DevlogManager {
    */
   async getActiveContext(limit?: number): Promise<DevlogEntry[]> {
     await this.ensureInitialized();
-    
+
     const filter = {
-      status: ["todo", "in-progress", "review", "testing"] as any[]
+      status: ['todo', 'in-progress', 'review', 'testing'] as any[],
     };
-    
+
     const entries = await this.storageProvider.list(filter);
     return entries.slice(0, limit || 10);
   }
@@ -329,7 +334,10 @@ export class DevlogManager {
   /**
    * Update AI context for a devlog entry
    */
-  async updateAIContext(id: DevlogId, context: Partial<DevlogEntry["aiContext"]>): Promise<DevlogEntry> {
+  async updateAIContext(
+    id: DevlogId,
+    context: Partial<DevlogEntry['aiContext']>,
+  ): Promise<DevlogEntry> {
     await this.ensureInitialized();
 
     const existing = await this.storageProvider.get(id);
@@ -341,9 +349,9 @@ export class DevlogManager {
       ...existing,
       aiContext: {
         ...existing.aiContext,
-        ...context
+        ...context,
       },
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     await this.storageProvider.save(updated);
@@ -365,112 +373,116 @@ export class DevlogManager {
    */
   async discoverRelatedDevlogs(request: DiscoverDevlogsRequest): Promise<DiscoveryResult> {
     await this.ensureInitialized();
-    
+
     const { workDescription, workType, keywords = [], scope } = request;
-    
+
     // Build comprehensive search terms
-    const searchTerms = [
-      workDescription,
-      workType,
-      scope,
-      ...keywords
-    ].filter(Boolean);
-    
+    const searchTerms = [workDescription, workType, scope, ...keywords].filter(Boolean);
+
     // Get all entries for analysis
     const allEntries = await this.listDevlogs();
     const relatedEntries: DiscoveredDevlogEntry[] = [];
-    
+
     // 1. Direct text matching in title/description/context
     for (const entry of allEntries) {
-      const entryText = `${entry.title} ${entry.description} ${entry.context.businessContext || ''} ${entry.context.technicalContext || ''}`.toLowerCase();
-      const matchedTerms = searchTerms.filter((term): term is string => 
-        term !== undefined && entryText.includes(term.toLowerCase())
+      const entryText =
+        `${entry.title} ${entry.description} ${entry.context.businessContext || ''} ${entry.context.technicalContext || ''}`.toLowerCase();
+      const matchedTerms = searchTerms.filter(
+        (term): term is string => term !== undefined && entryText.includes(term.toLowerCase()),
       );
-      
+
       if (matchedTerms.length > 0) {
         relatedEntries.push({
           entry,
           relevance: 'direct-text-match',
-          matchedTerms
+          matchedTerms,
         });
       }
     }
-    
+
     // 2. Same type entries (if not already included)
-    const sameTypeEntries = allEntries.filter(entry => 
-      entry.type === workType && 
-      !relatedEntries.some(r => r.entry.id === entry.id)
+    const sameTypeEntries = allEntries.filter(
+      (entry) => entry.type === workType && !relatedEntries.some((r) => r.entry.id === entry.id),
     );
-    
+
     for (const entry of sameTypeEntries) {
       relatedEntries.push({
         entry,
         relevance: 'same-type',
-        matchedTerms: [workType]
+        matchedTerms: [workType],
       });
     }
-    
+
     // 3. Keyword matching in notes and decisions
     for (const entry of allEntries) {
-      if (relatedEntries.some(r => r.entry.id === entry.id)) continue;
-      
-      const noteText = entry.notes.map(n => n.content).join(' ').toLowerCase();
-      const decisionText = entry.context.decisions.map(d => `${d.decision} ${d.rationale}`).join(' ').toLowerCase();
+      if (relatedEntries.some((r) => r.entry.id === entry.id)) continue;
+
+      const noteText = entry.notes
+        .map((n) => n.content)
+        .join(' ')
+        .toLowerCase();
+      const decisionText = entry.context.decisions
+        .map((d) => `${d.decision} ${d.rationale}`)
+        .join(' ')
+        .toLowerCase();
       const combinedText = `${noteText} ${decisionText}`;
-      
-      const matchedKeywords = keywords.filter((keyword): keyword is string => 
-        keyword !== undefined && combinedText.includes(keyword.toLowerCase())
+
+      const matchedKeywords = keywords.filter(
+        (keyword): keyword is string =>
+          keyword !== undefined && combinedText.includes(keyword.toLowerCase()),
       );
-      
+
       if (matchedKeywords.length > 0) {
         relatedEntries.push({
           entry,
           relevance: 'keyword-in-notes',
-          matchedTerms: matchedKeywords
+          matchedTerms: matchedKeywords,
         });
       }
     }
-    
+
     // Sort by relevance and status priority
     relatedEntries.sort((a, b) => {
       type RelevanceType = 'direct-text-match' | 'same-type' | 'keyword-in-notes';
-      
-      const relevanceOrder: Record<RelevanceType, number> = { 
-        'direct-text-match': 0, 
-        'same-type': 1, 
-        'keyword-in-notes': 2 
+
+      const relevanceOrder: Record<RelevanceType, number> = {
+        'direct-text-match': 0,
+        'same-type': 1,
+        'keyword-in-notes': 2,
       };
-      const statusOrder: Record<DevlogStatus, number> = { 
-        'in-progress': 0, 
-        'review': 1, 
-        'todo': 2, 
-        'testing': 3, 
-        'done': 4,
-        'archived': 5
+      const statusOrder: Record<DevlogStatus, number> = {
+        'in-progress': 0,
+        review: 1,
+        todo: 2,
+        testing: 3,
+        done: 4,
+        archived: 5,
       };
-      
-      const relevanceDiff = relevanceOrder[a.relevance as RelevanceType] - relevanceOrder[b.relevance as RelevanceType];
+
+      const relevanceDiff =
+        relevanceOrder[a.relevance as RelevanceType] - relevanceOrder[b.relevance as RelevanceType];
       if (relevanceDiff !== 0) return relevanceDiff;
-      
+
       return statusOrder[a.entry.status] - statusOrder[b.entry.status];
     });
-    
+
     // Calculate active entries and generate recommendation
-    const activeCount = relatedEntries.filter(r => 
-      ['todo', 'in-progress', 'review', 'testing'].includes(r.entry.status)
+    const activeCount = relatedEntries.filter((r) =>
+      ['todo', 'in-progress', 'review', 'testing'].includes(r.entry.status),
     ).length;
-    
-    const recommendation = activeCount > 0 
-      ? `⚠️ RECOMMENDATION: Review ${activeCount} active related entries before creating new work. Consider updating existing entries or coordinating efforts.`
-      : relatedEntries.length > 0
-        ? `✅ RECOMMENDATION: Related entries are completed. Safe to create new devlog entry, but review completed work for insights and patterns.`
-        : `✅ RECOMMENDATION: No related work found. Safe to create new devlog entry.`;
-    
+
+    const recommendation =
+      activeCount > 0
+        ? `⚠️ RECOMMENDATION: Review ${activeCount} active related entries before creating new work. Consider updating existing entries or coordinating efforts.`
+        : relatedEntries.length > 0
+          ? `✅ RECOMMENDATION: Related entries are completed. Safe to create new devlog entry, but review completed work for insights and patterns.`
+          : `✅ RECOMMENDATION: No related work found. Safe to create new devlog entry.`;
+
     return {
       relatedEntries,
       activeCount,
       recommendation,
-      searchParameters: request
+      searchParameters: request,
     };
   }
 
@@ -517,7 +529,7 @@ export class DevlogManager {
       return await this.idManager.generateNextId();
     } else {
       // Legacy system no longer supported - always use integers
-      throw new Error("Legacy string IDs are no longer supported. Use integer ID system.");
+      throw new Error('Legacy string IDs are no longer supported. Use integer ID system.');
     }
   }
 
@@ -527,8 +539,8 @@ export class DevlogManager {
   private generateKey(title: string, type?: DevlogType): string {
     const slug = title
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
       .substring(0, 50);
 
     // For consistency with legacy system, optionally include type-based hash
@@ -538,7 +550,7 @@ export class DevlogManager {
     } else {
       // Legacy format with hash
       const content = type ? `${title}:${type}` : title;
-      const hash = crypto.createHash("sha256").update(content).digest("hex").substring(0, 8);
+      const hash = crypto.createHash('sha256').update(content).digest('hex').substring(0, 8);
       return `${slug}--${hash}`;
     }
   }

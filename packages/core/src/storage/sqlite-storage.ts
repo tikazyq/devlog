@@ -2,8 +2,16 @@
  * SQLite storage provider for local devlog storage
  */
 
-import { DevlogEntry, DevlogFilter, DevlogStats, DevlogStatus, DevlogType, DevlogPriority, DevlogId } from "@devlog/types";
-import { StorageProvider } from "./storage-provider.js";
+import {
+  DevlogEntry,
+  DevlogFilter,
+  DevlogId,
+  DevlogPriority,
+  DevlogStats,
+  DevlogStatus,
+  DevlogType,
+} from '@devlog/types';
+import { StorageProvider } from './storage-provider.js';
 
 export class SQLiteStorageProvider implements StorageProvider {
   private db: any = null;
@@ -20,14 +28,14 @@ export class SQLiteStorageProvider implements StorageProvider {
   async initialize(): Promise<void> {
     console.log(`[SQLiteStorage] Initializing SQLite storage at path: ${this.filePath}`);
     console.log(`[SQLiteStorage] Options:`, this.options);
-    
+
     // Check if directory exists
     const path = await import('path');
     const fs = await import('fs');
     const dirname = path.dirname(this.filePath);
-    
+
     console.log(`[SQLiteStorage] Database directory: ${dirname}`);
-    
+
     try {
       await fs.promises.access(dirname);
       console.log(`[SQLiteStorage] Directory exists: ${dirname}`);
@@ -41,28 +49,28 @@ export class SQLiteStorageProvider implements StorageProvider {
         throw new Error(`Cannot create database directory: ${dirname} - ${mkdirError.message}`);
       }
     }
-    
+
     // Dynamic import to make better-sqlite3 optional
     try {
       console.log(`[SQLiteStorage] Attempting to import better-sqlite3...`);
-      
+
       // Try different import approaches for better compatibility
       let sqlite3Module;
       try {
         // Standard dynamic import
-        sqlite3Module = await import("better-sqlite3");
+        sqlite3Module = await import('better-sqlite3');
         console.log(`[SQLiteStorage] Successfully imported better-sqlite3 via standard import`);
       } catch (importError) {
         console.log(`[SQLiteStorage] Standard import failed, trying eval approach...`);
         // Fallback to eval approach for environments that require it
         const dynamicImport = eval('(specifier) => import(specifier)');
-        sqlite3Module = await dynamicImport("better-sqlite3");
+        sqlite3Module = await dynamicImport('better-sqlite3');
         console.log(`[SQLiteStorage] Successfully imported better-sqlite3 via eval import`);
       }
-      
+
       const Database = sqlite3Module.default;
       console.log(`[SQLiteStorage] Creating database instance...`);
-      
+
       this.db = new Database(this.filePath, this.options);
       console.log(`[SQLiteStorage] Successfully created database instance`);
     } catch (error: any) {
@@ -70,9 +78,9 @@ export class SQLiteStorageProvider implements StorageProvider {
       console.error(`[SQLiteStorage] Error type:`, typeof error);
       console.error(`[SQLiteStorage] Error message:`, error.message);
       console.error(`[SQLiteStorage] Error stack:`, error.stack);
-      throw new Error("Failed to initialize SQLite storage: " + error.message);
+      throw new Error('Failed to initialize SQLite storage: ' + error.message);
     }
-    
+
     // Create tables
     console.log(`[SQLiteStorage] Creating database tables...`);
     try {
@@ -135,7 +143,7 @@ export class SQLiteStorageProvider implements StorageProvider {
       console.error(`[SQLiteStorage] Failed to create database tables:`, tableError);
       throw new Error(`Failed to create database tables: ${tableError.message}`);
     }
-    
+
     console.log(`[SQLiteStorage] Initialization completed successfully`);
   }
 
@@ -143,11 +151,11 @@ export class SQLiteStorageProvider implements StorageProvider {
     console.log(`[SQLiteStorage] Checking if entry exists: ${id}`);
     if (!this.db) {
       console.error(`[SQLiteStorage] Database not initialized when checking exists for: ${id}`);
-      throw new Error("Database not initialized");
+      throw new Error('Database not initialized');
     }
-    
+
     try {
-      const stmt = this.db.prepare("SELECT 1 FROM devlog_entries WHERE id = ?");
+      const stmt = this.db.prepare('SELECT 1 FROM devlog_entries WHERE id = ?');
       const result = stmt.get(id) !== undefined;
       console.log(`[SQLiteStorage] Entry exists result for ${id}: ${result}`);
       return result;
@@ -161,18 +169,18 @@ export class SQLiteStorageProvider implements StorageProvider {
     console.log(`[SQLiteStorage] Getting entry: ${id}`);
     if (!this.db) {
       console.error(`[SQLiteStorage] Database not initialized when getting: ${id}`);
-      throw new Error("Database not initialized");
+      throw new Error('Database not initialized');
     }
-    
+
     try {
-      const stmt = this.db.prepare("SELECT * FROM devlog_entries WHERE id = ?");
+      const stmt = this.db.prepare('SELECT * FROM devlog_entries WHERE id = ?');
       const row = stmt.get(id) as any;
-      
+
       if (!row) {
         console.log(`[SQLiteStorage] Entry not found: ${id}`);
         return null;
       }
-      
+
       console.log(`[SQLiteStorage] Found entry: ${id}`);
       return this.rowToDevlogEntry(row);
     } catch (error: any) {
@@ -185,9 +193,9 @@ export class SQLiteStorageProvider implements StorageProvider {
     console.log(`[SQLiteStorage] Saving entry: ${entry.id} - ${entry.title}`);
     if (!this.db) {
       console.error(`[SQLiteStorage] Database not initialized when saving: ${entry.id}`);
-      throw new Error("Database not initialized");
+      throw new Error('Database not initialized');
     }
-    
+
     try {
       const stmt = this.db.prepare(`
         INSERT OR REPLACE INTO devlog_entries (
@@ -216,9 +224,9 @@ export class SQLiteStorageProvider implements StorageProvider {
         JSON.stringify(entry.context),
         JSON.stringify(entry.aiContext),
         JSON.stringify(entry.externalReferences || []),
-        JSON.stringify(entry.notes)
+        JSON.stringify(entry.notes),
       );
-      
+
       console.log(`[SQLiteStorage] Successfully saved entry: ${entry.id}`);
     } catch (error: any) {
       console.error(`[SQLiteStorage] Error saving entry:`, error);
@@ -227,16 +235,16 @@ export class SQLiteStorageProvider implements StorageProvider {
   }
 
   async delete(id: DevlogId): Promise<void> {
-    if (!this.db) throw new Error("Database not initialized");
-    
-    const stmt = this.db.prepare("DELETE FROM devlog_entries WHERE id = ?");
+    if (!this.db) throw new Error('Database not initialized');
+
+    const stmt = this.db.prepare('DELETE FROM devlog_entries WHERE id = ?');
     stmt.run(id);
   }
 
   async list(filter?: DevlogFilter): Promise<DevlogEntry[]> {
-    if (!this.db) throw new Error("Database not initialized");
-    
-    let query = "SELECT * FROM devlog_entries";
+    if (!this.db) throw new Error('Database not initialized');
+
+    let query = 'SELECT * FROM devlog_entries';
     const conditions: string[] = [];
     const params: any[] = [];
 
@@ -257,17 +265,17 @@ export class SQLiteStorageProvider implements StorageProvider {
       }
 
       if (filter.assignee) {
-        conditions.push("assignee = ?");
+        conditions.push('assignee = ?');
         params.push(filter.assignee);
       }
 
       if (filter.fromDate) {
-        conditions.push("created_at >= ?");
+        conditions.push('created_at >= ?');
         params.push(filter.fromDate);
       }
 
       if (filter.toDate) {
-        conditions.push("created_at <= ?");
+        conditions.push('created_at <= ?');
         params.push(filter.toDate);
       }
 
@@ -281,55 +289,61 @@ export class SQLiteStorageProvider implements StorageProvider {
     }
 
     if (conditions.length > 0) {
-      query += " WHERE " + conditions.join(" AND ");
+      query += ' WHERE ' + conditions.join(' AND ');
     }
 
-    query += " ORDER BY updated_at DESC";
+    query += ' ORDER BY updated_at DESC';
 
     const stmt = this.db.prepare(query);
     const rows = stmt.all(...params) as any[];
-    
-    return rows.map(row => this.rowToDevlogEntry(row));
+
+    return rows.map((row) => this.rowToDevlogEntry(row));
   }
 
   async search(query: string): Promise<DevlogEntry[]> {
-    if (!this.db) throw new Error("Database not initialized");
-    
+    if (!this.db) throw new Error('Database not initialized');
+
     const stmt = this.db.prepare(`
       SELECT devlog_entries.* FROM devlog_entries
       JOIN devlog_fts ON devlog_entries.rowid = devlog_fts.rowid
       WHERE devlog_fts MATCH ?
       ORDER BY rank
     `);
-    
+
     const rows = stmt.all(query) as any[];
-    return rows.map(row => this.rowToDevlogEntry(row));
+    return rows.map((row) => this.rowToDevlogEntry(row));
   }
 
   async getStats(): Promise<DevlogStats> {
-    if (!this.db) throw new Error("Database not initialized");
-    
-    const totalStmt = this.db.prepare("SELECT COUNT(*) as count FROM devlog_entries");
+    if (!this.db) throw new Error('Database not initialized');
+
+    const totalStmt = this.db.prepare('SELECT COUNT(*) as count FROM devlog_entries');
     const total = (totalStmt.get() as any).count;
 
-    const statusStmt = this.db.prepare("SELECT status, COUNT(*) as count FROM devlog_entries GROUP BY status");
+    const statusStmt = this.db.prepare(
+      'SELECT status, COUNT(*) as count FROM devlog_entries GROUP BY status',
+    );
     const statusRows = statusStmt.all() as any[];
     const byStatus = {} as Record<DevlogStatus, number>;
-    statusRows.forEach(row => {
+    statusRows.forEach((row) => {
       byStatus[row.status as DevlogStatus] = row.count;
     });
 
-    const typeStmt = this.db.prepare("SELECT type, COUNT(*) as count FROM devlog_entries GROUP BY type");
+    const typeStmt = this.db.prepare(
+      'SELECT type, COUNT(*) as count FROM devlog_entries GROUP BY type',
+    );
     const typeRows = typeStmt.all() as any[];
     const byType = {} as Record<DevlogType, number>;
-    typeRows.forEach(row => {
+    typeRows.forEach((row) => {
       byType[row.type as DevlogType] = row.count;
     });
 
-    const priorityStmt = this.db.prepare("SELECT priority, COUNT(*) as count FROM devlog_entries GROUP BY priority");
+    const priorityStmt = this.db.prepare(
+      'SELECT priority, COUNT(*) as count FROM devlog_entries GROUP BY priority',
+    );
     const priorityRows = priorityStmt.all() as any[];
     const byPriority = {} as Record<DevlogPriority, number>;
-    priorityRows.forEach(row => {
+    priorityRows.forEach((row) => {
       byPriority[row.priority as DevlogPriority] = row.count;
     });
 
@@ -337,7 +351,7 @@ export class SQLiteStorageProvider implements StorageProvider {
       totalEntries: total,
       byStatus,
       byType,
-      byPriority
+      byPriority,
     };
   }
 
@@ -384,7 +398,7 @@ export class SQLiteStorageProvider implements StorageProvider {
       context: JSON.parse(row.context || '{}'),
       aiContext: JSON.parse(row.ai_context || '{}'),
       notes: JSON.parse(row.notes || '[]'),
-      externalReferences: JSON.parse(row.external_references || '[]')
+      externalReferences: JSON.parse(row.external_references || '[]'),
     };
   }
 }

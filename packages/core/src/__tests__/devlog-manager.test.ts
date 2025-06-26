@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { DevlogManager } from '../devlog-manager.js';
 import fs from 'fs/promises';
 import path from 'path';
@@ -9,19 +9,22 @@ describe('DevlogManager', () => {
 
   beforeEach(async () => {
     // Create a temporary test workspace with unique name
-    testWorkspace = path.join(process.cwd(), 'test-workspace-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9));
-    
+    testWorkspace = path.join(
+      process.cwd(),
+      'test-workspace-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+    );
+
     // Create isolated storage config for each test using local JSON
-    manager = new DevlogManager({ 
+    manager = new DevlogManager({
       workspaceRoot: testWorkspace,
       useIntegerIds: false, // Use string IDs for backward compatibility in tests
       storage: {
         strategy: 'local-json',
         localJson: {
           directory: '.devlog',
-          filePattern: '{id:03d}-{slug}.json'
-        }
-      }
+          filePattern: '{id:03d}-{slug}.json',
+        },
+      },
     });
   });
 
@@ -42,7 +45,7 @@ describe('DevlogManager', () => {
         description: 'A test feature',
         priority: 'high',
         businessContext: 'Important business requirement',
-        technicalContext: 'Uses TypeScript'
+        technicalContext: 'Uses TypeScript',
       });
 
       expect(result.title).toBe('Test Feature');
@@ -60,7 +63,7 @@ describe('DevlogManager', () => {
         id: customId,
         title: 'Custom ID Test',
         type: 'task',
-        description: 'Testing custom ID'
+        description: 'Testing custom ID',
       });
 
       expect(result.id).toBe(customId);
@@ -70,7 +73,7 @@ describe('DevlogManager', () => {
       const result = await manager.createDevlog({
         title: 'Default Priority Test',
         type: 'bugfix',
-        description: 'Testing default priority'
+        description: 'Testing default priority',
       });
 
       expect(result.priority).toBe('medium');
@@ -82,13 +85,13 @@ describe('DevlogManager', () => {
       const created = await manager.createDevlog({
         title: 'Update Test',
         type: 'feature',
-        description: 'Testing updates'
+        description: 'Testing updates',
       });
 
       const result = await manager.updateDevlog({
         id: created.id,
         status: 'in-progress',
-        progress: 'Made good progress today'
+        progress: 'Made good progress today',
       });
 
       expect(result.status).toBe('in-progress');
@@ -101,14 +104,14 @@ describe('DevlogManager', () => {
       const created = await manager.createDevlog({
         title: 'Multi Update Test',
         type: 'task',
-        description: 'Testing multiple updates'
+        description: 'Testing multiple updates',
       });
 
       const result = await manager.updateDevlog({
         id: created.id,
         title: 'Updated Title',
         priority: 'critical',
-        files: ['file1.ts', 'file2.ts']
+        files: ['file1.ts', 'file2.ts'],
       });
 
       expect(result.title).toBe('Updated Title');
@@ -122,11 +125,11 @@ describe('DevlogManager', () => {
       const created = await manager.createDevlog({
         title: 'Get Test',
         type: 'task',
-        description: 'Testing retrieval'
+        description: 'Testing retrieval',
       });
 
       const result = await manager.getDevlog(created.id);
-      
+
       expect(result).not.toBeNull();
       expect(result!.title).toBe('Get Test');
       expect(result!.type).toBe('task');
@@ -144,38 +147,38 @@ describe('DevlogManager', () => {
       await manager.createDevlog({
         title: 'Feature 1',
         type: 'feature',
-        description: 'First feature'
+        description: 'First feature',
       });
 
       await manager.createDevlog({
         title: 'Bug Fix 1',
         type: 'bugfix',
-        description: 'First bug fix'
+        description: 'First bug fix',
       });
 
       const result = await manager.listDevlogs();
-      
+
       expect(result).toHaveLength(2);
-      expect(result.some(entry => entry.title === 'Feature 1')).toBe(true);
-      expect(result.some(entry => entry.title === 'Bug Fix 1')).toBe(true);
+      expect(result.some((entry) => entry.title === 'Feature 1')).toBe(true);
+      expect(result.some((entry) => entry.title === 'Bug Fix 1')).toBe(true);
     });
 
     it('should filter devlogs by status', async () => {
       const created1 = await manager.createDevlog({
         title: 'Todo Task',
         type: 'task',
-        description: 'A todo task'
+        description: 'A todo task',
       });
 
       const created2 = await manager.createDevlog({
         title: 'Done Task',
         type: 'task',
-        description: 'A done task'
+        description: 'A done task',
       });
 
       await manager.updateDevlog({
         id: created2.id,
-        status: 'done'
+        status: 'done',
       });
 
       const todoItems = await manager.listDevlogs({ status: ['todo'] });
@@ -191,13 +194,13 @@ describe('DevlogManager', () => {
       await manager.createDevlog({
         title: 'Feature Task',
         type: 'feature',
-        description: 'A feature'
+        description: 'A feature',
       });
 
       await manager.createDevlog({
         title: 'Bug Task',
         type: 'bugfix',
-        description: 'A bug fix'
+        description: 'A bug fix',
       });
 
       const features = await manager.listDevlogs({ type: ['feature'] });
@@ -215,13 +218,13 @@ describe('DevlogManager', () => {
       await manager.createDevlog({
         title: 'Authentication Feature',
         type: 'feature',
-        description: 'Implement user authentication'
+        description: 'Implement user authentication',
       });
 
       await manager.createDevlog({
         title: 'Database Bug',
         type: 'bugfix',
-        description: 'Fix database connection issue'
+        description: 'Fix database connection issue',
       });
 
       const authResults = await manager.searchDevlogs('authentication');
@@ -239,10 +242,14 @@ describe('DevlogManager', () => {
       const created = await manager.createDevlog({
         title: 'Note Test',
         type: 'task',
-        description: 'Testing notes'
+        description: 'Testing notes',
       });
 
-      const result = await manager.addNote(created.id, 'Made some progress on this task', 'progress');
+      const result = await manager.addNote(
+        created.id,
+        'Made some progress on this task',
+        'progress',
+      );
 
       expect(result.notes).toHaveLength(1);
       expect(result.notes[0].content).toBe('Made some progress on this task');
@@ -255,7 +262,7 @@ describe('DevlogManager', () => {
       const created = await manager.createDevlog({
         title: 'Complete Test',
         type: 'task',
-        description: 'Testing completion'
+        description: 'Testing completion',
       });
 
       const result = await manager.completeDevlog(created.id, 'Task completed successfully');
@@ -272,20 +279,20 @@ describe('DevlogManager', () => {
         title: 'Active Task 1',
         type: 'task',
         description: 'An active task',
-        priority: 'high'
+        priority: 'high',
       });
 
       const active2 = await manager.createDevlog({
         title: 'Active Task 2',
         type: 'feature',
         description: 'Another active task',
-        priority: 'medium'
+        priority: 'medium',
       });
 
       const completed = await manager.createDevlog({
         title: 'Completed Task',
         type: 'task',
-        description: 'A completed task'
+        description: 'A completed task',
       });
 
       await manager.completeDevlog(completed.id);
@@ -293,9 +300,9 @@ describe('DevlogManager', () => {
       const context = await manager.getActiveContext();
 
       expect(context).toHaveLength(2);
-      expect(context.some(entry => entry.title === 'Active Task 1')).toBe(true);
-      expect(context.some(entry => entry.title === 'Active Task 2')).toBe(true);
-      expect(context.some(entry => entry.title === 'Completed Task')).toBe(false);
+      expect(context.some((entry) => entry.title === 'Active Task 1')).toBe(true);
+      expect(context.some((entry) => entry.title === 'Active Task 2')).toBe(true);
+      expect(context.some((entry) => entry.title === 'Completed Task')).toBe(false);
     });
 
     it('should respect the limit parameter', async () => {
@@ -303,7 +310,7 @@ describe('DevlogManager', () => {
         await manager.createDevlog({
           title: `Task ${i}`,
           type: 'task',
-          description: `Task number ${i}`
+          description: `Task number ${i}`,
         });
       }
 
@@ -318,14 +325,14 @@ describe('DevlogManager', () => {
         title: 'Feature 1',
         type: 'feature',
         description: 'A feature',
-        priority: 'high'
+        priority: 'high',
       });
 
       const bugfix = await manager.createDevlog({
         title: 'Bug 1',
         type: 'bugfix',
         description: 'A bug fix',
-        priority: 'medium'
+        priority: 'medium',
       });
 
       await manager.completeDevlog(bugfix.id);
@@ -347,7 +354,7 @@ describe('DevlogManager', () => {
       const created = await manager.createDevlog({
         title: 'Delete Test',
         type: 'task',
-        description: 'Testing deletion'
+        description: 'Testing deletion',
       });
 
       await manager.deleteDevlog(created.id);

@@ -1,5 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { Result, Button } from 'antd';
+import { Button, Result } from 'antd';
 
 interface Props {
   children: ReactNode;
@@ -12,7 +12,7 @@ interface State {
 
 export class ErrorBoundary extends Component<Props, State> {
   public state: State = {
-    hasError: false
+    hasError: false,
   };
 
   public static getDerivedStateFromError(error: Error): State {
@@ -44,7 +44,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </Button>,
             <Button key="reset" onClick={this.handleReset}>
               Try Again
-            </Button>
+            </Button>,
           ]}
         />
       );

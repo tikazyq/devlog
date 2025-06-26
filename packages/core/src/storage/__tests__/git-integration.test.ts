@@ -1,23 +1,23 @@
 /**
  * Simple integration test for git storage functionality
  */
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { StorageProviderFactory } from '../storage-provider.js';
-import type { StorageConfig, DevlogEntry } from '@devlog/types';
+import type { StorageConfig } from '@devlog/types';
 
 describe('Git Storage Integration', () => {
   let provider: any;
-  
+
   beforeEach(async () => {
     // Create a git storage provider with mock git config
     const config: StorageConfig = {
       strategy: 'git-json',
       git: {
         repository: '/tmp/test-devlog-repo',
-        branch: 'main'
-      }
+        branch: 'main',
+      },
     };
-    
+
     provider = await StorageProviderFactory.create(config);
   });
 

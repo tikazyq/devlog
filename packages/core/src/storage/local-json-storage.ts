@@ -4,11 +4,18 @@
  * the project's existing git repository for versioning and collaboration.
  */
 
-import { DevlogEntry, DevlogFilter, DevlogStats, DevlogStatus, DevlogType, DevlogPriority, DevlogId } from "@devlog/types";
-import { StorageProvider } from "./storage-provider.js";
-import * as path from "path";
-import * as fs from "fs/promises";
-import * as crypto from "crypto";
+import {
+  DevlogEntry,
+  DevlogFilter,
+  DevlogId,
+  DevlogPriority,
+  DevlogStats,
+  DevlogStatus,
+  DevlogType,
+} from '@devlog/types';
+import { StorageProvider } from './storage-provider.js';
+import * as path from 'path';
+import * as fs from 'fs/promises';
 
 export interface LocalJsonConfig {
   directory?: string; // default: ".devlog/"
@@ -27,14 +34,14 @@ export class LocalJsonStorageProvider implements StorageProvider {
   constructor(projectRoot: string, config: LocalJsonConfig = {}) {
     this.projectRoot = projectRoot;
     this.config = {
-      directory: config.directory || ".devlog",
-      filePattern: config.filePattern || "{id:auto}-{slug}.json",
-      minPadding: config.minPadding || 3
+      directory: config.directory || '.devlog',
+      filePattern: config.filePattern || '{id:auto}-{slug}.json',
+      minPadding: config.minPadding || 3,
     };
-    
+
     this.devlogDir = path.join(this.projectRoot, this.config.directory);
-    this.entriesDir = path.join(this.devlogDir, "entries");
-    this.indexPath = path.join(this.devlogDir, "index.json");
+    this.entriesDir = path.join(this.devlogDir, 'entries');
+    this.indexPath = path.join(this.devlogDir, 'index.json');
   }
 
   async initialize(): Promise<void> {
@@ -48,7 +55,7 @@ export class LocalJsonStorageProvider implements StorageProvider {
     try {
       await fs.access(this.indexPath);
     } catch {
-      await this.saveIndex({ entries: {}, lastId: 0, version: "1.0.0" });
+      await this.saveIndex({ entries: {}, lastId: 0, version: '1.0.0' });
     }
 
     // Create .gitignore if needed (to exclude cache files but include JSON files)
@@ -65,7 +72,7 @@ export class LocalJsonStorageProvider implements StorageProvider {
   async get(id: DevlogId): Promise<DevlogEntry | null> {
     const index = await this.loadIndex();
     const entryInfo = index.entries[id.toString()];
-    
+
     if (!entryInfo) return null;
 
     try {
@@ -79,16 +86,16 @@ export class LocalJsonStorageProvider implements StorageProvider {
 
   async save(entry: DevlogEntry): Promise<void> {
     await this.initialize();
-    
+
     const index = await this.loadIndex();
     const slug = this.createSlug(entry.title);
     const filename = this.generateFilename(entry.id, slug, index.lastId);
-    
+
     const filePath = path.join(this.entriesDir, filename);
-    
+
     // Save entry file
     await fs.writeFile(filePath, JSON.stringify(entry, null, 2));
-    
+
     // Update index
     index.entries[entry.id.toString()] = {
       filename,
@@ -97,21 +104,21 @@ export class LocalJsonStorageProvider implements StorageProvider {
       type: entry.type,
       priority: entry.priority,
       createdAt: entry.createdAt,
-      updatedAt: entry.updatedAt
+      updatedAt: entry.updatedAt,
     };
-    
+
     // Update lastId if this is a new entry
     if (entry.id > index.lastId) {
       index.lastId = entry.id;
     }
-    
+
     await this.saveIndex(index);
   }
 
   async delete(id: DevlogId): Promise<void> {
     const index = await this.loadIndex();
     const entryInfo = index.entries[id.toString()];
-    
+
     if (entryInfo) {
       // Delete file
       const filePath = path.join(this.entriesDir, entryInfo.filename);
@@ -120,7 +127,7 @@ export class LocalJsonStorageProvider implements StorageProvider {
       } catch {
         // File might not exist, continue
       }
-      
+
       // Update index
       delete index.entries[id.toString()];
       await this.saveIndex(index);
@@ -130,7 +137,7 @@ export class LocalJsonStorageProvider implements StorageProvider {
   async list(filter?: DevlogFilter): Promise<DevlogEntry[]> {
     const index = await this.loadIndex();
     const entries: DevlogEntry[] = [];
-    
+
     for (const [id, entryInfo] of Object.entries(index.entries)) {
       // Apply basic filtering using index data first
       if (filter) {
@@ -140,55 +147,59 @@ export class LocalJsonStorageProvider implements StorageProvider {
         if (filter.fromDate && entryInfo.createdAt < filter.fromDate) continue;
         if (filter.toDate && entryInfo.createdAt > filter.toDate) continue;
       }
-      
+
       // Load full entry for more complex filtering
       const entry = await this.get(parseInt(id));
       if (entry) {
         // Apply additional filtering
         if (filter) {
           if (filter.assignee && entry.assignee !== filter.assignee) continue;
-          if (filter.tags && !filter.tags.some(tag => entry.tags.includes(tag))) continue;
+          if (filter.tags && !filter.tags.some((tag) => entry.tags.includes(tag))) continue;
         }
-        
+
         entries.push(entry);
       }
     }
-    
+
     // Sort by updated time (most recent first)
-    return entries.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    return entries.sort(
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    );
   }
 
   async search(query: string): Promise<DevlogEntry[]> {
     const entries = await this.list();
     const lowerQuery = query.toLowerCase();
-    
-    return entries.filter(entry => {
-      return entry.title.toLowerCase().includes(lowerQuery) ||
-             entry.description.toLowerCase().includes(lowerQuery) ||
-             entry.tags.some(tag => tag.toLowerCase().includes(lowerQuery)) ||
-             entry.notes.some(note => note.content.toLowerCase().includes(lowerQuery));
+
+    return entries.filter((entry) => {
+      return (
+        entry.title.toLowerCase().includes(lowerQuery) ||
+        entry.description.toLowerCase().includes(lowerQuery) ||
+        entry.tags.some((tag) => tag.toLowerCase().includes(lowerQuery)) ||
+        entry.notes.some((note) => note.content.toLowerCase().includes(lowerQuery))
+      );
     });
   }
 
   async getStats(): Promise<DevlogStats> {
     const index = await this.loadIndex();
     const entries = Object.values(index.entries);
-    
+
     const byStatus = {} as Record<DevlogStatus, number>;
     const byType = {} as Record<DevlogType, number>;
     const byPriority = {} as Record<DevlogPriority, number>;
-    
-    entries.forEach(entry => {
+
+    entries.forEach((entry) => {
       byStatus[entry.status] = (byStatus[entry.status] || 0) + 1;
       byType[entry.type] = (byType[entry.type] || 0) + 1;
       byPriority[entry.priority] = (byPriority[entry.priority] || 0) + 1;
     });
-    
+
     return {
       totalEntries: entries.length,
       byStatus,
       byType,
-      byPriority
+      byPriority,
     };
   }
 
@@ -219,7 +230,7 @@ export class LocalJsonStorageProvider implements StorageProvider {
       return JSON.parse(content);
     } catch {
       // Return default index if file doesn't exist
-      return { entries: {}, lastId: 0, version: "1.0.0" };
+      return { entries: {}, lastId: 0, version: '1.0.0' };
     }
   }
 
@@ -259,11 +270,11 @@ temp/
     // Calculate required padding based on max ID to ensure consistent ordering
     const requiredDigits = Math.max(this.config.minPadding, maxId.toString().length);
     const paddedId = id.toString().padStart(requiredDigits, '0');
-    
+
     return this.config.filePattern
-      .replace("{id:auto}", paddedId)
-      .replace("{id:03d}", id.toString().padStart(3, '0')) // Legacy support
-      .replace("{slug}", slug);
+      .replace('{id:auto}', paddedId)
+      .replace('{id:03d}', id.toString().padStart(3, '0')) // Legacy support
+      .replace('{slug}', slug);
   }
 }
 

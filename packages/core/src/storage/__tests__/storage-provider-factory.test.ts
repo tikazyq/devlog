@@ -2,7 +2,7 @@
  * Tests for StorageProviderFactory with new git storage support
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { StorageProviderFactory } from '../storage-provider.js';
 import { StorageConfig } from '@devlog/types';
 
@@ -11,24 +11,24 @@ vi.mock('../sqlite-storage.js', () => ({
   SQLiteStorageProvider: vi.fn().mockImplementation(() => ({
     initialize: vi.fn(),
     isGitBased: () => false,
-    isRemoteStorage: () => false
-  }))
+    isRemoteStorage: () => false,
+  })),
 }));
 
 vi.mock('../git-storage-provider.js', () => ({
   GitStorageProvider: vi.fn().mockImplementation(() => ({
     initialize: vi.fn(),
     isGitBased: () => true,
-    isRemoteStorage: () => true
-  }))
+    isRemoteStorage: () => true,
+  })),
 }));
 
 vi.mock('../hybrid-storage-provider.js', () => ({
   HybridStorageProvider: vi.fn().mockImplementation(() => ({
     initialize: vi.fn(),
     isGitBased: () => true,
-    isRemoteStorage: () => true
-  }))
+    isRemoteStorage: () => true,
+  })),
 }));
 
 describe('StorageProviderFactory', () => {
@@ -37,8 +37,8 @@ describe('StorageProviderFactory', () => {
       const config: StorageConfig = {
         strategy: 'local-sqlite',
         sqlite: {
-          filePath: '/tmp/test.db'
-        }
+          filePath: '/tmp/test.db',
+        },
       };
 
       const provider = await StorageProviderFactory.create(config);
@@ -51,8 +51,8 @@ describe('StorageProviderFactory', () => {
         strategy: 'git-json',
         git: {
           repository: 'test/repo',
-          branch: 'main'
-        }
+          branch: 'main',
+        },
       };
 
       const provider = await StorageProviderFactory.create(config);
@@ -65,12 +65,12 @@ describe('StorageProviderFactory', () => {
         strategy: 'hybrid-git',
         git: {
           repository: 'test/repo',
-          branch: 'main'
+          branch: 'main',
         },
         cache: {
           type: 'sqlite',
-          filePath: '/tmp/cache.db'
-        }
+          filePath: '/tmp/cache.db',
+        },
       };
 
       const provider = await StorageProviderFactory.create(config);
@@ -84,7 +84,7 @@ describe('StorageProviderFactory', () => {
       const config: StorageConfig = {
         type: 'sqlite',
         filePath: '/tmp/legacy.db',
-        strategy: 'local-sqlite'
+        strategy: 'local-sqlite',
       };
 
       const provider = await StorageProviderFactory.create(config);
@@ -94,23 +94,27 @@ describe('StorageProviderFactory', () => {
     it('should throw error for unsupported legacy types', async () => {
       const config: StorageConfig = {
         type: 'unsupported' as any,
-        strategy: 'local-sqlite'
+        strategy: 'local-sqlite',
       };
 
-      await expect(StorageProviderFactory.create(config)).rejects.toThrow('Unsupported storage type');
+      await expect(StorageProviderFactory.create(config)).rejects.toThrow(
+        'Unsupported storage type',
+      );
     });
 
     it('should throw error for unsupported strategies', async () => {
       const config: StorageConfig = {
-        strategy: 'unsupported' as any
+        strategy: 'unsupported' as any,
       };
 
-      await expect(StorageProviderFactory.create(config)).rejects.toThrow('Unsupported storage strategy');
+      await expect(StorageProviderFactory.create(config)).rejects.toThrow(
+        'Unsupported storage strategy',
+      );
     });
 
     it('should throw error for git-json without git config', async () => {
       const config: StorageConfig = {
-        strategy: 'git-json'
+        strategy: 'git-json',
         // Missing git configuration
       };
 
@@ -121,8 +125,8 @@ describe('StorageProviderFactory', () => {
       const config: StorageConfig = {
         strategy: 'hybrid-git',
         git: {
-          repository: 'test/repo'
-        }
+          repository: 'test/repo',
+        },
         // Missing cache configuration
       };
 

@@ -8,7 +8,7 @@ import { DevlogId } from '@devlog/types';
 export class IdManager {
   private counterFile: string;
   private lockFile: string;
-  
+
   constructor(dataDir: string) {
     this.counterFile = path.join(dataDir, '.devlog-counter');
     this.lockFile = path.join(dataDir, '.devlog-counter.lock');

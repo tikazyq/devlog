@@ -3,9 +3,9 @@
  * Handles .devlog/ folder organization, file naming, and metadata management
  */
 
-import { DevlogEntry, DevlogId, GitStorageConfig } from "@devlog/types";
-import * as path from "path";
-import * as fs from "fs/promises";
+import { DevlogEntry, DevlogId, GitStorageConfig } from '@devlog/types';
+import * as path from 'path';
+import * as fs from 'fs/promises';
 
 export interface DevlogIndex {
   version: string;
@@ -55,11 +55,11 @@ export class RepositoryStructure {
   constructor(repositoryPath: string, config: GitStorageConfig) {
     this.repositoryPath = repositoryPath;
     this.config = config;
-    this.devlogPath = path.join(repositoryPath, config.path || ".devlog");
-    this.entriesPath = path.join(this.devlogPath, "entries");
-    this.metadataPath = path.join(this.devlogPath, "metadata");
-    this.indexPath = path.join(this.devlogPath, "index.json");
-    this.configPath = path.join(this.devlogPath, "config.json");
+    this.devlogPath = path.join(repositoryPath, config.path || '.devlog');
+    this.entriesPath = path.join(this.devlogPath, 'entries');
+    this.metadataPath = path.join(this.devlogPath, 'metadata');
+    this.indexPath = path.join(this.devlogPath, 'index.json');
+    this.configPath = path.join(this.devlogPath, 'config.json');
   }
 
   /**
@@ -115,7 +115,7 @@ export class RepositoryStructure {
       const index = await this.readIndex();
       const indexEntry = index.entries[id];
       if (!indexEntry) return null;
-      
+
       return path.join(this.entriesPath, indexEntry.file);
     } catch {
       // Fallback to old naming convention
@@ -143,7 +143,7 @@ export class RepositoryStructure {
     try {
       const index = await this.readIndex();
       const filename = this.generateEntryFilename(entry);
-      
+
       index.entries[entry.id] = {
         id: entry.id,
         title: entry.title,
@@ -153,12 +153,12 @@ export class RepositoryStructure {
         createdAt: entry.createdAt,
         updatedAt: entry.updatedAt,
         file: filename,
-        slug: this.generateSlug(entry.title)
+        slug: this.generateSlug(entry.title),
       };
-      
+
       index.lastModified = new Date().toISOString();
       index.nextId = Math.max(index.nextId, entry.id + 1);
-      
+
       await fs.writeFile(this.indexPath, JSON.stringify(index, null, 2));
     } catch (error) {
       throw new Error(`Failed to update index: ${error}`);
@@ -173,7 +173,7 @@ export class RepositoryStructure {
       const index = await this.readIndex();
       delete index.entries[id];
       index.lastModified = new Date().toISOString();
-      
+
       await fs.writeFile(this.indexPath, JSON.stringify(index, null, 2));
     } catch (error) {
       throw new Error(`Failed to remove from index: ${error}`);
@@ -198,7 +198,7 @@ export class RepositoryStructure {
   async listEntryFiles(): Promise<string[]> {
     try {
       const files = await fs.readdir(this.entriesPath);
-      return files.filter(file => file.endsWith('.json')).sort();
+      return files.filter((file) => file.endsWith('.json')).sort();
     } catch {
       return [];
     }
@@ -246,9 +246,9 @@ export class RepositoryStructure {
     try {
       const files = await this.listEntryFiles();
       const index = await this.readIndex();
-      
+
       for (const file of files) {
-        const found = Object.values(index.entries).some(entry => entry.file === file);
+        const found = Object.values(index.entries).some((entry) => entry.file === file);
         if (!found) {
           issues.push(`Orphaned entry file: ${file}`);
         }
@@ -267,12 +267,12 @@ export class RepositoryStructure {
       await fs.access(this.indexPath);
     } catch {
       const initialIndex: DevlogIndex = {
-        version: "1.0",
+        version: '1.0',
         entries: {},
         nextId: 1,
         lastModified: new Date().toISOString(),
         createdAt: new Date().toISOString(),
-        workspace: workspaceName
+        workspace: workspaceName,
       };
       await fs.writeFile(this.indexPath, JSON.stringify(initialIndex, null, 2));
     }
@@ -280,22 +280,22 @@ export class RepositoryStructure {
 
   private async ensureMetadata(workspaceName?: string): Promise<void> {
     const metadataFile = path.join(this.metadataPath, 'workspace-info.json');
-    
+
     try {
       await fs.access(metadataFile);
     } catch {
       const metadata: DevlogMetadata = {
-        version: "1.0",
+        version: '1.0',
         createdAt: new Date().toISOString(),
         lastModified: new Date().toISOString(),
         workspace: {
           name: workspaceName || 'devlog',
-          description: 'Devlog workspace for development tracking'
+          description: 'Devlog workspace for development tracking',
         },
         statistics: {
           totalEntries: 0,
-          lastEntryId: 0
-        }
+          lastEntryId: 0,
+        },
       };
       await fs.writeFile(metadataFile, JSON.stringify(metadata, null, 2));
     }
@@ -306,16 +306,16 @@ export class RepositoryStructure {
       await fs.access(this.configPath);
     } catch {
       const config = {
-        version: "1.0",
+        version: '1.0',
         storage: {
-          type: this.config.repository ? "git-json" : "local-sqlite",
+          type: this.config.repository ? 'git-json' : 'local-sqlite',
           repository: this.config.repository,
-          branch: this.config.branch || "main"
+          branch: this.config.branch || 'main',
         },
         features: {
           autoSync: this.config.autoSync !== false,
-          conflictResolution: this.config.conflictResolution || "timestamp-wins"
-        }
+          conflictResolution: this.config.conflictResolution || 'timestamp-wins',
+        },
       };
       await fs.writeFile(this.configPath, JSON.stringify(config, null, 2));
     }
@@ -334,13 +334,13 @@ export class RepositoryStructure {
       '',
       '# Keep JSON files and structure',
       '!.devlog/entries/',
-      '!.devlog/*.json'
+      '!.devlog/*.json',
     ].join('\n');
 
     try {
       // Check if .gitignore exists
       const content = await fs.readFile(gitIgnorePath, 'utf-8');
-      
+
       // Add devlog rules if not present
       if (!content.includes('# Devlog - exclude SQLite databases')) {
         await fs.writeFile(gitIgnorePath, content + devlogIgnoreRules);

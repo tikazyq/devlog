@@ -3,14 +3,22 @@
  * Stores entries as JSON files in .devlog/ folder within a git repository
  */
 
-import { DevlogEntry, DevlogFilter, DevlogStats, DevlogId, GitStorageConfig, GitSyncStatus, ConflictResolution } from "@devlog/types";
-import { StorageProvider } from "./storage-provider.js";
-import { GitOperations } from "../utils/git-operations.js";
-import { ConflictResolver } from "../utils/conflict-resolver.js";
-import { RepositoryStructure } from "../utils/repository-structure.js";
-import { GitRepositoryManager } from "../utils/git-repository-manager.js";
-import * as path from "path";
-import * as fs from "fs/promises";
+import {
+  ConflictResolution,
+  DevlogEntry,
+  DevlogFilter,
+  DevlogId,
+  DevlogStats,
+  GitStorageConfig,
+  GitSyncStatus,
+} from '@devlog/types';
+import { StorageProvider } from './storage-provider.js';
+import { GitOperations } from '../utils/git-operations.js';
+import { ConflictResolver } from '../utils/conflict-resolver.js';
+import { RepositoryStructure } from '../utils/repository-structure.js';
+import { GitRepositoryManager } from '../utils/git-repository-manager.js';
+import * as path from 'path';
+import * as fs from 'fs/promises';
 
 export class GitStorageProvider implements StorageProvider {
   private gitOps: GitOperations;
@@ -23,16 +31,16 @@ export class GitStorageProvider implements StorageProvider {
 
   constructor(config: GitStorageConfig) {
     this.config = {
-      branch: "main",
-      path: ".devlog/",
+      branch: 'main',
+      path: '.devlog/',
       autoSync: true,
-      conflictResolution: "timestamp-wins",
-      ...config
+      conflictResolution: 'timestamp-wins',
+      ...config,
     };
-    
+
     // Repository will be cloned to a temp directory or specified path
     this.repositoryPath = this.getRepositoryPath();
-    
+
     this.gitOps = new GitOperations(this.repositoryPath, this.config);
     this.conflictResolver = new ConflictResolver();
     this.repoStructure = new RepositoryStructure(this.repositoryPath, this.config);
@@ -42,7 +50,12 @@ export class GitStorageProvider implements StorageProvider {
   private getRepositoryPath(): string {
     // Extract repo name from repository URL/path
     const repoName = this.config.repository.split('/').pop()?.replace('.git', '') || 'devlog';
-    return path.join(process.env.HOME || process.env.USERPROFILE || '/tmp', '.devlog', 'repos', repoName);
+    return path.join(
+      process.env.HOME || process.env.USERPROFILE || '/tmp',
+      '.devlog',
+      'repos',
+      repoName,
+    );
   }
 
   async initialize(): Promise<void> {
@@ -51,7 +64,7 @@ export class GitStorageProvider implements StorageProvider {
     try {
       // Check if repository exists locally
       const repoExists = await this.repositoryExists();
-      
+
       if (!repoExists) {
         // Clone the repository
         await this.clone(this.config.repository, this.config.branch);
@@ -62,7 +75,7 @@ export class GitStorageProvider implements StorageProvider {
 
       // Ensure .devlog directory structure exists
       await this.repoStructure.initialize();
-      
+
       this.initialized = true;
     } catch (error) {
       throw new Error(`Failed to initialize git storage: ${error}`);
@@ -81,7 +94,7 @@ export class GitStorageProvider implements StorageProvider {
   async exists(id: DevlogId): Promise<boolean> {
     const entryPath = await this.repoStructure.getEntryPathById(id);
     if (!entryPath) return false;
-    
+
     try {
       await fs.access(entryPath);
       return true;
@@ -93,7 +106,7 @@ export class GitStorageProvider implements StorageProvider {
   async get(id: DevlogId): Promise<DevlogEntry | null> {
     const entryPath = await this.repoStructure.getEntryPathById(id);
     if (!entryPath) return null;
-    
+
     try {
       const content = await fs.readFile(entryPath, 'utf-8');
       return JSON.parse(content);
@@ -104,13 +117,13 @@ export class GitStorageProvider implements StorageProvider {
 
   async save(entry: DevlogEntry): Promise<void> {
     const entryPath = this.repoStructure.getEntryPath(entry);
-    
+
     // Write entry to JSON file
     await fs.writeFile(entryPath, JSON.stringify(entry, null, 2));
-    
+
     // Update index
     await this.repoStructure.updateIndex(entry);
-    
+
     // Auto-sync if enabled
     if (this.config.autoSync) {
       await this.push(`Update devlog entry ${entry.id}: ${entry.title}`);
@@ -122,11 +135,11 @@ export class GitStorageProvider implements StorageProvider {
     if (!entryPath) {
       throw new Error(`Entry ${id} not found`);
     }
-    
+
     try {
       await fs.unlink(entryPath);
       await this.repoStructure.removeFromIndex(id);
-      
+
       // Auto-sync if enabled
       if (this.config.autoSync) {
         await this.push(`Delete devlog entry ${id}`);
@@ -138,16 +151,16 @@ export class GitStorageProvider implements StorageProvider {
 
   async list(filter?: DevlogFilter): Promise<DevlogEntry[]> {
     const entries: DevlogEntry[] = [];
-    
+
     try {
       const files = await this.repoStructure.listEntryFiles();
-      
+
       for (const file of files) {
-        const filePath = path.join(this.repositoryPath, this.config.path!, "entries", file);
+        const filePath = path.join(this.repositoryPath, this.config.path!, 'entries', file);
         try {
           const content = await fs.readFile(filePath, 'utf-8');
           const entry = JSON.parse(content);
-          
+
           if (this.matchesFilter(entry, filter)) {
             entries.push(entry);
           }
@@ -158,33 +171,34 @@ export class GitStorageProvider implements StorageProvider {
     } catch (error) {
       // Directory might not exist yet
     }
-    
+
     return entries.sort((a, b) => b.id - a.id);
   }
 
   async search(query: string): Promise<DevlogEntry[]> {
     const allEntries = await this.list();
     const lowerQuery = query.toLowerCase();
-    
-    return allEntries.filter(entry => 
-      entry.title.toLowerCase().includes(lowerQuery) ||
-      entry.description.toLowerCase().includes(lowerQuery) ||
-      entry.notes.some(note => note.content.toLowerCase().includes(lowerQuery)) ||
-      entry.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+
+    return allEntries.filter(
+      (entry) =>
+        entry.title.toLowerCase().includes(lowerQuery) ||
+        entry.description.toLowerCase().includes(lowerQuery) ||
+        entry.notes.some((note) => note.content.toLowerCase().includes(lowerQuery)) ||
+        entry.tags.some((tag) => tag.toLowerCase().includes(lowerQuery)),
     );
   }
 
   async getStats(): Promise<DevlogStats> {
     const entries = await this.list();
-    
+
     const stats: DevlogStats = {
       totalEntries: entries.length,
       byStatus: {} as any,
       byType: {} as any,
-      byPriority: {} as any
+      byPriority: {} as any,
     };
 
-    entries.forEach(entry => {
+    entries.forEach((entry) => {
       stats.byStatus[entry.status] = (stats.byStatus[entry.status] || 0) + 1;
       stats.byType[entry.type] = (stats.byType[entry.type] || 0) + 1;
       stats.byPriority[entry.priority] = (stats.byPriority[entry.priority] || 0) + 1;
@@ -228,16 +242,16 @@ export class GitStorageProvider implements StorageProvider {
 
   private matchesFilter(entry: DevlogEntry, filter?: DevlogFilter): boolean {
     if (!filter) return true;
-    
+
     if (filter.status && !filter.status.includes(entry.status)) return false;
     if (filter.type && !filter.type.includes(entry.type)) return false;
     if (filter.priority && !filter.priority.includes(entry.priority)) return false;
     if (filter.assignee && entry.assignee !== filter.assignee) return false;
-    if (filter.tags && !filter.tags.some(tag => entry.tags.includes(tag))) return false;
-    
+    if (filter.tags && !filter.tags.some((tag) => entry.tags.includes(tag))) return false;
+
     if (filter.fromDate && entry.createdAt < filter.fromDate) return false;
     if (filter.toDate && entry.createdAt > filter.toDate) return false;
-    
+
     return true;
   }
 }

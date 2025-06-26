@@ -28,7 +28,8 @@ pnpm dev:client
 pnpm dev:server
 ```
 
-The client will be available at http://localhost:3000 and will proxy API requests to the server at http://localhost:3001.
+The client will be available at http://localhost:3000 and will proxy API requests to the server
+at http://localhost:3001.
 
 ### Production
 
@@ -45,11 +46,13 @@ pnpm start
 The web package consists of two main parts:
 
 ### Client (React App)
+
 - Built with React 18 and TypeScript
 - Styled with Tailwind CSS
 - Bundled with Vite for fast development
 
 ### Server (Express API)
+
 - RESTful API built with Express.js
 - WebSocket support for real-time updates
 - Integrates with `@devlog/core` for data management
@@ -77,4 +80,5 @@ The web package consists of two main parts:
 
 ## Development Guidelines
 
-This package follows the project's dogfooding approach - use the devlog system to track development of the web interface itself!
+This package follows the project's dogfooding approach - use the devlog system to track development of the web interface
+itself!

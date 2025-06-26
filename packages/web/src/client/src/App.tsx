@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { ConfigProvider, Layout, Alert, theme, Spin } from 'antd';
-import { DevlogEntry, DevlogStats, DevlogId } from '@devlog/types';
+import React, { useEffect, useState } from 'react';
+import { Alert, ConfigProvider, Layout, Spin, theme } from 'antd';
+import { DevlogEntry, DevlogId, DevlogStats } from '@devlog/types';
 import { Dashboard } from './components/Dashboard';
 import { DevlogList } from './components/DevlogList';
 import { DevlogForm } from './components/DevlogForm';
@@ -20,8 +20,9 @@ function App() {
   const [selectedDevlog, setSelectedDevlog] = useState<DevlogEntry | null>(null);
   const [stats, setStats] = useState<DevlogStats | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  
-  const { devlogs, loading, error, refetch, createDevlog, updateDevlog, deleteDevlog } = useDevlogs();
+
+  const { devlogs, loading, error, refetch, createDevlog, updateDevlog, deleteDevlog } =
+    useDevlogs();
   const { connected } = useWebSocket();
 
   // Fetch stats
@@ -84,7 +85,7 @@ function App() {
     switch (currentView) {
       case 'dashboard':
         return (
-          <Dashboard 
+          <Dashboard
             stats={stats}
             recentDevlogs={devlogs.slice(0, 5)}
             onViewDevlog={(devlog: DevlogEntry) => handleViewChange('details', devlog)}
@@ -92,7 +93,7 @@ function App() {
         );
       case 'list':
         return (
-          <DevlogList 
+          <DevlogList
             devlogs={devlogs}
             loading={loading}
             onViewDevlog={(devlog: DevlogEntry) => handleViewChange('details', devlog)}
@@ -100,15 +101,10 @@ function App() {
           />
         );
       case 'create':
-        return (
-          <DevlogForm 
-            onSubmit={handleDevlogCreate}
-            onCancel={() => setCurrentView('list')}
-          />
-        );
+        return <DevlogForm onSubmit={handleDevlogCreate} onCancel={() => setCurrentView('list')} />;
       case 'details':
         return selectedDevlog ? (
-          <DevlogDetails 
+          <DevlogDetails
             devlog={selectedDevlog}
             onUpdate={handleDevlogUpdate}
             onDelete={() => handleDevlogDelete(selectedDevlog.id)}
@@ -133,41 +129,41 @@ function App() {
           },
         }}
       >
-      <Layout style={{ height: '100vh' }}>
-        <Sidebar 
-          currentView={currentView}
-          onViewChange={handleViewChange}
-          stats={stats}
-          collapsed={sidebarCollapsed}
-        />
-        <Layout>
-          <Header 
-            connected={connected}
-            onRefresh={refetch}
-            sidebarCollapsed={sidebarCollapsed}
-            onSidebarToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        <Layout style={{ height: '100vh' }}>
+          <Sidebar
+            currentView={currentView}
+            onViewChange={handleViewChange}
+            stats={stats}
+            collapsed={sidebarCollapsed}
           />
-          <Content style={{ margin: '24px', overflow: 'auto' }}>
-            {error && (
-              <Alert
-                message="Error"
-                description={error}
-                type="error"
-                showIcon
-                closable
-                style={{ marginBottom: 16 }}
-              />
-            )}
-            {loading && currentView === 'list' ? (
-              <div className="loading-container">
-                <Spin size="large" tip="Loading devlogs..." />
-              </div>
-            ) : (
-              renderCurrentView()
-            )}
-          </Content>
+          <Layout>
+            <Header
+              connected={connected}
+              onRefresh={refetch}
+              sidebarCollapsed={sidebarCollapsed}
+              onSidebarToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+            />
+            <Content style={{ margin: '24px', overflow: 'auto' }}>
+              {error && (
+                <Alert
+                  message="Error"
+                  description={error}
+                  type="error"
+                  showIcon
+                  closable
+                  style={{ marginBottom: 16 }}
+                />
+              )}
+              {loading && currentView === 'list' ? (
+                <div className="loading-container">
+                  <Spin size="large" tip="Loading devlogs..." />
+                </div>
+              ) : (
+                renderCurrentView()
+              )}
+            </Content>
+          </Layout>
         </Layout>
-      </Layout>
       </ConfigProvider>
     </ErrorBoundary>
   );

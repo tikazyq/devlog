@@ -3,14 +3,14 @@
  */
 
 // Load environment variables from .env file if available
-import { config } from "dotenv";
-config({ path: [".env.local", ".env"] });
+import { config } from 'dotenv';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import * as crypto from 'crypto';
+import * as os from 'os';
+import { EnterpriseIntegration, StorageConfig } from '@devlog/types';
 
-import * as fs from "fs/promises";
-import * as path from "path";
-import * as crypto from "crypto";
-import * as os from "os";
-import { EnterpriseIntegration, StorageConfig, StorageStrategy, LocalJsonConfig } from "@devlog/types";
+config({ path: ['.env.local', '.env'] });
 
 export interface SyncStrategy {
   sourceOfTruth: 'local' | 'external' | 'manual';
@@ -31,21 +31,21 @@ export interface DevlogConfig {
  * Global devlog directory structure in ~/.devlog
  */
 interface DevlogGlobalStructure {
-  configPath: string;      // ~/.devlog/config.json
-  workspacesDir: string;   // ~/.devlog/workspaces/
-  cacheDir: string;        // ~/.devlog/cache/
-  backupsDir: string;      // ~/.devlog/backups/
-  logsDir: string;         // ~/.devlog/logs/
+  configPath: string; // ~/.devlog/config.json
+  workspacesDir: string; // ~/.devlog/workspaces/
+  cacheDir: string; // ~/.devlog/cache/
+  backupsDir: string; // ~/.devlog/backups/
+  logsDir: string; // ~/.devlog/logs/
 }
 
 /**
  * Workspace-specific structure within ~/.devlog/workspaces/{workspaceId}/
  */
 interface DevlogWorkspaceStructure {
-  workspaceDir: string;    // ~/.devlog/workspaces/{workspaceId}/
-  dbPath: string;          // ~/.devlog/workspaces/{workspaceId}/devlog.db
-  metadataPath: string;    // ~/.devlog/workspaces/{workspaceId}/metadata.json
-  attachmentsDir: string;  // ~/.devlog/workspaces/{workspaceId}/attachments/
+  workspaceDir: string; // ~/.devlog/workspaces/{workspaceId}/
+  dbPath: string; // ~/.devlog/workspaces/{workspaceId}/devlog.db
+  metadataPath: string; // ~/.devlog/workspaces/{workspaceId}/metadata.json
+  attachmentsDir: string; // ~/.devlog/workspaces/{workspaceId}/attachments/
 }
 
 export class ConfigurationManager {
@@ -54,7 +54,7 @@ export class ConfigurationManager {
 
   constructor(workspaceRoot: string = process.cwd()) {
     this.workspaceRoot = workspaceRoot;
-    this.configPath = path.join(workspaceRoot, "devlog.config.json");
+    this.configPath = path.join(workspaceRoot, 'devlog.config.json');
   }
 
   /**
@@ -63,7 +63,7 @@ export class ConfigurationManager {
   async loadConfig(): Promise<DevlogConfig> {
     // Try to load from config file first
     try {
-      const configData = await fs.readFile(this.configPath, "utf-8");
+      const configData = await fs.readFile(this.configPath, 'utf-8');
       const config = JSON.parse(configData) as DevlogConfig;
       return this.validateAndEnhanceConfig(config);
     } catch {
@@ -86,31 +86,37 @@ export class ConfigurationManager {
   async detectBestStorage(): Promise<StorageConfig> {
     // Check for new storage strategy environment variable
     if (process.env.DEVLOG_STORAGE_STRATEGY) {
-      const strategy = process.env.DEVLOG_STORAGE_STRATEGY as 'local-sqlite' | 'local-json' | 'git-json' | 'hybrid-git';
-      
+      const strategy = process.env.DEVLOG_STORAGE_STRATEGY as
+        | 'local-sqlite'
+        | 'local-json'
+        | 'git-json'
+        | 'hybrid-git';
+
       switch (strategy) {
         case 'local-json':
           return {
             strategy: 'local-json',
             localJson: {
               directory: process.env.DEVLOG_JSON_DIR || '.devlog',
-              filePattern: process.env.DEVLOG_FILE_PATTERN || '{id:03d}-{slug}.json'
-            }
+              filePattern: process.env.DEVLOG_FILE_PATTERN || '{id:03d}-{slug}.json',
+            },
           };
-          
+
         case 'git-json':
           return {
             strategy: 'git-json',
             git: {
               repository: process.env.DEVLOG_GIT_REPO || '',
               branch: process.env.DEVLOG_GIT_BRANCH || 'main',
-              credentials: process.env.DEVLOG_GIT_TOKEN ? {
-                type: 'token',
-                token: process.env.DEVLOG_GIT_TOKEN
-              } : undefined
-            }
+              credentials: process.env.DEVLOG_GIT_TOKEN
+                ? {
+                    type: 'token',
+                    token: process.env.DEVLOG_GIT_TOKEN,
+                  }
+                : undefined,
+            },
           };
-          
+
         case 'hybrid-git':
           const workspace = await this.getWorkspaceStructure();
           return {
@@ -118,17 +124,21 @@ export class ConfigurationManager {
             git: {
               repository: process.env.DEVLOG_GIT_REPO || '',
               branch: process.env.DEVLOG_GIT_BRANCH || 'main',
-              credentials: process.env.DEVLOG_GIT_TOKEN ? {
-                type: 'token',
-                token: process.env.DEVLOG_GIT_TOKEN
-              } : undefined
+              credentials: process.env.DEVLOG_GIT_TOKEN
+                ? {
+                    type: 'token',
+                    token: process.env.DEVLOG_GIT_TOKEN,
+                  }
+                : undefined,
             },
             cache: {
               type: 'sqlite',
-              filePath: process.env.DEVLOG_CACHE_PATH || `${os.homedir()}/.devlog/cache/${path.basename(workspace.workspaceDir)}.db`
-            }
+              filePath:
+                process.env.DEVLOG_CACHE_PATH ||
+                `${os.homedir()}/.devlog/cache/${path.basename(workspace.workspaceDir)}.db`,
+            },
           };
-          
+
         case 'local-sqlite':
         default:
           const workspace2 = await this.getWorkspaceStructure();
@@ -137,8 +147,8 @@ export class ConfigurationManager {
           return {
             strategy: 'local-sqlite',
             sqlite: {
-              filePath: workspace2.dbPath
-            }
+              filePath: workspace2.dbPath,
+            },
           };
       }
     }
@@ -146,22 +156,22 @@ export class ConfigurationManager {
     // Legacy environment variable support for backwards compatibility
     if (process.env.DATABASE_URL) {
       const dbUrl = process.env.DATABASE_URL;
-      
-      if (dbUrl.startsWith("postgres://") || dbUrl.startsWith("postgresql://")) {
+
+      if (dbUrl.startsWith('postgres://') || dbUrl.startsWith('postgresql://')) {
         return {
           // Legacy format for backwards compatibility
-          type: "postgres",
+          type: 'postgres',
           connectionString: dbUrl,
-          strategy: 'local-sqlite' // Default strategy
+          strategy: 'local-sqlite', // Default strategy
         };
       }
-      
-      if (dbUrl.startsWith("mysql://")) {
+
+      if (dbUrl.startsWith('mysql://')) {
         return {
-          // Legacy format for backwards compatibility  
-          type: "mysql",
+          // Legacy format for backwards compatibility
+          type: 'mysql',
           connectionString: dbUrl,
-          strategy: 'local-sqlite' // Default strategy
+          strategy: 'local-sqlite', // Default strategy
         };
       }
     }
@@ -169,29 +179,29 @@ export class ConfigurationManager {
     // Check for specific database preferences (legacy)
     if (process.env.DEVLOG_STORAGE_TYPE) {
       const storageType = process.env.DEVLOG_STORAGE_TYPE.toLowerCase();
-      
+
       switch (storageType) {
-        case "sqlite":
+        case 'sqlite':
           return {
             // Legacy format for backwards compatibility
-            type: "sqlite",
-            filePath: process.env.DEVLOG_SQLITE_PATH || ":memory:",
-            strategy: 'local-sqlite' // Default strategy
+            type: 'sqlite',
+            filePath: process.env.DEVLOG_SQLITE_PATH || ':memory:',
+            strategy: 'local-sqlite', // Default strategy
           };
-        case "postgres":
-        case "postgresql":
+        case 'postgres':
+        case 'postgresql':
           return {
             // Legacy format for backwards compatibility
-            type: "postgres",
-            connectionString: process.env.DEVLOG_POSTGRES_URL || "postgresql://localhost/devlog",
-            strategy: 'local-sqlite' // Default strategy
+            type: 'postgres',
+            connectionString: process.env.DEVLOG_POSTGRES_URL || 'postgresql://localhost/devlog',
+            strategy: 'local-sqlite', // Default strategy
           };
-        case "mysql":
+        case 'mysql':
           return {
             // Legacy format for backwards compatibility
-            type: "mysql",
-            connectionString: process.env.DEVLOG_MYSQL_URL || "mysql://localhost/devlog",
-            strategy: 'local-sqlite' // Default strategy
+            type: 'mysql',
+            connectionString: process.env.DEVLOG_MYSQL_URL || 'mysql://localhost/devlog',
+            strategy: 'local-sqlite', // Default strategy
           };
       }
     }
@@ -201,8 +211,8 @@ export class ConfigurationManager {
       strategy: 'local-json',
       localJson: {
         directory: '.devlog',
-        filePattern: '{id:03d}-{slug}.json'
-      }
+        filePattern: '{id:03d}-{slug}.json',
+      },
     };
   }
 
@@ -210,7 +220,7 @@ export class ConfigurationManager {
    * Get storage recommendations based on use case
    */
   getStorageRecommendations(): Array<{
-    type: StorageConfig["type"];
+    type: StorageConfig['type'];
     name: string;
     description: string;
     pros: string[];
@@ -219,74 +229,61 @@ export class ConfigurationManager {
   }> {
     return [
       {
-        type: "sqlite",
-        name: "SQLite Database",
-        description: "Local SQLite database for efficient storage and querying",
+        type: 'sqlite',
+        name: 'SQLite Database',
+        description: 'Local SQLite database for efficient storage and querying',
         pros: [
-          "Fast performance",
-          "Full-text search",
-          "ACID transactions",
-          "No server required",
-          "Works offline"
+          'Fast performance',
+          'Full-text search',
+          'ACID transactions',
+          'No server required',
+          'Works offline',
         ],
         cons: [
-          "Single-user access",
-          "Limited concurrent writes",
-          "Not suitable for distributed teams"
+          'Single-user access',
+          'Limited concurrent writes',
+          'Not suitable for distributed teams',
         ],
-        bestFor: [
-          "Individual developers",
-          "Local development",
-          "Fast prototyping",
-          "Offline work"
-        ]
+        bestFor: ['Individual developers', 'Local development', 'Fast prototyping', 'Offline work'],
       },
       {
-        type: "postgres",
-        name: "PostgreSQL Database",
-        description: "Production-grade PostgreSQL database",
+        type: 'postgres',
+        name: 'PostgreSQL Database',
+        description: 'Production-grade PostgreSQL database',
         pros: [
-          "Multi-user support",
-          "Advanced querying",
-          "Scalable",
-          "Full ACID compliance",
-          "Concurrent access"
+          'Multi-user support',
+          'Advanced querying',
+          'Scalable',
+          'Full ACID compliance',
+          'Concurrent access',
         ],
-        cons: [
-          "Requires database server",
-          "More complex setup",
-          "Network dependency"
-        ],
+        cons: ['Requires database server', 'More complex setup', 'Network dependency'],
         bestFor: [
-          "Team collaboration",
-          "Production deployments",
-          "Web applications",
-          "Multi-user environments"
-        ]
+          'Team collaboration',
+          'Production deployments',
+          'Web applications',
+          'Multi-user environments',
+        ],
       },
       {
-        type: "mysql",
-        name: "MySQL Database",
-        description: "Popular MySQL database for web applications",
+        type: 'mysql',
+        name: 'MySQL Database',
+        description: 'Popular MySQL database for web applications',
         pros: [
-          "Wide adoption",
-          "Good performance",
-          "Multi-user support",
-          "Full-text search",
-          "Mature ecosystem"
+          'Wide adoption',
+          'Good performance',
+          'Multi-user support',
+          'Full-text search',
+          'Mature ecosystem',
         ],
-        cons: [
-          "Requires database server",
-          "Setup complexity",
-          "Network dependency"
-        ],
+        cons: ['Requires database server', 'Setup complexity', 'Network dependency'],
         bestFor: [
-          "Web applications",
-          "Existing MySQL infrastructure",
-          "Team collaboration",
-          "LAMP stack projects"
-        ]
-      }
+          'Web applications',
+          'Existing MySQL infrastructure',
+          'Team collaboration',
+          'LAMP stack projects',
+        ],
+      },
     ];
   }
 
@@ -299,7 +296,7 @@ export class ConfigurationManager {
       sourceOfTruth: 'local',
       conflictResolution: 'local-wins',
       syncInterval: 15, // 15 minutes
-      autoSync: true
+      autoSync: true,
     };
 
     // If no integrations configured, return minimal strategy
@@ -307,7 +304,7 @@ export class ConfigurationManager {
       return {
         sourceOfTruth: 'local',
         conflictResolution: 'local-wins',
-        autoSync: false
+        autoSync: false,
       };
     }
 
@@ -319,14 +316,14 @@ export class ConfigurationManager {
           return {
             ...defaultStrategy,
             sourceOfTruth: 'external',
-            conflictResolution: 'external-wins'
+            conflictResolution: 'external-wins',
           };
         case 'manual':
           return {
             ...defaultStrategy,
             sourceOfTruth: 'manual',
             conflictResolution: 'manual',
-            autoSync: false
+            autoSync: false,
           };
       }
     }
@@ -348,13 +345,13 @@ export class ConfigurationManager {
     const syncStrategy = await this.detectSyncStrategy(integrations);
     const detectedRoot = await this.detectProjectRoot();
     const workspace = await this.getWorkspaceStructure(detectedRoot || undefined);
-    
+
     return {
       storage,
       integrations,
       syncStrategy,
       workspaceRoot: detectedRoot || this.workspaceRoot,
-      workspaceId: path.basename(workspace.workspaceDir)
+      workspaceId: path.basename(workspace.workspaceDir),
     };
   }
 
@@ -365,9 +362,9 @@ export class ConfigurationManager {
     if (process.env.JIRA_BASE_URL && process.env.JIRA_EMAIL && process.env.JIRA_API_TOKEN) {
       integrations.jira = {
         baseUrl: process.env.JIRA_BASE_URL,
-        projectKey: process.env.JIRA_PROJECT_KEY || "",
+        projectKey: process.env.JIRA_PROJECT_KEY || '',
         userEmail: process.env.JIRA_EMAIL,
-        apiToken: process.env.JIRA_API_TOKEN
+        apiToken: process.env.JIRA_API_TOKEN,
       };
     }
 
@@ -376,7 +373,7 @@ export class ConfigurationManager {
       integrations.ado = {
         organization: process.env.ADO_ORGANIZATION,
         project: process.env.ADO_PROJECT,
-        personalAccessToken: process.env.ADO_PAT
+        personalAccessToken: process.env.ADO_PAT,
       };
     }
 
@@ -386,8 +383,10 @@ export class ConfigurationManager {
         owner: process.env.GITHUB_OWNER,
         repo: process.env.GITHUB_REPO,
         token: process.env.GITHUB_TOKEN,
-        projectNumber: process.env.GITHUB_PROJECT_NUMBER ? parseInt(process.env.GITHUB_PROJECT_NUMBER) : undefined,
-        projectId: process.env.GITHUB_PROJECT_ID
+        projectNumber: process.env.GITHUB_PROJECT_NUMBER
+          ? parseInt(process.env.GITHUB_PROJECT_NUMBER)
+          : undefined,
+        projectId: process.env.GITHUB_PROJECT_ID,
       };
     }
 
@@ -401,17 +400,17 @@ export class ConfigurationManager {
   private async validateAndEnhanceConfig(config: DevlogConfig): Promise<DevlogConfig> {
     // Add any missing fields or validate existing ones
     if (!config.storage) {
-      throw new Error("Storage configuration is required");
+      throw new Error('Storage configuration is required');
     }
 
     // Detect and set workspace information
     const detectedRoot = await this.detectProjectRoot();
     const workspace = await this.getWorkspaceStructure(detectedRoot || undefined);
-    
+
     return {
       ...config,
       workspaceRoot: detectedRoot || this.workspaceRoot,
-      workspaceId: path.basename(workspace.workspaceDir)
+      workspaceId: path.basename(workspace.workspaceDir),
     };
   }
 
@@ -421,13 +420,13 @@ export class ConfigurationManager {
   private getGlobalStructure(): DevlogGlobalStructure {
     const homeDir = os.homedir();
     const devlogDir = path.join(homeDir, '.devlog');
-    
+
     return {
       configPath: path.join(devlogDir, 'config.json'),
       workspacesDir: path.join(devlogDir, 'workspaces'),
       cacheDir: path.join(devlogDir, 'cache'),
       backupsDir: path.join(devlogDir, 'backups'),
-      logsDir: path.join(devlogDir, 'logs')
+      logsDir: path.join(devlogDir, 'logs'),
     };
   }
 
@@ -445,7 +444,7 @@ export class ConfigurationManager {
    */
   private async detectProjectRoot(startPath: string = this.workspaceRoot): Promise<string | null> {
     let currentDir = path.resolve(startPath);
-    
+
     while (currentDir !== path.dirname(currentDir)) {
       // Check for common project root indicators
       const indicators = [
@@ -454,9 +453,9 @@ export class ConfigurationManager {
         path.join(currentDir, 'pyproject.toml'),
         path.join(currentDir, 'Cargo.toml'),
         path.join(currentDir, 'go.mod'),
-        path.join(currentDir, 'devlog.config.json')
+        path.join(currentDir, 'devlog.config.json'),
       ];
-      
+
       for (const indicator of indicators) {
         try {
           await fs.access(indicator);
@@ -465,10 +464,10 @@ export class ConfigurationManager {
           // Continue checking
         }
       }
-      
+
       currentDir = path.dirname(currentDir);
     }
-    
+
     return null;
   }
 
@@ -477,23 +476,23 @@ export class ConfigurationManager {
    */
   private async getWorkspaceStructure(projectPath?: string): Promise<DevlogWorkspaceStructure> {
     const global = this.getGlobalStructure();
-    
+
     // Use 'default' workspace by default for simplicity
     // Users can still override with environment variables if needed
     let workspaceId = 'default';
-    
+
     // Only use project-specific workspace if explicitly requested via projectPath
     if (projectPath) {
       workspaceId = this.generateWorkspaceId(projectPath);
     }
-    
+
     const workspaceDir = path.join(global.workspacesDir, workspaceId);
-    
+
     return {
       workspaceDir,
       dbPath: path.join(workspaceDir, 'devlog.db'),
       metadataPath: path.join(workspaceDir, 'metadata.json'),
-      attachmentsDir: path.join(workspaceDir, 'attachments')
+      attachmentsDir: path.join(workspaceDir, 'attachments'),
     };
   }
 
@@ -502,21 +501,21 @@ export class ConfigurationManager {
    */
   private async initializeGlobalStructure(): Promise<void> {
     const global = this.getGlobalStructure();
-    
+
     // Create all necessary directories
     await fs.mkdir(global.workspacesDir, { recursive: true });
     await fs.mkdir(global.cacheDir, { recursive: true });
     await fs.mkdir(global.backupsDir, { recursive: true });
     await fs.mkdir(global.logsDir, { recursive: true });
-    
+
     // Create global config if it doesn't exist
     try {
       await fs.access(global.configPath);
     } catch {
       const defaultGlobalConfig = {
-        version: "1.0.0",
+        version: '1.0.0',
         created: new Date().toISOString(),
-        defaultStorage: "sqlite"
+        defaultStorage: 'sqlite',
       };
       await fs.writeFile(global.configPath, JSON.stringify(defaultGlobalConfig, null, 2));
     }
@@ -525,22 +524,25 @@ export class ConfigurationManager {
   /**
    * Initialize workspace-specific structure
    */
-  private async initializeWorkspaceStructure(workspace: DevlogWorkspaceStructure, projectPath?: string): Promise<void> {
+  private async initializeWorkspaceStructure(
+    workspace: DevlogWorkspaceStructure,
+    projectPath?: string,
+  ): Promise<void> {
     // Create workspace directory
     await fs.mkdir(workspace.workspaceDir, { recursive: true });
     await fs.mkdir(workspace.attachmentsDir, { recursive: true });
-    
+
     // Create workspace metadata if it doesn't exist
     try {
       await fs.access(workspace.metadataPath);
     } catch {
-      const detectedRoot = projectPath || await this.detectProjectRoot();
+      const detectedRoot = projectPath || (await this.detectProjectRoot());
       const metadata = {
-        version: "1.0.0",
+        version: '1.0.0',
         created: new Date().toISOString(),
         projectPath: detectedRoot,
         workspaceId: path.basename(workspace.workspaceDir),
-        lastAccessed: new Date().toISOString()
+        lastAccessed: new Date().toISOString(),
       };
       await fs.writeFile(workspace.metadataPath, JSON.stringify(metadata, null, 2));
     }

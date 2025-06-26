@@ -1,11 +1,6 @@
 import React from 'react';
-import { Layout, Menu, Typography, Card, Statistic, Row, Col } from 'antd';
-import { 
-  DashboardOutlined, 
-  FileTextOutlined, 
-  PlusOutlined,
-  CodeOutlined 
-} from '@ant-design/icons';
+import { Card, Col, Layout, Menu, Row, Statistic, Typography } from 'antd';
+import { CodeOutlined, DashboardOutlined, FileTextOutlined, PlusOutlined } from '@ant-design/icons';
 
 const { Sider } = Layout;
 const { Title, Text } = Typography;
@@ -19,32 +14,32 @@ interface SidebarProps {
 
 export function Sidebar({ currentView, onViewChange, stats, collapsed = false }: SidebarProps) {
   const menuItems = [
-    { 
-      key: 'dashboard', 
-      label: 'Dashboard', 
-      icon: <DashboardOutlined /> 
+    {
+      key: 'dashboard',
+      label: 'Dashboard',
+      icon: <DashboardOutlined />,
     },
-    { 
-      key: 'list', 
-      label: 'All Devlogs', 
-      icon: <FileTextOutlined /> 
+    {
+      key: 'list',
+      label: 'All Devlogs',
+      icon: <FileTextOutlined />,
     },
-    { 
-      key: 'create', 
-      label: 'New Devlog', 
-      icon: <PlusOutlined /> 
+    {
+      key: 'create',
+      label: 'New Devlog',
+      icon: <PlusOutlined />,
     },
   ];
 
   return (
-    <Sider 
-      width={280} 
+    <Sider
+      width={280}
       collapsed={collapsed}
       collapsedWidth={0}
       breakpoint="md"
-      style={{ 
+      style={{
         background: '#fff',
-        borderRight: '1px solid #f0f0f0'
+        borderRight: '1px solid #f0f0f0',
       }}
     >
       <div className="sidebar-header">
@@ -56,7 +51,7 @@ export function Sidebar({ currentView, onViewChange, stats, collapsed = false }:
         </div>
         <Text type="secondary">Development Tracker</Text>
       </div>
-      
+
       <Menu
         mode="inline"
         selectedKeys={[currentView]}
@@ -73,22 +68,22 @@ export function Sidebar({ currentView, onViewChange, stats, collapsed = false }:
           <Card size="small" className="sidebar-stats-card">
             <Row gutter={[16, 16]}>
               <Col span={24}>
-                <Statistic 
-                  title="Total" 
-                  value={stats.totalEntries || 0} 
+                <Statistic
+                  title="Total"
+                  value={stats.totalEntries || 0}
                   valueStyle={{ fontSize: '16px' }}
                 />
               </Col>
               <Col span={12}>
-                <Statistic 
-                  title="In Progress" 
+                <Statistic
+                  title="In Progress"
                   value={stats.byStatus?.['in-progress'] || 0}
                   valueStyle={{ fontSize: '14px', color: '#1890ff' }}
                 />
               </Col>
               <Col span={12}>
-                <Statistic 
-                  title="Completed" 
+                <Statistic
+                  title="Completed"
                   value={stats.byStatus?.done || 0}
                   valueStyle={{ fontSize: '14px', color: '#52c41a' }}
                 />

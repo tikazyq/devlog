@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { DevlogEntry, DevlogId } from '@devlog/types';
 
 export function useDevlogs() {
@@ -31,11 +31,11 @@ export function useDevlogs() {
       },
       body: JSON.stringify(data),
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to create devlog');
     }
-    
+
     await fetchDevlogs();
   };
 
@@ -47,11 +47,11 @@ export function useDevlogs() {
       },
       body: JSON.stringify(data),
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to update devlog');
     }
-    
+
     await fetchDevlogs();
   };
 
@@ -59,11 +59,11 @@ export function useDevlogs() {
     const response = await fetch(`/api/devlogs/${id}`, {
       method: 'DELETE',
     });
-    
+
     if (!response.ok) {
       throw new Error('Failed to delete devlog');
     }
-    
+
     await fetchDevlogs();
   };
 

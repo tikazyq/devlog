@@ -1,14 +1,14 @@
 import React from 'react';
-import { Typography, Card, Row, Col, List, Tag, Avatar, Statistic, Empty, Skeleton } from 'antd';
-import { 
-  FileTextOutlined, 
-  SyncOutlined, 
-  CheckCircleOutlined, 
-  StopOutlined,
+import { Avatar, Card, Col, Empty, List, Row, Skeleton, Statistic, Tag, Typography } from 'antd';
+import {
+  CheckCircleOutlined,
   ClockCircleOutlined,
   ExclamationCircleOutlined,
+  FileTextOutlined,
+  MinusCircleOutlined,
+  StopOutlined,
+  SyncOutlined,
   WarningOutlined,
-  MinusCircleOutlined 
 } from '@ant-design/icons';
 import { DevlogEntry, DevlogStats } from '@devlog/types';
 
@@ -23,41 +23,61 @@ interface DashboardProps {
 export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'done': return 'success';
-      case 'in-progress': return 'processing';
-      case 'blocked': return 'error';
-      case 'todo': return 'default';
-      default: return 'default';
+      case 'done':
+        return 'success';
+      case 'in-progress':
+        return 'processing';
+      case 'blocked':
+        return 'error';
+      case 'todo':
+        return 'default';
+      default:
+        return 'default';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'done': return <CheckCircleOutlined />;
-      case 'in-progress': return <SyncOutlined spin />;
-      case 'blocked': return <StopOutlined />;
-      case 'todo': return <ClockCircleOutlined />;
-      default: return <MinusCircleOutlined />;
+      case 'done':
+        return <CheckCircleOutlined />;
+      case 'in-progress':
+        return <SyncOutlined spin />;
+      case 'blocked':
+        return <StopOutlined />;
+      case 'todo':
+        return <ClockCircleOutlined />;
+      default:
+        return <MinusCircleOutlined />;
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'critical': return 'red';
-      case 'high': return 'orange';
-      case 'medium': return 'gold';
-      case 'low': return 'green';
-      default: return 'default';
+      case 'critical':
+        return 'red';
+      case 'high':
+        return 'orange';
+      case 'medium':
+        return 'gold';
+      case 'low':
+        return 'green';
+      default:
+        return 'default';
     }
   };
 
   const getPriorityIcon = (priority: string) => {
     switch (priority) {
-      case 'critical': return <ExclamationCircleOutlined />;
-      case 'high': return <WarningOutlined />;
-      case 'medium': return <MinusCircleOutlined />;
-      case 'low': return <CheckCircleOutlined />;
-      default: return <MinusCircleOutlined />;
+      case 'critical':
+        return <ExclamationCircleOutlined />;
+      case 'high':
+        return <WarningOutlined />;
+      case 'medium':
+        return <MinusCircleOutlined />;
+      case 'low':
+        return <CheckCircleOutlined />;
+      default:
+        return <MinusCircleOutlined />;
     }
   };
 
@@ -65,9 +85,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
     <div>
       <div className="dashboard-header">
         <Title level={2}>Dashboard</Title>
-        <Paragraph type="secondary">
-          Overview of your development progress
-        </Paragraph>
+        <Paragraph type="secondary">Overview of your development progress</Paragraph>
       </div>
 
       {/* Stats Cards */}
@@ -128,15 +146,12 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
       )}
 
       {/* Recent Devlogs */}
-      <Card 
-        title="Recent Devlogs"
-        bodyStyle={{ padding: 0 }}
-      >
+      <Card title="Recent Devlogs" bodyStyle={{ padding: 0 }}>
         {recentDevlogs.length === 0 ? (
-          <Empty 
+          <Empty
             image={Empty.PRESENTED_IMAGE_SIMPLE}
             description="No devlogs found"
-            style={{ padding: '40px' }} 
+            style={{ padding: '40px' }}
           />
         ) : (
           <List
@@ -149,17 +164,22 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                 actions={[
                   <Text type="secondary" key="date">
                     {new Date(devlog.updatedAt).toLocaleDateString()}
-                  </Text>
+                  </Text>,
                 ]}
               >
                 <List.Item.Meta
                   avatar={
-                    <Avatar 
-                      icon={getStatusIcon(devlog.status)} 
-                      style={{ 
-                        backgroundColor: getStatusColor(devlog.status) === 'success' ? '#52c41a' :
-                                         getStatusColor(devlog.status) === 'processing' ? '#1890ff' :
-                                         getStatusColor(devlog.status) === 'error' ? '#ff4d4f' : '#d9d9d9'
+                    <Avatar
+                      icon={getStatusIcon(devlog.status)}
+                      style={{
+                        backgroundColor:
+                          getStatusColor(devlog.status) === 'success'
+                            ? '#52c41a'
+                            : getStatusColor(devlog.status) === 'processing'
+                              ? '#1890ff'
+                              : getStatusColor(devlog.status) === 'error'
+                                ? '#ff4d4f'
+                                : '#d9d9d9',
                       }}
                     />
                   }
@@ -167,13 +187,13 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                     <div>
                       <Text strong>{devlog.title}</Text>
                       <div className="recent-devlogs-meta">
-                        <Tag 
-                          color={getStatusColor(devlog.status)} 
+                        <Tag
+                          color={getStatusColor(devlog.status)}
                           icon={getStatusIcon(devlog.status)}
                         >
                           {devlog.status}
                         </Tag>
-                        <Tag 
+                        <Tag
                           color={getPriorityColor(devlog.priority)}
                           icon={getPriorityIcon(devlog.priority)}
                         >

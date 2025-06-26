@@ -1,0 +1,15 @@
+{
+  "entries": {
+    "2": {
+      "filename": "002-test-devlog-creation.json",
+      "title": "Test Devlog Creation",
+      "status": "todo",
+      "type": "task",
+      "priority": "low",
+      "createdAt": "2025-06-26T01:32:38.289Z",
+      "updatedAt": "2025-06-26T01:32:38.289Z"
+    }
+  },
+  "lastId": 2,
+  "version": "1.0.0"
+}

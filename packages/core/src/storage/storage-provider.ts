@@ -2,7 +2,15 @@
  * Abstract storage interface that supports different storage backends
  */
 
-import { DevlogEntry, DevlogFilter, DevlogStats, DevlogId, GitSyncStatus, ConflictResolution, StorageConfig } from "@devlog/types";
+import {
+  ConflictResolution,
+  DevlogEntry,
+  DevlogFilter,
+  DevlogId,
+  DevlogStats,
+  GitSyncStatus,
+  StorageConfig,
+} from '@devlog/types';
 
 export interface StorageProvider {
   /**
@@ -66,7 +74,7 @@ export interface StorageProvider {
   getNextId?(): Promise<DevlogId>;
 
   // Git-specific methods (optional - only implemented by git storage providers)
-  
+
   /**
    * Clone a git repository for storage
    */
@@ -101,16 +109,16 @@ export class StorageProviderFactory {
     // Handle legacy configurations
     if (config.type) {
       switch (config.type) {
-        case "sqlite":
-          const { SQLiteStorageProvider } = await import("./sqlite-storage.js");
-          return new SQLiteStorageProvider(config.filePath || ":memory:", config.options);
+        case 'sqlite':
+          const { SQLiteStorageProvider } = await import('./sqlite-storage.js');
+          return new SQLiteStorageProvider(config.filePath || ':memory:', config.options);
 
-        case "postgres":
-          const { PostgreSQLStorageProvider } = await import("./postgresql-storage.js");
+        case 'postgres':
+          const { PostgreSQLStorageProvider } = await import('./postgresql-storage.js');
           return new PostgreSQLStorageProvider(config.connectionString!, config.options);
 
-        case "mysql":
-          const { MySQLStorageProvider } = await import("./mysql-storage.js");
+        case 'mysql':
+          const { MySQLStorageProvider } = await import('./mysql-storage.js');
           return new MySQLStorageProvider(config.connectionString!, config.options);
 
         default:
@@ -120,35 +128,35 @@ export class StorageProviderFactory {
 
     // Handle new storage strategies
     switch (config.strategy) {
-      case "local-sqlite":
-        const { SQLiteStorageProvider } = await import("./sqlite-storage.js");
+      case 'local-sqlite':
+        const { SQLiteStorageProvider } = await import('./sqlite-storage.js');
         return new SQLiteStorageProvider(
-          config.sqlite?.filePath || ":memory:", 
-          config.sqlite?.options
+          config.sqlite?.filePath || ':memory:',
+          config.sqlite?.options,
         );
 
-      case "local-json":
-        const { LocalJsonStorageProvider } = await import("./local-json-storage.js");
+      case 'local-json':
+        const { LocalJsonStorageProvider } = await import('./local-json-storage.js');
         return new LocalJsonStorageProvider(
           process.cwd(), // Use current working directory as project root
-          config.localJson || {}
+          config.localJson || {},
         );
 
-      case "git-json":
+      case 'git-json':
         if (!config.git) {
-          throw new Error("Git configuration is required for git-json strategy");
+          throw new Error('Git configuration is required for git-json strategy');
         }
-        const { GitStorageProvider } = await import("./git-storage-provider.js");
+        const { GitStorageProvider } = await import('./git-storage-provider.js');
         return new GitStorageProvider(config.git);
 
-      case "hybrid-git":
+      case 'hybrid-git':
         if (!config.git) {
-          throw new Error("Git configuration is required for hybrid-git strategy");
+          throw new Error('Git configuration is required for hybrid-git strategy');
         }
         if (!config.cache) {
-          throw new Error("Cache configuration is required for hybrid-git strategy");
+          throw new Error('Cache configuration is required for hybrid-git strategy');
         }
-        const { HybridStorageProvider } = await import("./hybrid-storage-provider.js");
+        const { HybridStorageProvider } = await import('./hybrid-storage-provider.js');
         return new HybridStorageProvider(config.git, config.cache);
 
       default:

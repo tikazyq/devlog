@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { DevlogManager } from "../devlog-manager.js";
-import { IdManager } from "../utils/id-manager.js";
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { DevlogManager } from '../devlog-manager.js';
+import { IdManager } from '../utils/id-manager.js';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
@@ -12,7 +12,7 @@ describe('Integer ID System', () => {
   beforeEach(async () => {
     // Create temporary directory for test
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'devlog-test-'));
-    
+
     manager = new DevlogManager({
       workspaceRoot: tempDir,
       useIntegerIds: true,
@@ -20,9 +20,9 @@ describe('Integer ID System', () => {
         strategy: 'local-json',
         localJson: {
           directory: '.devlog',
-          filePattern: '{id:03d}-{slug}.json'
-        }
-      }
+          filePattern: '{id:03d}-{slug}.json',
+        },
+      },
     });
   });
 
@@ -36,7 +36,7 @@ describe('Integer ID System', () => {
     const entry = await manager.findOrCreateDevlog({
       title: 'Test Integer ID Feature',
       type: 'feature',
-      description: 'Testing the new integer ID system'
+      description: 'Testing the new integer ID system',
     });
 
     expect(typeof entry.id).toBe('number');
@@ -47,13 +47,13 @@ describe('Integer ID System', () => {
     const entry1 = await manager.findOrCreateDevlog({
       title: 'First Entry',
       type: 'feature',
-      description: 'First test entry'
+      description: 'First test entry',
     });
 
     const entry2 = await manager.findOrCreateDevlog({
       title: 'Second Entry',
       type: 'bugfix',
-      description: 'Second test entry'
+      description: 'Second test entry',
     });
 
     expect(entry1.id).toBe(1);
@@ -64,11 +64,11 @@ describe('Integer ID System', () => {
     const created = await manager.findOrCreateDevlog({
       title: 'Test Retrieval',
       type: 'task',
-      description: 'Testing ID retrieval'
+      description: 'Testing ID retrieval',
     });
 
     const retrieved = await manager.getDevlog(created.id);
-    
+
     expect(retrieved).not.toBeNull();
     expect(retrieved!.id).toBe(created.id);
     expect(retrieved!.title).toBe('Test Retrieval');
@@ -82,7 +82,7 @@ describe('Integer ID System', () => {
   it('should convert between ID formats correctly', () => {
     // String to ID conversion (for parsing)
     expect(IdManager.stringToId('123')).toBe(123);
-    
+
     // ID to string conversion (for storage)
     expect(IdManager.idToString(123)).toBe('123');
   });
@@ -95,16 +95,18 @@ describe('Integer ID System', () => {
         strategy: 'local-json',
         localJson: {
           directory: '.devlog',
-          filePattern: '{id:03d}-{slug}.json'
-        }
-      }
+          filePattern: '{id:03d}-{slug}.json',
+        },
+      },
     });
 
-    await expect(legacyManager.findOrCreateDevlog({
-      title: 'Legacy Test',
-      type: 'feature',
-      description: 'Testing legacy ID system should fail'
-    })).rejects.toThrow('Legacy string IDs are no longer supported');
+    await expect(
+      legacyManager.findOrCreateDevlog({
+        title: 'Legacy Test',
+        type: 'feature',
+        description: 'Testing legacy ID system should fail',
+      }),
+    ).rejects.toThrow('Legacy string IDs are no longer supported');
 
     await legacyManager.dispose();
   });

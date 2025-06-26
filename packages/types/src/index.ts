@@ -2,13 +2,13 @@
  * Core types for the devlog system
  */
 
-export type DevlogType = "feature" | "bugfix" | "task" | "refactor" | "docs";
+export type DevlogType = 'feature' | 'bugfix' | 'task' | 'refactor' | 'docs';
 
-export type DevlogStatus = "todo" | "in-progress" | "review" | "testing" | "done" | "archived";
+export type DevlogStatus = 'todo' | 'in-progress' | 'review' | 'testing' | 'done' | 'archived';
 
-export type DevlogPriority = "low" | "medium" | "high" | "critical";
+export type DevlogPriority = 'low' | 'medium' | 'high' | 'critical';
 
-export type NoteCategory = "progress" | "issue" | "solution" | "idea" | "reminder";
+export type NoteCategory = 'progress' | 'issue' | 'solution' | 'idea' | 'reminder';
 
 /**
  * ID type for devlog entries - integer only for clean, user-friendly references
@@ -41,13 +41,13 @@ export interface DevlogEntry {
   notes: DevlogNote[];
   files: string[];
   relatedDevlogs: string[];
-  
+
   // Enhanced AI agent context
   context: DevlogContext;
-  
+
   // AI-specific context for cross-session persistence
   aiContext: AIContext;
-  
+
   // Enterprise tool integration (optional for now)
   externalReferences?: ExternalReference[];
 }
@@ -55,26 +55,26 @@ export interface DevlogEntry {
 export interface DevlogContext {
   // What problem this solves or what goal it achieves
   businessContext: string;
-  
+
   // Technical context - architecture decisions, constraints, assumptions
   technicalContext: string;
-  
+
   // Dependencies on other work items or external factors
   dependencies: Dependency[];
-  
+
   // Key decisions made and their rationale
   decisions: Decision[];
-  
+
   // Acceptance criteria or definition of done
   acceptanceCriteria: string[];
-  
+
   // Risks and mitigation strategies
   risks: Risk[];
 }
 
 export interface Dependency {
   id: string;
-  type: "blocks" | "blocked-by" | "related-to";
+  type: 'blocks' | 'blocked-by' | 'related-to';
   description: string;
   externalId?: string; // For Jira, ADO, etc.
 }
@@ -91,13 +91,13 @@ export interface Decision {
 export interface Risk {
   id: string;
   description: string;
-  impact: "low" | "medium" | "high";
-  probability: "low" | "medium" | "high";
+  impact: 'low' | 'medium' | 'high';
+  probability: 'low' | 'medium' | 'high';
   mitigation: string;
 }
 
 export interface ExternalReference {
-  system: "jira" | "ado" | "github" | "slack" | "confluence" | "other";
+  system: 'jira' | 'ado' | 'github' | 'slack' | 'confluence' | 'other';
   id: string;
   url?: string;
   title?: string;
@@ -132,7 +132,7 @@ export interface CreateDevlogRequest {
   estimatedHours?: number;
   assignee?: string;
   tags?: string[];
-  
+
   // Enhanced context for AI agents
   businessContext?: string;
   technicalContext?: string;
@@ -195,19 +195,19 @@ export interface GitHubConfig {
 export interface AIContext {
   // Summary of the current understanding for AI agents
   currentSummary: string;
-  
+
   // Key insights that should be preserved across sessions
   keyInsights: string[];
-  
+
   // Current blockers or questions that need resolution
   openQuestions: string[];
-  
+
   // Related concepts or patterns from other projects
   relatedPatterns: string[];
-  
+
   // Next logical steps based on current progress
   suggestedNextSteps: string[];
-  
+
   // Context freshness indicator
   lastAIUpdate: string;
   contextVersion: number;
@@ -240,51 +240,51 @@ export type ConflictResolution = 'local-wins' | 'remote-wins' | 'timestamp-wins'
 
 export interface GitCredentials {
   type: 'token' | 'ssh' | 'basic';
-  token?: string;          // For GitHub/GitLab PAT
-  username?: string;       // For basic auth
-  password?: string;       // For basic auth
-  keyPath?: string;        // For SSH key path
+  token?: string; // For GitHub/GitLab PAT
+  username?: string; // For basic auth
+  password?: string; // For basic auth
+  keyPath?: string; // For SSH key path
 }
 
 export interface GitStorageConfig {
-  repository: string;      // "owner/repo" or full Git URL
-  branch?: string;         // default: "main"
-  path?: string;           // default: ".devlog/"
+  repository: string; // "owner/repo" or full Git URL
+  branch?: string; // default: "main"
+  path?: string; // default: ".devlog/"
   credentials?: GitCredentials;
-  autoSync?: boolean;      // default: true
+  autoSync?: boolean; // default: true
   conflictResolution?: ConflictResolution;
 }
 
 export interface LocalCacheConfig {
   type: 'sqlite';
-  filePath: string;        // e.g., "~/.devlog/cache/project-name.db"
+  filePath: string; // e.g., "~/.devlog/cache/project-name.db"
 }
 
 export interface LocalJsonConfig {
-  directory?: string;      // default: ".devlog/"
-  filePattern?: string;    // default: "{id:03d}-{slug}.json"
+  directory?: string; // default: ".devlog/"
+  filePattern?: string; // default: "{id:03d}-{slug}.json"
 }
 
 export interface StorageConfig {
   strategy: StorageStrategy;
-  
+
   // Local SQLite storage (existing)
   sqlite?: {
     filePath: string;
     options?: Record<string, any>;
   };
-  
+
   // Local JSON storage (new - simple git-based approach)
   localJson?: LocalJsonConfig;
-  
+
   // Git repository storage (deprecated - overly complex)
   git?: GitStorageConfig;
-  
+
   // Local cache for hybrid strategy
   cache?: LocalCacheConfig;
-  
+
   // Legacy support
-  type?: "sqlite" | "postgres" | "mysql";
+  type?: 'sqlite' | 'postgres' | 'mysql';
   connectionString?: string;
   filePath?: string;
   options?: Record<string, any>;

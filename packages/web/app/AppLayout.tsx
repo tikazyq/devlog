@@ -55,18 +55,22 @@ export function AppLayout({ children }: AppLayoutProps) {
             onSidebarToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
           />
           <Content className="app-content">
-            {error && (
-              <Alert
-                message="Error"
-                description={error}
-                type="error"
-                showIcon
-                closable
-                className="app-error-alert"
-              />
-            )}
-            <NavigationBreadcrumb />
-            {children}
+            <div className="app-content-wrapper">
+              {error && (
+                <Alert
+                  message="Error"
+                  description={error}
+                  type="error"
+                  showIcon
+                  closable
+                  className="app-error-alert"
+                />
+              )}
+              <NavigationBreadcrumb />
+              <div className="page-content">
+                {children}
+              </div>
+            </div>
           </Content>
         </Layout>
       </Layout>

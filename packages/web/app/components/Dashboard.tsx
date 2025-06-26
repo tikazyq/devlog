@@ -84,18 +84,20 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
   };
 
   return (
-    <div>
+    <div className="dashboard-container">
       <div className="dashboard-header">
-        <Title level={2}>Dashboard</Title>
-        <Paragraph type="secondary">Overview of your development progress</Paragraph>
+        <Title level={2} className="dashboard-title">Dashboard</Title>
+        <Paragraph type="secondary" className="dashboard-subtitle">
+          Overview of your development progress
+        </Paragraph>
       </div>
 
       {/* Stats Cards */}
       {!stats ? (
-        <Row gutter={[16, 16]} className="dashboard-stats-row">
+        <Row gutter={[24, 24]} className="dashboard-stats-row">
           {[1, 2, 3, 4].map((i) => (
             <Col key={i} xs={24} sm={12} lg={6}>
-              <Card>
+              <Card className="stats-card">
                 <Skeleton.Input active size="small" style={{ width: '60%', marginBottom: '8px' }} />
                 <Skeleton.Input active size="large" style={{ width: '40%' }} />
               </Card>
@@ -103,9 +105,9 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
           ))}
         </Row>
       ) : (
-        <Row gutter={[16, 16]} className="dashboard-stats-row">
+        <Row gutter={[24, 24]} className="dashboard-stats-row">
           <Col xs={24} sm={12} lg={6}>
-            <Card>
+            <Card className="stats-card">
               <Statistic
                 title="Total Devlogs"
                 value={stats.totalEntries}
@@ -115,7 +117,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card>
+            <Card className="stats-card">
               <Statistic
                 title="In Progress"
                 value={stats.byStatus['in-progress'] || 0}
@@ -125,7 +127,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card>
+            <Card className="stats-card">
               <Statistic
                 title="Completed"
                 value={stats.byStatus['done'] || 0}
@@ -135,7 +137,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card>
+            <Card className="stats-card">
               <Statistic
                 title="Todo"
                 value={stats.byStatus['todo'] || 0}
@@ -148,12 +150,16 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
       )}
 
       {/* Recent Devlogs */}
-      <Card title="Recent Devlogs" bodyStyle={{ padding: 0 }}>
+      <Card 
+        title={<Title level={3} className="recent-devlogs-title">Recent Devlogs</Title>} 
+        bodyStyle={{ padding: 0 }}
+        className="recent-devlogs-card"
+      >
         {recentDevlogs.length === 0 ? (
           <Empty
             image={Empty.PRESENTED_IMAGE_SIMPLE}
             description="No devlogs found"
-            style={{ padding: '40px' }}
+            className="empty-devlogs"
           />
         ) : (
           <List
@@ -161,10 +167,10 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
             dataSource={recentDevlogs}
             renderItem={(devlog) => (
               <List.Item
-                style={{ cursor: 'pointer', padding: '16px 24px' }}
+                className="devlog-list-item"
                 onClick={() => onViewDevlog(devlog)}
                 actions={[
-                  <Text type="secondary" key="date">
+                  <Text type="secondary" key="date" className="devlog-date">
                     {new Date(devlog.updatedAt).toLocaleDateString()}
                   </Text>,
                 ]}
@@ -172,6 +178,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                 <List.Item.Meta
                   avatar={
                     <Avatar
+                      size={40}
                       icon={getStatusIcon(devlog.status)}
                       style={{
                         backgroundColor:
@@ -186,18 +193,22 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                     />
                   }
                   title={
-                    <div>
-                      <Text strong>{devlog.title}</Text>
+                    <div className="devlog-title-section">
+                      <Text strong className="devlog-title-text">
+                        {devlog.title}
+                      </Text>
                       <div className="recent-devlogs-meta">
                         <Tag
                           color={getStatusColor(devlog.status)}
                           icon={getStatusIcon(devlog.status)}
+                          className="devlog-tag"
                         >
                           {devlog.status}
                         </Tag>
                         <Tag
                           color={getPriorityColor(devlog.priority)}
                           icon={getPriorityIcon(devlog.priority)}
+                          className="devlog-tag"
                         >
                           {devlog.priority}
                         </Tag>
@@ -205,7 +216,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                     </div>
                   }
                   description={
-                    <Text type="secondary" ellipsis>
+                    <Text type="secondary" ellipsis className="devlog-description">
                       {devlog.description}
                     </Text>
                   }

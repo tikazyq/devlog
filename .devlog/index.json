@@ -1,5 +1,15 @@
 {
-  "entries": {},
-  "lastId": 1,
+  "entries": {
+    "2": {
+      "filename": "002-fix-web-dashboard-ui-layout-issues.json",
+      "title": "Fix Web Dashboard UI Layout Issues",
+      "status": "done",
+      "type": "feature",
+      "priority": "medium",
+      "createdAt": "2025-06-26T14:26:46.312Z",
+      "updatedAt": "2025-06-26T14:44:17.813Z"
+    }
+  },
+  "lastId": 2,
   "version": "1.0.0"
 }

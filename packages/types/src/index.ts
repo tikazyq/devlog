@@ -233,7 +233,7 @@ export interface DiscoveryResult {
 }
 
 // Storage Configuration Types
-export type StorageStrategy = 'local-sqlite' | 'local-json' | 'git-json' | 'hybrid-git';
+export type StorageType = 'json' | 'sqlite' | 'mysql' | 'postgres';
 
 export type ConflictResolution = 'local-wins' | 'remote-wins' | 'timestamp-wins' | 'interactive';
 
@@ -265,27 +265,13 @@ export interface LocalJsonConfig {
 }
 
 export interface StorageConfig {
-  strategy: StorageStrategy;
+  type: StorageType;
 
-  // Local SQLite storage (existing)
-  sqlite?: {
-    filePath: string;
-    options?: Record<string, any>;
-  };
+  // JSON storage
+  json?: LocalJsonConfig;
 
-  // Local JSON storage (new - simple git-based approach)
-  localJson?: LocalJsonConfig;
-
-  // Git repository storage (deprecated - overly complex)
-  git?: GitStorageConfig;
-
-  // Local cache for hybrid strategy
-  cache?: LocalCacheConfig;
-
-  // Legacy support
-  type?: 'sqlite' | 'postgres' | 'mysql';
+  // Connection support
   connectionString?: string;
-  filePath?: string;
   options?: Record<string, any>;
 }
 

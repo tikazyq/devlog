@@ -8,7 +8,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import * as os from 'os';
-import { EnterpriseIntegration, StorageConfig } from '@devlog/types';
+import type { EnterpriseIntegration, StorageConfig, StorageType } from '@devlog/types';
 
 config({ path: ['.env.local', '.env'] });
 
@@ -85,133 +85,60 @@ export class ConfigurationManager {
    */
   async detectBestStorage(): Promise<StorageConfig> {
     // Check for new storage strategy environment variable
-    if (process.env.DEVLOG_STORAGE_STRATEGY) {
-      const strategy = process.env.DEVLOG_STORAGE_STRATEGY as
-        | 'local-sqlite'
-        | 'local-json'
-        | 'git-json'
-        | 'hybrid-git';
+    if (process.env.DEVLOG_STORAGE_TYPE) {
+      const storageType = process.env.DEVLOG_STORAGE_TYPE as StorageType;
 
-      switch (strategy) {
-        case 'local-json':
+      switch (storageType) {
+        case 'json':
           return {
-            strategy: 'local-json',
-            localJson: {
+            type: storageType,
+            json: {
               directory: process.env.DEVLOG_JSON_DIR || '.devlog',
               filePattern: process.env.DEVLOG_FILE_PATTERN || '{id:03d}-{slug}.json',
             },
           };
 
-        case 'git-json':
-          return {
-            strategy: 'git-json',
-            git: {
-              repository: process.env.DEVLOG_GIT_REPO || '',
-              branch: process.env.DEVLOG_GIT_BRANCH || 'main',
-              credentials: process.env.DEVLOG_GIT_TOKEN
-                ? {
-                    type: 'token',
-                    token: process.env.DEVLOG_GIT_TOKEN,
-                  }
-                : undefined,
-            },
-          };
-
-        case 'hybrid-git':
-          const workspace = await this.getWorkspaceStructure();
-          return {
-            strategy: 'hybrid-git',
-            git: {
-              repository: process.env.DEVLOG_GIT_REPO || '',
-              branch: process.env.DEVLOG_GIT_BRANCH || 'main',
-              credentials: process.env.DEVLOG_GIT_TOKEN
-                ? {
-                    type: 'token',
-                    token: process.env.DEVLOG_GIT_TOKEN,
-                  }
-                : undefined,
-            },
-            cache: {
-              type: 'sqlite',
-              filePath:
-                process.env.DEVLOG_CACHE_PATH ||
-                `${os.homedir()}/.devlog/cache/${path.basename(workspace.workspaceDir)}.db`,
-            },
-          };
-
-        case 'local-sqlite':
-        default:
-          const workspace2 = await this.getWorkspaceStructure();
-          await this.initializeGlobalStructure();
-          await this.initializeWorkspaceStructure(workspace2);
-          return {
-            strategy: 'local-sqlite',
-            sqlite: {
-              filePath: workspace2.dbPath,
-            },
-          };
-      }
-    }
-
-    // Legacy environment variable support for backwards compatibility
-    if (process.env.DATABASE_URL) {
-      const dbUrl = process.env.DATABASE_URL;
-
-      if (dbUrl.startsWith('postgres://') || dbUrl.startsWith('postgresql://')) {
-        return {
-          // Legacy format for backwards compatibility
-          type: 'postgres',
-          connectionString: dbUrl,
-          strategy: 'local-sqlite', // Default strategy
-        };
-      }
-
-      if (dbUrl.startsWith('mysql://')) {
-        return {
-          // Legacy format for backwards compatibility
-          type: 'mysql',
-          connectionString: dbUrl,
-          strategy: 'local-sqlite', // Default strategy
-        };
-      }
-    }
-
-    // Check for specific database preferences (legacy)
-    if (process.env.DEVLOG_STORAGE_TYPE) {
-      const storageType = process.env.DEVLOG_STORAGE_TYPE.toLowerCase();
-
-      switch (storageType) {
         case 'sqlite':
+          const workspace = await this.getWorkspaceStructure();
+          await this.initializeGlobalStructure();
+          await this.initializeWorkspaceStructure(workspace);
           return {
-            // Legacy format for backwards compatibility
-            type: 'sqlite',
-            filePath: process.env.DEVLOG_SQLITE_PATH || ':memory:',
-            strategy: 'local-sqlite', // Default strategy
+            type: storageType,
+            connectionString: workspace.dbPath,
           };
-        case 'postgres':
-        case 'postgresql':
-          return {
-            // Legacy format for backwards compatibility
-            type: 'postgres',
-            connectionString: process.env.DEVLOG_POSTGRES_URL || 'postgresql://localhost/devlog',
-            strategy: 'local-sqlite', // Default strategy
-          };
+
         case 'mysql':
+          if (!process.env.DEVLOG_DATABASE_URL) {
+            throw new Error(
+              'MySQL connection string is required in DEVLOG_DATABASE_URL environment variable',
+            );
+          }
           return {
-            // Legacy format for backwards compatibility
-            type: 'mysql',
-            connectionString: process.env.DEVLOG_MYSQL_URL || 'mysql://localhost/devlog',
-            strategy: 'local-sqlite', // Default strategy
+            type: storageType,
+            connectionString: process.env.DEVLOG_DATABASE_URL,
+          };
+
+        case 'postgres':
+          if (!process.env.DEVLOG_DATABASE_URL) {
+            throw new Error(
+              'PostgreSQL connection string is required in DEVLOG_DATABASE_URL environment variable',
+            );
+          }
+          return {
+            type: storageType,
+            connectionString: process.env.DEVLOG_DATABASE_URL,
           };
       }
     }
 
-    // Default to local-json strategy (git-friendly, zero config)
+    // Default to local-sqlite strategy (git-friendly, zero config)
+    const workspace = await this.getWorkspaceStructure();
+    await this.initializeGlobalStructure();
+    await this.initializeWorkspaceStructure(workspace);
     return {
-      strategy: 'local-json',
-      localJson: {
-        directory: '.devlog',
-        filePattern: '{id:03d}-{slug}.json',
+      type: 'json',
+      json: {
+        directory: workspace.dbPath,
       },
     };
   }

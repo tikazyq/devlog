@@ -17,8 +17,8 @@ describe('Integer ID System', () => {
       workspaceRoot: tempDir,
       useIntegerIds: true,
       storage: {
-        strategy: 'local-json',
-        localJson: {
+        type: 'local-json',
+        json: {
           directory: '.devlog',
           filePattern: '{id:03d}-{slug}.json',
         },
@@ -92,8 +92,8 @@ describe('Integer ID System', () => {
       workspaceRoot: tempDir,
       useIntegerIds: false, // This should throw an error now
       storage: {
-        strategy: 'local-json',
-        localJson: {
+        type: 'local-json',
+        json: {
           directory: '.devlog',
           filePattern: '{id:03d}-{slug}.json',
         },

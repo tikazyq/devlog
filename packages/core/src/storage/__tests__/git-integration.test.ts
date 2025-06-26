@@ -11,7 +11,7 @@ describe('Git Storage Integration', () => {
   beforeEach(async () => {
     // Create a git storage provider with mock git config
     const config: StorageConfig = {
-      strategy: 'git-json',
+      type: 'git-json',
       git: {
         repository: '/tmp/test-devlog-repo',
         branch: 'main',

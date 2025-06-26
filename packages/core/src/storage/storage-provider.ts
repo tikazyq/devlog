@@ -108,65 +108,30 @@ export interface StorageProvider {
  */
 export class StorageProviderFactory {
   static async create(config: StorageConfig): Promise<StorageProvider> {
-    // Handle legacy configurations
-    if (config.type) {
-      switch (config.type) {
-        case 'sqlite':
-          const { SQLiteStorageProvider } = await import('./sqlite-storage.js');
-          return new SQLiteStorageProvider(config.filePath || ':memory:', config.options);
-
-        case 'postgres':
-          const { PostgreSQLStorageProvider } = await import('./postgresql-storage.js');
-          return new PostgreSQLStorageProvider(config.connectionString!, config.options);
-
-        case 'mysql':
-          const { MySQLStorageProvider } = await import('./mysql-storage.js');
-          return new MySQLStorageProvider(config.connectionString!, config.options);
-
-        default:
-          throw new Error(`Unsupported storage type: ${config.type}`);
-      }
-    }
-
     // Handle new storage strategies
-    switch (config.strategy) {
-      case 'local-sqlite':
+    switch (config.type) {
+      case 'sqlite':
         const { SQLiteStorageProvider } = await import('./sqlite-storage.js');
-        return new SQLiteStorageProvider(
-          config.sqlite?.filePath || ':memory:',
-          config.sqlite?.options,
-        );
+        return new SQLiteStorageProvider(config.connectionString || ':memory:', config.options);
 
-      case 'local-json':
+      case 'postgres':
+        const { PostgreSQLStorageProvider } = await import('./postgresql-storage.js');
+        return new PostgreSQLStorageProvider(config.connectionString!, config.options);
+
+      case 'mysql':
+        const { MySQLStorageProvider } = await import('./mysql-storage.js');
+        return new MySQLStorageProvider(config.connectionString!, config.options);
+
+      case 'json':
+      default:
         const { LocalJsonStorageProvider } = await import('./local-json-storage.js');
         const projectRoot = await findProjectRoot();
         if (!projectRoot) {
-          throw new Error('Could not detect project root. Please run from within a project directory or specify the path explicitly.');
+          throw new Error(
+            'Could not detect project root. Please run from within a project directory or specify the path explicitly.',
+          );
         }
-        return new LocalJsonStorageProvider(
-          projectRoot,
-          config.localJson || {},
-        );
-
-      case 'git-json':
-        if (!config.git) {
-          throw new Error('Git configuration is required for git-json strategy');
-        }
-        const { GitStorageProvider } = await import('./git-storage-provider.js');
-        return new GitStorageProvider(config.git);
-
-      case 'hybrid-git':
-        if (!config.git) {
-          throw new Error('Git configuration is required for hybrid-git strategy');
-        }
-        if (!config.cache) {
-          throw new Error('Cache configuration is required for hybrid-git strategy');
-        }
-        const { HybridStorageProvider } = await import('./hybrid-storage-provider.js');
-        return new HybridStorageProvider(config.git, config.cache);
-
-      default:
-        throw new Error(`Unsupported storage strategy: ${config.strategy}`);
+        return new LocalJsonStorageProvider(projectRoot, config.json || {});
     }
   }
 }
@@ -233,7 +198,7 @@ export async function findProjectRoot(startPath: string = process.cwd()): Promis
       // Look ahead to see if there's a monorepo indicator in parent directories
       let tempDir = path.dirname(currentDir);
       let foundMonorepoAbove = false;
-      
+
       while (tempDir !== path.dirname(tempDir)) {
         for (const indicator of strongIndicators) {
           try {
@@ -247,7 +212,7 @@ export async function findProjectRoot(startPath: string = process.cwd()): Promis
         if (foundMonorepoAbove) break;
         tempDir = path.dirname(tempDir);
       }
-      
+
       // If no monorepo found above, use git root
       if (!foundMonorepoAbove) {
         return gitRoot;

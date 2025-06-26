@@ -19,8 +19,8 @@ describe('DevlogManager', () => {
       workspaceRoot: testWorkspace,
       useIntegerIds: false, // Use string IDs for backward compatibility in tests
       storage: {
-        strategy: 'local-json',
-        localJson: {
+        type: 'local-json',
+        json: {
           directory: '.devlog',
           filePattern: '{id:03d}-{slug}.json',
         },

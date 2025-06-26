@@ -62,12 +62,12 @@ test('ConfigurationManager detects best storage as local-json by default', async
 
   const storageConfig = await configManager.detectBestStorage();
 
-  expect(storageConfig.strategy).toBe('local-json');
-  expect(storageConfig.localJson).toBeDefined();
+  expect(storageConfig.type).toBe('local-json');
+  expect(storageConfig.json).toBeDefined();
 
   // Verify the default configuration
-  expect(storageConfig.localJson!.directory).toBe('.devlog');
-  expect(storageConfig.localJson!.filePattern).toBe('{id:03d}-{slug}.json');
+  expect(storageConfig.json!.directory).toBe('.devlog');
+  expect(storageConfig.json!.filePattern).toBe('{id:03d}-{slug}.json');
 });
 
 test('ConfigurationManager uses local-json storage without global structure', async () => {
@@ -76,10 +76,10 @@ test('ConfigurationManager uses local-json storage without global structure', as
   // This should detect local-json storage without needing global structure
   const storageConfig = await configManager.detectBestStorage();
 
-  expect(storageConfig.strategy).toBe('local-json');
+  expect(storageConfig.type).toBe('local-json');
 
   // Local JSON storage doesn't require global ~/.devlog structure
   // It uses the project-local .devlog directory instead
-  expect(storageConfig.localJson).toBeDefined();
-  expect(storageConfig.localJson!.directory).toBe('.devlog');
+  expect(storageConfig.json).toBeDefined();
+  expect(storageConfig.json!.directory).toBe('.devlog');
 });

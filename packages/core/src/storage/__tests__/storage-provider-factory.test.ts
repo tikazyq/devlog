@@ -35,7 +35,7 @@ describe('StorageProviderFactory', () => {
   describe('new storage strategies', () => {
     it('should create local-sqlite storage provider', async () => {
       const config: StorageConfig = {
-        strategy: 'local-sqlite',
+        type: 'local-sqlite',
         sqlite: {
           filePath: '/tmp/test.db',
         },
@@ -48,7 +48,7 @@ describe('StorageProviderFactory', () => {
 
     it('should create git-json storage provider', async () => {
       const config: StorageConfig = {
-        strategy: 'git-json',
+        type: 'git-json',
         git: {
           repository: 'test/repo',
           branch: 'main',
@@ -62,7 +62,7 @@ describe('StorageProviderFactory', () => {
 
     it('should create hybrid-git storage provider', async () => {
       const config: StorageConfig = {
-        strategy: 'hybrid-git',
+        type: 'hybrid-git',
         git: {
           repository: 'test/repo',
           branch: 'main',
@@ -84,7 +84,7 @@ describe('StorageProviderFactory', () => {
       const config: StorageConfig = {
         type: 'sqlite',
         filePath: '/tmp/legacy.db',
-        strategy: 'local-sqlite',
+        type: 'local-sqlite',
       };
 
       const provider = await StorageProviderFactory.create(config);
@@ -94,7 +94,7 @@ describe('StorageProviderFactory', () => {
     it('should throw error for unsupported legacy types', async () => {
       const config: StorageConfig = {
         type: 'unsupported' as any,
-        strategy: 'local-sqlite',
+        type: 'local-sqlite',
       };
 
       await expect(StorageProviderFactory.create(config)).rejects.toThrow(
@@ -104,7 +104,7 @@ describe('StorageProviderFactory', () => {
 
     it('should throw error for unsupported strategies', async () => {
       const config: StorageConfig = {
-        strategy: 'unsupported' as any,
+        type: 'unsupported' as any,
       };
 
       await expect(StorageProviderFactory.create(config)).rejects.toThrow(
@@ -114,7 +114,7 @@ describe('StorageProviderFactory', () => {
 
     it('should throw error for git-json without git config', async () => {
       const config: StorageConfig = {
-        strategy: 'git-json',
+        type: 'git-json',
         // Missing git configuration
       };
 
@@ -123,7 +123,7 @@ describe('StorageProviderFactory', () => {
 
     it('should throw error for hybrid-git without cache config', async () => {
       const config: StorageConfig = {
-        strategy: 'hybrid-git',
+        type: 'hybrid-git',
         git: {
           repository: 'test/repo',
         },

@@ -7,7 +7,7 @@ import * as dotenv from 'dotenv';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import type { StorageConfig } from '@devlog/types';
-import { getWorkspaceRoot } from './storage/utils';
+import { getWorkspaceRoot } from './utils/storage.js';
 
 dotenv.config({ path: ['.env.local', '.env'] });
 

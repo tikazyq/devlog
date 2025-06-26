@@ -373,18 +373,45 @@ To use this server with an MCP client, add it to your client configuration:
 
 ## Development
 
+This monorepo provides an enhanced development experience with automatic dependency building. When you run development scripts for application packages, the base packages (`@devlog/types` and `@devlog/core`) automatically rebuild when their source files change.
+
+### Quick Start
+
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
-# Build the project
-npm run build
+# Build all packages
+pnpm build
 
-# Run in development mode
-npm run dev
+# Start MCP server with auto-building dependencies
+pnpm dev:mcp
 
-# Start the server
-npm start
+# Start web app with auto-building dependencies  
+pnpm dev:web
+```
+
+### Enhanced Dev Scripts
+
+The following commands automatically watch and rebuild dependencies:
+
+- `pnpm dev:mcp` - MCP server with auto-building `types` and `core`
+- `pnpm dev:web` - Web app with auto-building `types` and `core`
+
+For more details, see [Development Guide](docs/guides/DEVELOPMENT.md).
+
+### Legacy Commands
+
+```bash
+# Build individual packages
+pnpm build:types
+pnpm build:core  
+pnpm build:mcp
+pnpm build:web
+
+# Run individual packages (no dependency watching)
+pnpm dev          # MCP server only
+pnpm --filter @devlog/web dev  # Web app only
 ```
 
 ## License

@@ -17,9 +17,6 @@ export { JsonStorageProvider } from './storage/json-storage.js';
 export { PostgreSQLStorageProvider } from './storage/postgresql-storage.js';
 export { MySQLStorageProvider } from './storage/mysql-storage.js';
 export { EnterpriseSync } from './integrations/enterprise-sync.js';
-export { DevlogUtils } from './utils/devlog-utils.js';
-export { GitOperations } from './utils/git-operations.js';
-export { ConflictResolver } from './utils/conflict-resolver.js';
 
 // Re-export types for convenience
 export type {
@@ -47,4 +44,4 @@ export type {
 } from '@devlog/types';
 
 // Utilities
-export * from './storage/utils';
+export * from './utils/storage.js';

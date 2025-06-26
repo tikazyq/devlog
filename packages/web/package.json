@@ -5,6 +5,9 @@
   "main": "./next.config.js",
   "scripts": {
     "dev": "next dev",
+    "dev:full": "concurrently --names \"TYPES,CORE,WEB\" --prefix-colors \"cyan,green,blue\" \"pnpm --filter @devlog/types dev\" \"pnpm --filter @devlog/core dev\" \"pnpm dev\"",
+    "dev:server": "next dev --port 3000",
+    "dev:client": "next dev --port 3001",
     "build": "next build",
     "start": "next start",
     "preview": "next start",
@@ -26,6 +29,7 @@
     "@types/ws": "^8.5.10",
     "antd": "^5.12.8",
     "autoprefixer": "^10.4.17",
+    "concurrently": "9.2.0",
     "date-fns": "^3.2.0",
     "lucide-react": "^0.323.0",
     "postcss": "^8.4.33",

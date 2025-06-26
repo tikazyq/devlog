@@ -14,10 +14,10 @@ import type {
   DevlogType,
   JsonConfig,
 } from '@devlog/types';
-import { StorageProvider } from './storage-provider';
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import { getDevlogDirFromJsonConfig } from './utils';
+import { StorageProvider } from './storage-provider.js';
+import { getDevlogDirFromJsonConfig } from '../utils/storage.js';
 
 export class JsonStorageProvider implements StorageProvider {
   private readonly config: Required<JsonConfig>;

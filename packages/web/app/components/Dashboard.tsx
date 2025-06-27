@@ -17,16 +17,13 @@ import {
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
-  ExclamationCircleOutlined,
   FileTextOutlined,
-  MinusCircleOutlined,
   PlusOutlined,
-  StopOutlined,
   SyncOutlined,
-  WarningOutlined,
 } from '@ant-design/icons';
 import { DevlogEntry, DevlogStats } from '@devlog/types';
 import { useRouter } from 'next/navigation';
+import { getStatusColor, getStatusIcon, getPriorityColor, getPriorityIcon } from '../lib/devlog-ui-utils';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -38,66 +35,6 @@ interface DashboardProps {
 
 export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps) {
   const router = useRouter();
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'done':
-        return 'success';
-      case 'in-progress':
-        return 'processing';
-      case 'blocked':
-        return 'error';
-      case 'todo':
-        return 'default';
-      default:
-        return 'default';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'done':
-        return <CheckCircleOutlined />;
-      case 'in-progress':
-        return <SyncOutlined spin />;
-      case 'blocked':
-        return <StopOutlined />;
-      case 'todo':
-        return <ClockCircleOutlined />;
-      default:
-        return <MinusCircleOutlined />;
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'critical':
-        return 'red';
-      case 'high':
-        return 'orange';
-      case 'medium':
-        return 'gold';
-      case 'low':
-        return 'green';
-      default:
-        return 'default';
-    }
-  };
-
-  const getPriorityIcon = (priority: string) => {
-    switch (priority) {
-      case 'critical':
-        return <ExclamationCircleOutlined />;
-      case 'high':
-        return <WarningOutlined />;
-      case 'medium':
-        return <MinusCircleOutlined />;
-      case 'low':
-        return <CheckCircleOutlined />;
-      default:
-        return <MinusCircleOutlined />;
-    }
-  };
 
   return (
     <div className="flex flex-col h-full w-full overflow-hidden">

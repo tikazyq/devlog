@@ -3,83 +3,17 @@
 import React from 'react';
 import { Button, Card, Empty, Popconfirm, Space, Spin, Table, Tag, Typography } from 'antd';
 import {
-  CheckCircleOutlined,
-  ClockCircleOutlined,
   DeleteOutlined,
-  ExclamationCircleOutlined,
   EyeOutlined,
-  MinusCircleOutlined,
-  StopOutlined,
-  SyncOutlined,
-  WarningOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { DevlogEntry, DevlogId, DevlogListProps } from '@devlog/types';
+import { getStatusColor, getStatusIcon, getPriorityColor, getPriorityIcon } from '../lib/devlog-ui-utils';
 import './styles.css';
 
 const { Title, Text } = Typography;
 
 export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: DevlogListProps) {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'done':
-        return 'success';
-      case 'in-progress':
-        return 'processing';
-      case 'blocked':
-        return 'error';
-      case 'todo':
-        return 'default';
-      default:
-        return 'default';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'done':
-        return <CheckCircleOutlined />;
-      case 'in-progress':
-        return <SyncOutlined spin />;
-      case 'blocked':
-        return <StopOutlined />;
-      case 'todo':
-        return <ClockCircleOutlined />;
-      default:
-        return <MinusCircleOutlined />;
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'critical':
-        return 'red';
-      case 'high':
-        return 'orange';
-      case 'medium':
-        return 'gold';
-      case 'low':
-        return 'green';
-      default:
-        return 'default';
-    }
-  };
-
-  const getPriorityIcon = (priority: string) => {
-    switch (priority) {
-      case 'critical':
-        return <ExclamationCircleOutlined />;
-      case 'high':
-        return <WarningOutlined />;
-      case 'medium':
-        return <MinusCircleOutlined />;
-      case 'low':
-        return <CheckCircleOutlined />;
-      default:
-        return <MinusCircleOutlined />;
-    }
-  };
-
   const columns: ColumnsType<DevlogEntry> = [
     {
       title: 'Title',

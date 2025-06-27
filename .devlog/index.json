@@ -84,11 +84,11 @@
     "11": {
       "filename": "011-add-support-for-all-entrystatus-values-in-dashboar.json",
       "title": "Add support for all EntryStatus values in Dashboard statistics and UI utilities",
-      "status": "todo",
+      "status": "done",
       "type": "feature",
       "priority": "medium",
       "createdAt": "2025-06-27T09:01:42.931Z",
-      "updatedAt": "2025-06-27T09:01:42.931Z"
+      "updatedAt": "2025-06-27T09:25:45.662Z"
     }
   },
   "lastId": 11,

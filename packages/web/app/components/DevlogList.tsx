@@ -14,17 +14,10 @@ import {
   WarningOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import { DevlogEntry, DevlogId } from '@devlog/types';
+import { DevlogEntry, DevlogId, DevlogListProps } from '@devlog/types';
 import './styles.css';
 
 const { Title, Text } = Typography;
-
-interface DevlogListProps {
-  devlogs: DevlogEntry[];
-  loading: boolean;
-  onViewDevlog: (devlog: DevlogEntry) => void;
-  onDeleteDevlog: (id: DevlogId) => void;
-}
 
 export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: DevlogListProps) {
   const getStatusColor = (status: string) => {

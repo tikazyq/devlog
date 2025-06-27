@@ -3,8 +3,8 @@
  */
 
 import * as crypto from 'crypto';
-import { type DevlogConfig, DevlogManager } from '@devlog/core';
-import { CreateDevlogRequest, DevlogStatus, DevlogType, UpdateDevlogRequest } from '@devlog/types';
+import { DevlogManager } from '@devlog/core';
+import { CreateDevlogRequest, DevlogStatus, DevlogType, UpdateDevlogRequest, DevlogConfig } from '@devlog/types';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 export class MCPDevlogAdapter {

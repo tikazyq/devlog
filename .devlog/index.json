@@ -44,8 +44,26 @@
       "priority": "medium",
       "createdAt": "2025-06-26T15:15:39.185Z",
       "updatedAt": "2025-06-26T15:27:03.117Z"
+    },
+    "7": {
+      "filename": "007-optimize-ui-display-for-acceptance-criteria-and-ai.json",
+      "title": "Optimize UI display for Acceptance Criteria and AI Context lists in devlog details page",
+      "status": "testing",
+      "type": "feature",
+      "priority": "medium",
+      "createdAt": "2025-06-27T02:47:48.981Z",
+      "updatedAt": "2025-06-27T03:09:08.532Z"
+    },
+    "8": {
+      "filename": "008-centralize-all-typescript-types-and-interfaces-in-.json",
+      "title": "Centralize all TypeScript types and interfaces in @devlog/types package",
+      "status": "done",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-06-27T03:19:26.752Z",
+      "updatedAt": "2025-06-27T05:12:55.413Z"
     }
   },
-  "lastId": 6,
+  "lastId": 8,
   "version": "1.0.0"
 }

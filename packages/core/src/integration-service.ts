@@ -2,20 +2,7 @@
  * Integration service that handles synchronization between local storage and external systems
  */
 
-import { DevlogEntry } from '@devlog/types';
-
-export interface ConflictData {
-  localChanges: Partial<DevlogEntry>;
-  externalChanges: Partial<DevlogEntry>;
-  conflictFields: string[];
-}
-
-export interface SyncStatus {
-  status: 'synced' | 'pending' | 'failed' | 'conflict';
-  lastSyncAt?: string;
-  errorMessage?: string;
-  conflictData?: ConflictData;
-}
+import { DevlogEntry, ConflictData, SyncStatus } from '@devlog/types';
 
 export class IntegrationService {
   private backgroundSyncTimer?: NodeJS.Timeout;

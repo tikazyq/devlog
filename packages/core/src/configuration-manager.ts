@@ -6,17 +6,10 @@
 import * as dotenv from 'dotenv';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import type { StorageConfig } from '@devlog/types';
+import type { StorageConfig, DevlogConfig } from '@devlog/types';
 import { getWorkspaceRoot } from './utils/storage.js';
 
 dotenv.config({ path: ['.env.local', '.env'] });
-
-export interface DevlogConfig {
-  storage: StorageConfig;
-  // TODO: Uncomment when integrations are implemented
-  // integrations?: EnterpriseIntegration;
-  // syncStrategy?: SyncStrategy;
-}
 
 export class ConfigurationManager {
   private workspaceRoot: string | null = null;

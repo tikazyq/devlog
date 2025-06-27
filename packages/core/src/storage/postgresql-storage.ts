@@ -3,7 +3,7 @@
  */
 
 import { DevlogEntry, DevlogFilter, DevlogId, DevlogStats } from '@devlog/types';
-import { StorageProvider } from './storage-provider.js';
+import { StorageProvider } from '@devlog/types';
 
 export class PostgreSQLStorageProvider implements StorageProvider {
   private connectionString: string;
@@ -246,11 +246,18 @@ export class PostgreSQLStorageProvider implements StorageProvider {
     };
   }
 
-  async dispose(): Promise<void> {
+  async cleanup(): Promise<void> {
     if (this.client) {
       await this.client.end();
       this.client = null;
     }
+  }
+
+  async getNextId(): Promise<DevlogId> {
+    const result = await this.client.query(
+      'SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM devlog_entries'
+    );
+    return result.rows[0].next_id;
   }
 
   isRemoteStorage(): boolean {

@@ -11,7 +11,7 @@ import {
   DevlogStatus,
   DevlogType,
 } from '@devlog/types';
-import { StorageProvider } from './storage-provider.js';
+import { StorageProvider } from '@devlog/types';
 
 export class SQLiteStorageProvider implements StorageProvider {
   private db: any = null;
@@ -355,7 +355,7 @@ export class SQLiteStorageProvider implements StorageProvider {
     };
   }
 
-  async dispose(): Promise<void> {
+  async cleanup(): Promise<void> {
     console.log(`[SQLiteStorage] Disposing database connection`);
     if (this.db) {
       try {
@@ -368,6 +368,12 @@ export class SQLiteStorageProvider implements StorageProvider {
     } else {
       console.log(`[SQLiteStorage] No database connection to dispose`);
     }
+  }
+
+  async getNextId(): Promise<DevlogId> {
+    const stmt = this.db.prepare('SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM devlog_entries');
+    const result = stmt.get();
+    return (result as any).next_id;
   }
 
   isRemoteStorage(): boolean {

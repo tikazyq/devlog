@@ -5,10 +5,12 @@ import {
   Alert,
   Button,
   Card,
+  Checkbox,
   Col,
   Divider,
   Form,
   Input,
+  List,
   Popconfirm,
   Row,
   Select,
@@ -21,6 +23,7 @@ import {
   ArrowLeftOutlined,
   BookOutlined,
   BugOutlined,
+  BulbOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
   CloseOutlined,
@@ -29,25 +32,20 @@ import {
   ExclamationCircleOutlined,
   InfoCircleOutlined,
   MinusCircleOutlined,
+  QuestionCircleOutlined,
+  RightOutlined,
   SaveOutlined,
   StopOutlined,
   SyncOutlined,
   ToolOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
-import { DevlogEntry } from '@devlog/types';
+import { DevlogEntry, DevlogDetailsProps } from '@devlog/types';
 import { MarkdownRenderer } from './MarkdownRenderer';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
-
-interface DevlogDetailsProps {
-  devlog: DevlogEntry;
-  onUpdate: (data: any) => void;
-  onDelete: () => void;
-  onBack: () => void;
-}
 
 export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDetailsProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -444,13 +442,17 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
               <div style={{ marginBottom: '24px' }}>
                 <Title level={4}>Acceptance Criteria</Title>
                 <Card size="small">
-                  <ul style={{ paddingLeft: '20px', margin: 0 }}>
-                    {devlog.context.acceptanceCriteria.map((criteria, index) => (
-                      <li key={index} style={{ marginBottom: '8px' }}>
-                        <Text>{criteria}</Text>
-                      </li>
-                    ))}
-                  </ul>
+                  <List
+                    dataSource={devlog.context.acceptanceCriteria}
+                    renderItem={(criteria, index) => (
+                      <List.Item style={{ padding: '8px 0', border: 'none' }}>
+                        <Space align="start">
+                          <Checkbox disabled checked={false} />
+                          <Text>{criteria}</Text>
+                        </Space>
+                      </List.Item>
+                    )}
+                  />
                 </Card>
               </div>
             )}
@@ -578,39 +580,57 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
                   {devlog.aiContext.keyInsights && devlog.aiContext.keyInsights.length > 0 && (
                     <div style={{ marginBottom: '16px' }}>
                       <Text strong>Key Insights:</Text>
-                      <ul style={{ paddingLeft: '20px', marginTop: '8px' }}>
-                        {devlog.aiContext.keyInsights.map((insight, index) => (
-                          <li key={index} style={{ marginBottom: '4px' }}>
-                            <Text>{insight}</Text>
-                          </li>
-                        ))}
-                      </ul>
+                      <List
+                        size="small"
+                        style={{ marginTop: '8px' }}
+                        dataSource={devlog.aiContext.keyInsights}
+                        renderItem={(insight, index) => (
+                          <List.Item style={{ padding: '4px 0', border: 'none' }}>
+                            <Space align="start">
+                              <BulbOutlined style={{ color: '#faad14', marginTop: '2px' }} />
+                              <Text>{insight}</Text>
+                            </Space>
+                          </List.Item>
+                        )}
+                      />
                     </div>
                   )}
 
                   {devlog.aiContext.openQuestions && devlog.aiContext.openQuestions.length > 0 && (
                     <div style={{ marginBottom: '16px' }}>
                       <Text strong>Open Questions:</Text>
-                      <ul style={{ paddingLeft: '20px', marginTop: '8px' }}>
-                        {devlog.aiContext.openQuestions.map((question, index) => (
-                          <li key={index} style={{ marginBottom: '4px' }}>
-                            <Text>{question}</Text>
-                          </li>
-                        ))}
-                      </ul>
+                      <List
+                        size="small"
+                        style={{ marginTop: '8px' }}
+                        dataSource={devlog.aiContext.openQuestions}
+                        renderItem={(question, index) => (
+                          <List.Item style={{ padding: '4px 0', border: 'none' }}>
+                            <Space align="start">
+                              <QuestionCircleOutlined style={{ color: '#f5222d', marginTop: '2px' }} />
+                              <Text>{question}</Text>
+                            </Space>
+                          </List.Item>
+                        )}
+                      />
                     </div>
                   )}
 
                   {devlog.aiContext.suggestedNextSteps && devlog.aiContext.suggestedNextSteps.length > 0 && (
                     <div style={{ marginBottom: '16px' }}>
                       <Text strong>Suggested Next Steps:</Text>
-                      <ul style={{ paddingLeft: '20px', marginTop: '8px' }}>
-                        {devlog.aiContext.suggestedNextSteps.map((step, index) => (
-                          <li key={index} style={{ marginBottom: '4px' }}>
-                            <Text>{step}</Text>
-                          </li>
-                        ))}
-                      </ul>
+                      <List
+                        size="small"
+                        style={{ marginTop: '8px' }}
+                        dataSource={devlog.aiContext.suggestedNextSteps}
+                        renderItem={(step, index) => (
+                          <List.Item style={{ padding: '4px 0', border: 'none' }}>
+                            <Space align="start">
+                              <RightOutlined style={{ color: '#52c41a', marginTop: '2px' }} />
+                              <Text>{step}</Text>
+                            </Space>
+                          </List.Item>
+                        )}
+                      />
                     </div>
                   )}
 

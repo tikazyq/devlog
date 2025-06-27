@@ -13,10 +13,12 @@ import type {
   DevlogStatus,
   DevlogType,
   JsonConfig,
+  DevlogIndex,
+  DevlogIndexEntry,
+  StorageProvider,
 } from '@devlog/types';
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import { StorageProvider } from './storage-provider.js';
 import { getDevlogDirFromJsonConfig } from '../utils/storage.js';
 
 export class JsonStorageProvider implements StorageProvider {
@@ -203,7 +205,7 @@ export class JsonStorageProvider implements StorageProvider {
     };
   }
 
-  async dispose(): Promise<void> {
+  async cleanup(): Promise<void> {
     // No cleanup needed for file-based storage
   }
 
@@ -265,20 +267,4 @@ temp/
 
     return this.config.filePattern.replace('{id:auto}', paddedId).replace('{slug}', slug);
   }
-}
-
-interface DevlogIndex {
-  entries: Record<string, DevlogIndexEntry>;
-  lastId: number;
-  version: string;
-}
-
-interface DevlogIndexEntry {
-  filename: string;
-  title: string;
-  status: DevlogStatus;
-  type: DevlogType;
-  priority: DevlogPriority;
-  createdAt: string;
-  updatedAt: string;
 }

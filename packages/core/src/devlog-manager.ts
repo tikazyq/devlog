@@ -16,37 +16,14 @@ import type {
   EnterpriseIntegration,
   StorageConfig,
   UpdateDevlogRequest,
+  DevlogManagerOptions,
+  DiscoverDevlogsRequest,
+  DiscoveredDevlogEntry,
+  DiscoveryResult,
+  StorageProvider,
 } from '@devlog/types';
-import { StorageProvider, StorageProviderFactory } from './storage/storage-provider.js';
+import { StorageProviderFactory } from './storage/storage-provider.js';
 import { ConfigurationManager } from './configuration-manager.js';
-
-// Discovery-related interfaces
-export interface DiscoverDevlogsRequest {
-  workDescription: string;
-  workType: DevlogType;
-  keywords?: string[];
-  scope?: string;
-}
-
-export interface DiscoveredDevlogEntry {
-  entry: DevlogEntry;
-  relevance: 'direct-text-match' | 'same-type' | 'keyword-in-notes';
-  matchedTerms: string[];
-}
-
-export interface DiscoveryResult {
-  relatedEntries: DiscoveredDevlogEntry[];
-  activeCount: number;
-  recommendation: string;
-  searchParameters: DiscoverDevlogsRequest;
-}
-
-export interface DevlogManagerOptions {
-  workspaceRoot?: string;
-  storage?: StorageConfig;
-  // integrations?: EnterpriseIntegration;
-  // syncStrategy?: SyncStrategy;
-}
 
 export class DevlogManager {
   private storageProvider!: StorageProvider;
@@ -333,7 +310,7 @@ export class DevlogManager {
    */
   async dispose(): Promise<void> {
     if (this.storageProvider) {
-      await this.storageProvider.dispose();
+      await this.storageProvider.cleanup();
     }
   }
 

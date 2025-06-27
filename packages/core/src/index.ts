@@ -1,17 +1,13 @@
 export {
   DevlogManager,
-  type DevlogManagerOptions,
-  type DiscoverDevlogsRequest,
-  type DiscoveredDevlogEntry,
-  type DiscoveryResult,
 } from './devlog-manager.js';
-export { ConfigurationManager, type DevlogConfig } from './configuration-manager.js';
+export { ConfigurationManager } from './configuration-manager.js';
 
 // Integration Service
-export { IntegrationService, type SyncStatus, type ConflictData } from './integration-service.js';
+export { IntegrationService } from './integration-service.js';
 
 // Storage Providers
-export { StorageProviderFactory, type StorageProvider } from './storage/storage-provider.js';
+export { StorageProviderFactory } from './storage/storage-provider.js';
 export { SQLiteStorageProvider } from './storage/sqlite-storage.js';
 export { JsonStorageProvider } from './storage/json-storage.js';
 export { PostgreSQLStorageProvider } from './storage/postgresql-storage.js';

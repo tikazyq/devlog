@@ -123,6 +123,32 @@ export interface DevlogStats {
   averageCompletionTime?: number;
 }
 
+// Time series data for dashboard charts
+export interface TimeSeriesDataPoint {
+  date: string; // ISO date string (YYYY-MM-DD)
+  created: number;
+  completed: number;
+  inProgress: number;
+  review: number;
+  testing: number;
+  todo: number;
+  archived: number;
+}
+
+export interface TimeSeriesStats {
+  dataPoints: TimeSeriesDataPoint[];
+  dateRange: {
+    from: string;
+    to: string;
+  };
+}
+
+export interface TimeSeriesRequest {
+  days?: number; // Number of days to look back (default: 30)
+  from?: string; // Start date (ISO string)
+  to?: string; // End date (ISO string)
+}
+
 // AI Agent Context Enhancement
 export interface AIContext {
   // Summary of the current understanding for AI agents

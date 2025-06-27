@@ -21,6 +21,9 @@ import {
   Line,
   AreaChart,
   Area,
+  PieChart,
+  Pie,
+  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -28,7 +31,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { DevlogEntry, DevlogStats } from '@devlog/types';
+import { DevlogEntry, DevlogStats, TimeSeriesStats } from '@devlog/types';
 import { useRouter } from 'next/navigation';
 import { getStatusColor, getStatusIcon, getPriorityColor, getPriorityIcon } from '../lib/devlog-ui-utils';
 
@@ -42,39 +45,47 @@ interface DashboardProps {
 
 export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps) {
   const router = useRouter();
+  const [timeSeriesData, setTimeSeriesData] = React.useState<TimeSeriesStats | null>(null);
+  const [isLoadingTimeSeries, setIsLoadingTimeSeries] = React.useState(true);
 
-  // Mock time series data - this would come from the backend in a real implementation
-  const mockTimeSeriesData = React.useMemo(() => {
-    const now = new Date();
-    const data = [];
-    
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(now);
-      date.setDate(date.getDate() - i);
-      
-      // Generate realistic mock data
-      const baseCreated = Math.floor(Math.random() * 3) + 1;
-      const baseCompleted = Math.floor(Math.random() * 2) + 1;
-      
-      data.push({
-        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        fullDate: date.toISOString().split('T')[0],
-        created: baseCreated,
-        completed: baseCompleted,
-        inProgress: Math.floor(Math.random() * 4) + 2,
-        review: Math.floor(Math.random() * 2),
-        testing: Math.floor(Math.random() * 2),
-        todo: Math.floor(Math.random() * 3) + 1,
-      });
+  // Fetch time series data from the API
+  React.useEffect(() => {
+    async function fetchTimeSeriesData() {
+      try {
+        setIsLoadingTimeSeries(true);
+        const response = await fetch('/api/devlogs/stats/timeseries?days=30');
+        if (response.ok) {
+          const data: TimeSeriesStats = await response.json();
+          setTimeSeriesData(data);
+        } else {
+          console.error('Failed to fetch time series data');
+        }
+      } catch (error) {
+        console.error('Error fetching time series data:', error);
+      } finally {
+        setIsLoadingTimeSeries(false);
+      }
     }
-    
-    return data;
+
+    fetchTimeSeriesData();
   }, []);
 
-  const mockStatusDistributionData = React.useMemo(() => {
+  // Format data for charts
+  const chartData = React.useMemo(() => {
+    if (!timeSeriesData) return [];
+    
+    return timeSeriesData.dataPoints.map(point => ({
+      ...point,
+      date: new Date(point.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      fullDate: point.date,
+    }));
+  }, [timeSeriesData]);
+
+  // Format pie chart data for current status distribution
+  const pieChartData = React.useMemo(() => {
     if (!stats) return [];
     
-    return [
+    const statusData = [
       { name: 'Todo', value: stats.byStatus['todo'] || 0, color: '#8c8c8c' },
       { name: 'In Progress', value: stats.byStatus['in-progress'] || 0, color: '#faad14' },
       { name: 'Review', value: stats.byStatus['review'] || 0, color: '#fa8c16' },
@@ -82,6 +93,8 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
       { name: 'Done', value: stats.byStatus['done'] || 0, color: '#52c41a' },
       { name: 'Archived', value: stats.byStatus['archived'] || 0, color: '#595959' },
     ].filter(item => item.value > 0);
+
+    return statusData;
   }, [stats]);
 
   return (
@@ -97,6 +110,10 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
               <div className="stat-compact">
                 <span className="stat-value">{stats.totalEntries}</span>
                 <span className="stat-label">Total</span>
+              </div>
+              <div className="stat-compact">
+                <span className="stat-value todo">{stats.byStatus['todo'] || 0}</span>
+                <span className="stat-label">Todo</span>
               </div>
               <div className="stat-compact">
                 <span className="stat-value in-progress">{stats.byStatus['in-progress'] || 0}</span>
@@ -115,10 +132,6 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                 <span className="stat-label">Completed</span>
               </div>
               <div className="stat-compact">
-                <span className="stat-value todo">{stats.byStatus['todo'] || 0}</span>
-                <span className="stat-label">Todo</span>
-              </div>
-              <div className="stat-compact">
                 <span className="stat-value archived">{stats.byStatus['archived'] || 0}</span>
                 <span className="stat-label">Archived</span>
               </div>
@@ -132,102 +145,110 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
 
       {/* Charts Section */}
       <div className="dashboard-charts-section">
-        <Row gutter={[24, 24]}>
-          <Col xs={24} lg={14}>
-            <Card title="Development Activity (Last 30 Days)" className="chart-card">
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={mockTimeSeriesData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="date" 
-                    fontSize={12}
-                    tickLine={false}
-                  />
-                  <YAxis fontSize={12} tickLine={false} />
-                  <Tooltip 
-                    labelFormatter={(label, payload) => {
-                      const data = payload[0]?.payload;
-                      return data ? data.fullDate : label;
-                    }}
-                  />
-                  <Legend />
-                  <Area 
-                    type="monotone" 
-                    dataKey="created" 
-                    stackId="1" 
-                    stroke="#1890ff" 
-                    fill="#1890ff" 
-                    fillOpacity={0.7}
-                    name="Created"
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="completed" 
-                    stackId="1" 
-                    stroke="#52c41a" 
-                    fill="#52c41a" 
-                    fillOpacity={0.7}
-                    name="Completed"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </Card>
-          </Col>
-          <Col xs={24} lg={10}>
-            <Card title="Status Distribution Trends" className="chart-card">
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={mockTimeSeriesData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="date" 
-                    fontSize={12}
-                    tickLine={false}
-                  />
-                  <YAxis fontSize={12} tickLine={false} />
-                  <Tooltip 
-                    labelFormatter={(label, payload) => {
-                      const data = payload[0]?.payload;
-                      return data ? data.fullDate : label;
-                    }}
-                  />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="inProgress" 
-                    stroke="#faad14" 
-                    strokeWidth={2}
-                    name="In Progress"
-                    dot={{ r: 2 }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="review" 
-                    stroke="#fa8c16" 
-                    strokeWidth={2}
-                    name="Review"
-                    dot={{ r: 2 }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="testing" 
-                    stroke="#13c2c2" 
-                    strokeWidth={2}
-                    name="Testing"
-                    dot={{ r: 2 }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="todo" 
-                    stroke="#8c8c8c" 
-                    strokeWidth={2}
-                    name="Todo"
-                    dot={{ r: 2 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </Card>
-          </Col>
-        </Row>
+        {isLoadingTimeSeries ? (
+          <Row gutter={[24, 24]}>
+            <Col xs={24} lg={14}>
+              <Card title="Development Activity (Last 30 Days)" className="chart-card">
+                <Skeleton active paragraph={{ rows: 8 }} />
+              </Card>
+            </Col>
+            <Col xs={24} lg={10}>
+              <Card title="Current Status Distribution" className="chart-card">
+                <Skeleton active paragraph={{ rows: 8 }} />
+              </Card>
+            </Col>
+          </Row>
+        ) : chartData.length === 0 ? (
+          <Row gutter={[24, 24]}>
+            <Col xs={24}>
+              <Card className="chart-card">
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description="No historical data available yet"
+                />
+              </Card>
+            </Col>
+          </Row>
+        ) : (
+          <Row gutter={[24, 24]}>
+            <Col xs={24} lg={14}>
+              <Card title="Development Activity (Last 30 Days)" className="chart-card">
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      dataKey="date" 
+                      fontSize={12}
+                      tickLine={false}
+                    />
+                    <YAxis fontSize={12} tickLine={false} />
+                    <Tooltip 
+                      labelFormatter={(label, payload) => {
+                        const data = payload[0]?.payload;
+                        return data ? data.fullDate : label;
+                      }}
+                    />
+                    <Legend />
+                    <Area 
+                      type="monotone" 
+                      dataKey="created" 
+                      stackId="1" 
+                      stroke="#1890ff" 
+                      fill="#1890ff" 
+                      fillOpacity={0.7}
+                      name="Created"
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="completed" 
+                      stackId="1" 
+                      stroke="#52c41a" 
+                      fill="#52c41a" 
+                      fillOpacity={0.7}
+                      name="Completed"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </Card>
+            </Col>
+            <Col xs={24} lg={10}>
+              <Card title="Current Status Distribution" className="chart-card">
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={pieChartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={120}
+                      paddingAngle={2}
+                      dataKey="value"
+                      label={({ name, value, percent }) => 
+                        value > 0 ? `${name}: ${value} (${(percent * 100).toFixed(0)}%)` : ''
+                      }
+                      labelLine={false}
+                    >
+                      {pieChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      formatter={(value: number, name: string) => [value, name]}
+                      labelFormatter={() => ''}
+                    />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={36}
+                      formatter={(value: string) => (
+                        <span className="chart-legend-text">{value}</span>
+                      )}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </Card>
+            </Col>
+          </Row>
+        )}
       </div>
 
       {/* Scrollable Content */}

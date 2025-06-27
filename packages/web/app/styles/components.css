@@ -73,6 +73,10 @@
     font-size: 16px;
 }
 
+.chart-legend-text {
+    font-size: 12px;
+}
+
 .dashboard-stats-row {
     margin-bottom: 0;
 }

@@ -1,0 +1,48 @@
+/* Ant Design component customizations */
+
+.ant-layout {
+    min-height: 100vh;
+    background: #fff;
+}
+
+.ant-layout-header {
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    background: #fff;
+    border-bottom: 1px solid #e8e8e8;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    z-index: 10;
+    position: relative;
+}
+
+.ant-layout-sider {
+    background: #fff;
+    border-right: 1px solid #e8e8e8;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
+}
+
+.ant-card {
+    border-radius: 8px;
+    border: 1px solid #e8e8e8;
+}
+
+.ant-card-head {
+    border-bottom: 1px solid #e8e8e8;
+    padding: 16px 24px;
+}
+
+.ant-card-body {
+    padding: 24px;
+}
+
+.ant-statistic-title {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.ant-statistic-content {
+    font-size: 24px;
+    font-weight: 600;
+}

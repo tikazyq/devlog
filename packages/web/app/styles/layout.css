@@ -1,0 +1,39 @@
+/* App layout and navigation styles */
+
+/* App Layout styles */
+.app-layout {
+    height: 100vh;
+}
+
+.app-content {
+    background: #f8f9fa;
+    overflow: auto;
+}
+
+.app-content-wrapper {
+    padding: 24px;
+    min-height: calc(100vh - 64px); /* Adjust for header height */
+}
+
+.page-content {
+    background: transparent;
+}
+
+.app-error-alert {
+    margin-bottom: 24px;
+    border-radius: 8px;
+}
+
+/* Navigation styles */
+.navigation-breadcrumb {
+    margin: 0 0 24px 0;
+}
+
+/* Loading container */
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+    flex-direction: column;
+}

@@ -7,6 +7,7 @@ import { NavigationSidebar } from './components/NavigationSidebar';
 import { NavigationBreadcrumb } from './components/NavigationBreadcrumb';
 import { Header } from './components/Header';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { AppLayoutSkeleton } from './components/AppLayoutSkeleton';
 import { useDevlogs } from './hooks/useDevlogs';
 import { useWebSocket } from './hooks/useWebSocket';
 
@@ -19,9 +20,15 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   const [stats, setStats] = useState<DevlogStats | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mounted, setMounted] = useState(false);
   
   const { devlogs, error, refetch } = useDevlogs();
   const { connected } = useWebSocket();
+
+  // Handle client-side hydration
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Fetch stats
   useEffect(() => {
@@ -39,6 +46,11 @@ export function AppLayout({ children }: AppLayoutProps) {
 
     fetchStats();
   }, [devlogs]);
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return <AppLayoutSkeleton />;
+  }
 
   return (
     <ErrorBoundary>

@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Col, Layout, Menu, Row, Statistic, Typography } from 'antd';
 import { CodeOutlined, DashboardOutlined, FileTextOutlined, PlusOutlined } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 import { DevlogStats } from '@devlog/types';
+import './styles.css';
 
 const { Sider } = Layout;
 const { Title, Text } = Typography;
@@ -17,9 +18,16 @@ interface NavigationSidebarProps {
 export function NavigationSidebar({ stats, collapsed = false }: NavigationSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+
+  // Handle client-side hydration
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Determine selected key based on current pathname
   const getSelectedKey = () => {
+    if (!mounted) return 'dashboard'; // Fallback during SSR
     if (pathname === '/') return 'dashboard';
     if (pathname === '/devlogs') return 'list';
     if (pathname === '/devlogs/create') return 'create';
@@ -46,6 +54,8 @@ export function NavigationSidebar({ stats, collapsed = false }: NavigationSideba
   ];
 
   const handleMenuClick = ({ key }: { key: string }) => {
+    if (!mounted) return;
+    
     switch (key) {
       case 'dashboard':
         router.push('/');
@@ -59,12 +69,42 @@ export function NavigationSidebar({ stats, collapsed = false }: NavigationSideba
     }
   };
 
+  // Don't render menu items until mounted to prevent hydration issues
+  if (!mounted) {
+    return (
+      <Sider
+        width={280}
+        collapsed={collapsed}
+        collapsedWidth={0}
+        breakpoint="md"
+        collapsible={false}
+        trigger={null}
+        style={{
+          background: '#fff',
+          borderRight: '1px solid #f0f0f0',
+        }}
+      >
+        <div className="sidebar-header">
+          <div className="sidebar-brand">
+            <CodeOutlined className="sidebar-brand-icon" />
+            <Title level={3} className="sidebar-brand-title">
+              Devlog
+            </Title>
+          </div>
+          <Text type="secondary">Development Tracker</Text>
+        </div>
+      </Sider>
+    );
+  }
+
   return (
     <Sider
       width={280}
       collapsed={collapsed}
       collapsedWidth={0}
       breakpoint="md"
+      collapsible={false}
+      trigger={null}
       style={{
         background: '#fff',
         borderRight: '1px solid #f0f0f0',

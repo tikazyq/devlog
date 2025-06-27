@@ -48,11 +48,11 @@
     "7": {
       "filename": "007-optimize-ui-display-for-acceptance-criteria-and-ai.json",
       "title": "Optimize UI display for Acceptance Criteria and AI Context lists in devlog details page",
-      "status": "testing",
+      "status": "done",
       "type": "feature",
       "priority": "medium",
       "createdAt": "2025-06-27T02:47:48.981Z",
-      "updatedAt": "2025-06-27T03:09:08.532Z"
+      "updatedAt": "2025-06-27T05:53:54.133Z"
     },
     "8": {
       "filename": "008-centralize-all-typescript-types-and-interfaces-in-.json",
@@ -62,8 +62,26 @@
       "priority": "medium",
       "createdAt": "2025-06-27T03:19:26.752Z",
       "updatedAt": "2025-06-27T05:12:55.413Z"
+    },
+    "9": {
+      "filename": "009-modularize-globals-css-into-focused-css-modules.json",
+      "title": "Modularize globals.css into focused CSS modules",
+      "status": "done",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-06-27T05:48:12.322Z",
+      "updatedAt": "2025-06-27T05:50:04.721Z"
+    },
+    "10": {
+      "filename": "010-fix-sidebar-ui-corruption-on-home-page-refresh.json",
+      "title": "Fix sidebar UI corruption on home page refresh",
+      "status": "done",
+      "type": "bugfix",
+      "priority": "high",
+      "createdAt": "2025-06-27T05:53:02.534Z",
+      "updatedAt": "2025-06-27T05:59:28.709Z"
     }
   },
-  "lastId": 8,
+  "lastId": 10,
   "version": "1.0.0"
 }

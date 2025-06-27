@@ -1,0 +1,125 @@
+/* Component-specific styles */
+
+/* Dashboard components */
+.dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.dashboard-header {
+    margin-bottom: 32px;
+    text-align: left;
+}
+
+.dashboard-title {
+    margin-bottom: 8px !important;
+}
+
+.dashboard-subtitle {
+    margin-bottom: 32px !important;
+}
+
+.dashboard-stats-row {
+    margin-bottom: 32px;
+}
+
+.stats-card {
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+.dashboard-card {
+    margin-bottom: 16px;
+}
+
+/* Devlog components */
+.recent-devlogs-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.recent-devlogs-title {
+    margin: 0 !important;
+}
+
+.empty-devlogs {
+    padding: 60px 24px;
+}
+
+.devlog-list-item {
+    cursor: pointer;
+    padding: 20px 24px !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    transition: background-color 0.2s ease;
+}
+
+.devlog-list-item:hover {
+    background-color: #fafafa;
+}
+
+.devlog-list-item:last-child {
+    border-bottom: none !important;
+}
+
+.devlog-date {
+    font-size: 14px;
+}
+
+.devlog-title-section {
+    margin-bottom: 8px;
+}
+
+.devlog-title-text {
+    font-size: 16px !important;
+    display: block;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.devlog-description {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+}
+
+.recent-devlogs-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.devlog-tag {
+    margin: 0 !important;
+}
+
+.devlog-item {
+    margin-bottom: 16px;
+    padding: 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    background: #fff;
+}
+
+.devlog-item:hover {
+    border-color: #1890ff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+/* Form components */
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.details-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}

@@ -163,6 +163,27 @@
     background: #fafafa;
 }
 
+/* Loading skeleton styles */
+.sidebar-skeleton {
+    background: #fff;
+    border-right: 1px solid #f0f0f0;
+}
+
+.sidebar-skeleton-content {
+    padding: 24px;
+}
+
+.header-skeleton {
+    height: 64px;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.header-skeleton-button {
+    margin: 16px 24px;
+    width: 200px;
+}
+
 /* Responsive improvements */
 @media (max-width: 768px) {
     .dashboard-stats-row .ant-col {

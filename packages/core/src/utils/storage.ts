@@ -21,7 +21,7 @@ export function getWorkspaceRoot(startPath: string = process.cwd()): string {
     return process.cwd();
   } else if (parseBoolean(process.env.UNIT_TEST)) {
     // Use temporary directory in unit tests
-    return fs.mkdtempSync('devlog-test');
+    return fs.mkdtempSync(path.join(os.tmpdir(), 'devlog-test'));
   } else {
     // Use project root in development
     return findProjectRoot(startPath);

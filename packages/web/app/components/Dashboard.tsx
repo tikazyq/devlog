@@ -152,7 +152,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
       {/* Recent Devlogs */}
       <Card 
         title={<Title level={3} className="recent-devlogs-title">Recent Devlogs</Title>} 
-        bodyStyle={{ padding: 0 }}
+        styles={{ body: {padding: 0 }}}
         className="recent-devlogs-card"
       >
         {recentDevlogs.length === 0 ? (

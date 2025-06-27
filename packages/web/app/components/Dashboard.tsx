@@ -10,20 +10,24 @@ import {
   List,
   Row,
   Skeleton,
-  Statistic,
   Tag,
   Typography,
 } from 'antd';
 import {
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  EyeOutlined,
-  FileProtectOutlined,
-  FileTextOutlined,
-  MinusCircleOutlined,
   PlusOutlined,
-  SyncOutlined,
 } from '@ant-design/icons';
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
 import { DevlogEntry, DevlogStats } from '@devlog/types';
 import { useRouter } from 'next/navigation';
 import { getStatusColor, getStatusIcon, getPriorityColor, getPriorityIcon } from '../lib/devlog-ui-utils';
@@ -38,6 +42,47 @@ interface DashboardProps {
 
 export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps) {
   const router = useRouter();
+
+  // Mock time series data - this would come from the backend in a real implementation
+  const mockTimeSeriesData = React.useMemo(() => {
+    const now = new Date();
+    const data = [];
+    
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      
+      // Generate realistic mock data
+      const baseCreated = Math.floor(Math.random() * 3) + 1;
+      const baseCompleted = Math.floor(Math.random() * 2) + 1;
+      
+      data.push({
+        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        fullDate: date.toISOString().split('T')[0],
+        created: baseCreated,
+        completed: baseCompleted,
+        inProgress: Math.floor(Math.random() * 4) + 2,
+        review: Math.floor(Math.random() * 2),
+        testing: Math.floor(Math.random() * 2),
+        todo: Math.floor(Math.random() * 3) + 1,
+      });
+    }
+    
+    return data;
+  }, []);
+
+  const mockStatusDistributionData = React.useMemo(() => {
+    if (!stats) return [];
+    
+    return [
+      { name: 'Todo', value: stats.byStatus['todo'] || 0, color: '#8c8c8c' },
+      { name: 'In Progress', value: stats.byStatus['in-progress'] || 0, color: '#faad14' },
+      { name: 'Review', value: stats.byStatus['review'] || 0, color: '#fa8c16' },
+      { name: 'Testing', value: stats.byStatus['testing'] || 0, color: '#13c2c2' },
+      { name: 'Done', value: stats.byStatus['done'] || 0, color: '#52c41a' },
+      { name: 'Archived', value: stats.byStatus['archived'] || 0, color: '#595959' },
+    ].filter(item => item.value > 0);
+  }, [stats]);
 
   return (
     <div className="flex flex-col h-full w-full overflow-hidden">
@@ -85,97 +130,104 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
         </Paragraph>
       </div>
 
-      {/* Fixed Stats Cards */}
-      <div className="dashboard-stats-section">
-        {!stats ? (
-          <Row gutter={[24, 24]} className="dashboard-stats-row">
-            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <Col key={i} xs={24} sm={12} md={8} lg={8} xl={4}>
-                <Card className="stats-card">
-                  <Skeleton.Input
-                    active
-                    size="small"
-                    style={{ width: '60%', marginBottom: '8px' }}
+      {/* Charts Section */}
+      <div className="dashboard-charts-section">
+        <Row gutter={[24, 24]}>
+          <Col xs={24} lg={14}>
+            <Card title="Development Activity (Last 30 Days)" className="chart-card">
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={mockTimeSeriesData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="date" 
+                    fontSize={12}
+                    tickLine={false}
                   />
-                  <Skeleton.Input active size="large" style={{ width: '40%' }} />
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        ) : (
-          <Row gutter={[24, 24]} className="dashboard-stats-row">
-            <Col xs={24} sm={12} md={8} lg={8} xl={4}>
-              <Card className="stats-card">
-                <Statistic
-                  title="Total Devlogs"
-                  value={stats.totalEntries}
-                  prefix={<FileTextOutlined style={{ color: '#1890ff' }} />}
-                  valueStyle={{ color: '#1890ff' }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} md={8} lg={8} xl={4}>
-              <Card className="stats-card">
-                <Statistic
-                  title="In Progress"
-                  value={stats.byStatus['in-progress'] || 0}
-                  prefix={<SyncOutlined spin style={{ color: '#faad14' }} />}
-                  valueStyle={{ color: '#faad14' }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} md={8} lg={8} xl={4}>
-              <Card className="stats-card">
-                <Statistic
-                  title="Review"
-                  value={stats.byStatus['review'] || 0}
-                  prefix={<EyeOutlined style={{ color: '#fa8c16' }} />}
-                  valueStyle={{ color: '#fa8c16' }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} md={8} lg={8} xl={4}>
-              <Card className="stats-card">
-                <Statistic
-                  title="Testing"
-                  value={stats.byStatus['testing'] || 0}
-                  prefix={<FileProtectOutlined style={{ color: '#13c2c2' }} />}
-                  valueStyle={{ color: '#13c2c2' }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} md={8} lg={8} xl={4}>
-              <Card className="stats-card">
-                <Statistic
-                  title="Completed"
-                  value={stats.byStatus['done'] || 0}
-                  prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
-                  valueStyle={{ color: '#52c41a' }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} md={8} lg={8} xl={4}>
-              <Card className="stats-card">
-                <Statistic
-                  title="Todo"
-                  value={stats.byStatus['todo'] || 0}
-                  prefix={<ClockCircleOutlined style={{ color: '#8c8c8c' }} />}
-                  valueStyle={{ color: '#8c8c8c' }}
-                />
-              </Card>
-            </Col>
-            <Col xs={24} sm={12} md={8} lg={8} xl={4}>
-              <Card className="stats-card">
-                <Statistic
-                  title="Archived"
-                  value={stats.byStatus['archived'] || 0}
-                  prefix={<MinusCircleOutlined style={{ color: '#595959' }} />}
-                  valueStyle={{ color: '#595959' }}
-                />
-              </Card>
-            </Col>
-          </Row>
-        )}
+                  <YAxis fontSize={12} tickLine={false} />
+                  <Tooltip 
+                    labelFormatter={(label, payload) => {
+                      const data = payload[0]?.payload;
+                      return data ? data.fullDate : label;
+                    }}
+                  />
+                  <Legend />
+                  <Area 
+                    type="monotone" 
+                    dataKey="created" 
+                    stackId="1" 
+                    stroke="#1890ff" 
+                    fill="#1890ff" 
+                    fillOpacity={0.7}
+                    name="Created"
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="completed" 
+                    stackId="1" 
+                    stroke="#52c41a" 
+                    fill="#52c41a" 
+                    fillOpacity={0.7}
+                    name="Completed"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </Card>
+          </Col>
+          <Col xs={24} lg={10}>
+            <Card title="Status Distribution Trends" className="chart-card">
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={mockTimeSeriesData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="date" 
+                    fontSize={12}
+                    tickLine={false}
+                  />
+                  <YAxis fontSize={12} tickLine={false} />
+                  <Tooltip 
+                    labelFormatter={(label, payload) => {
+                      const data = payload[0]?.payload;
+                      return data ? data.fullDate : label;
+                    }}
+                  />
+                  <Legend />
+                  <Line 
+                    type="monotone" 
+                    dataKey="inProgress" 
+                    stroke="#faad14" 
+                    strokeWidth={2}
+                    name="In Progress"
+                    dot={{ r: 2 }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="review" 
+                    stroke="#fa8c16" 
+                    strokeWidth={2}
+                    name="Review"
+                    dot={{ r: 2 }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="testing" 
+                    stroke="#13c2c2" 
+                    strokeWidth={2}
+                    name="Testing"
+                    dot={{ r: 2 }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="todo" 
+                    stroke="#8c8c8c" 
+                    strokeWidth={2}
+                    name="Todo"
+                    dot={{ r: 2 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </Card>
+          </Col>
+        </Row>
       </div>
 
       {/* Scrollable Content */}

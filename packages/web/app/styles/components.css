@@ -49,6 +49,30 @@
     flex-shrink: 0;
 }
 
+/* Charts section */
+.dashboard-charts-section {
+    padding: 24px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e8e8e8;
+    flex-shrink: 0;
+}
+
+.chart-card {
+    height: 380px;
+}
+
+.chart-card .ant-card-body {
+    padding: 20px;
+    height: calc(100% - 57px);
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-card .ant-card-head-title {
+    font-weight: 600;
+    font-size: 16px;
+}
+
 .dashboard-stats-row {
     margin-bottom: 0;
 }

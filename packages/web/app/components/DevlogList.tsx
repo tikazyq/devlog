@@ -244,34 +244,83 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
     );
   }
 
+  // Calculate stats for the sticky header
+  const totalCount = devlogs.length;
+  const statusCounts = devlogs.reduce((acc, devlog) => {
+    acc[devlog.status] = (acc[devlog.status] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
   return (
-    <div>
-      <div className="devlog-list-header">
-        <Title level={2}>All Devlogs</Title>
-        <Text type="secondary">{devlogs.length} total entries</Text>
+    <div className="devlog-list-container">
+      {/* Sticky Header with Summary */}
+      <div className="page-header-sticky">
+        <div className="devlog-list-header-compact">
+          <div className="devlog-title-row">
+            <Title level={2} className="devlog-list-title-compact">All Devlogs</Title>
+            <div className="devlog-stats-compact">
+              <div className="stat-compact">
+                <span className="stat-value">{totalCount}</span>
+                <span className="stat-label">Total</span>
+              </div>
+              <div className="stat-compact">
+                <span className="stat-value in-progress">
+                  {statusCounts['in-progress'] || 0}
+                </span>
+                <span className="stat-label">In Progress</span>
+              </div>
+              <div className="stat-compact">
+                <span className="stat-value completed">
+                  {statusCounts['done'] || 0}
+                </span>
+                <span className="stat-label">Done</span>
+              </div>
+              <div className="stat-compact">
+                <span className="stat-value todo">
+                  {statusCounts['todo'] || 0}
+                </span>
+                <span className="stat-label">Todo</span>
+              </div>
+              {statusCounts['blocked'] && (
+                <div className="stat-compact">
+                  <span className="stat-value blocked">
+                    {statusCounts['blocked']}
+                  </span>
+                  <span className="stat-label">Blocked</span>
+                </div>
+              )}
+            </div>
+          </div>
+          <Text type="secondary" className="devlog-list-subtitle-compact">
+            Manage and track your development logs
+          </Text>
+        </div>
       </div>
 
-      <Card>
-        {devlogs.length === 0 ? (
-          <Empty description="No devlogs found" style={{ padding: '40px' }} />
-        ) : (
-          <div className="devlog-table-container">
-            <Table
-              columns={columns}
-              dataSource={devlogs}
-              rowKey="id"
-              scroll={{ x: 1200 }}
-              pagination={{
-                pageSize: 10,
-                showSizeChanger: true,
-                showQuickJumper: true,
-                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} devlogs`,
-              }}
-              size="middle"
-            />
-          </div>
-        )}
-      </Card>
+      {/* Scrollable Content */}
+      <div className="scrollable-content">
+        <Card className="devlog-list-card">
+          {devlogs.length === 0 ? (
+            <Empty description="No devlogs found" style={{ padding: '40px' }} />
+          ) : (
+            <div className="devlog-table-container">
+              <Table
+                columns={columns}
+                dataSource={devlogs}
+                rowKey="id"
+                scroll={{ x: 1200 }}
+                pagination={{
+                  pageSize: 10,
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                  showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} devlogs`,
+                }}
+                size="middle"
+              />
+            </div>
+          )}
+        </Card>
+      </div>
     </div>
   );
 }

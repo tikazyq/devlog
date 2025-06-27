@@ -7,16 +7,85 @@
 
 .app-content {
     background: #f8f9fa;
-    overflow: auto;
+    overflow: hidden; /* Prevent outer scroll */
+    display: flex;
+    flex-direction: column;
 }
 
 .app-content-wrapper {
-    padding: 24px;
-    min-height: calc(100vh - 64px); /* Adjust for header height */
+    padding: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Allow flex children to shrink */
 }
 
 .page-content {
     background: transparent;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 24px;
+}
+
+/* Sticky header for page content */
+.page-header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e8e8e8;
+    padding: 16px 24px 12px 24px;
+    margin: 0 -24px 24px -24px;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    background: rgba(248, 249, 250, 0.9);
+}
+
+/* Enhanced scrollable content container */
+.scrollable-content {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    /* Add custom scrollbar styling */
+    scrollbar-width: thin;
+    scrollbar-color: #d9d9d9 transparent;
+}
+
+.scrollable-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scrollable-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb {
+    background-color: #d9d9d9;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb:hover {
+    background-color: #bfbfbf;
+}
+
+/* Smooth transitions for better UX */
+.page-content * {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+    .page-header-sticky {
+        padding: 12px 16px 8px 16px;
+        margin: 0 -16px 16px -16px;
+    }
+    
+    .page-content {
+        padding: 16px;
+    }
 }
 
 .app-error-alert {

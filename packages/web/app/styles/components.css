@@ -4,12 +4,91 @@
 .dashboard-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 24px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
-.dashboard-header {
-    margin-bottom: 32px;
-    text-align: left;
+/* Header section with title and compact stats */
+.dashboard-header-section {
+    padding: 24px 24px 16px 24px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e8e8e8;
+    flex-shrink: 0;
+}
+
+.dashboard-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.dashboard-title {
+    margin: 0 !important;
+    font-size: 28px !important;
+}
+
+.dashboard-subtitle {
+    margin: 0 !important;
+    font-size: 14px;
+}
+
+.dashboard-stats-compact {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+
+/* Fixed stats cards section */
+.dashboard-stats-section {
+    padding: 24px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e8e8e8;
+    flex-shrink: 0;
+}
+
+.dashboard-stats-row {
+    margin-bottom: 0;
+}
+
+.stat-compact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 60px;
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #1890ff;
+}
+
+.stat-value.in-progress {
+    color: #faad14;
+}
+
+.stat-value.completed {
+    color: #52c41a;
+}
+
+.stat-value.todo {
+    color: #8c8c8c;
+}
+
+.stat-value.blocked {
+    color: #ff4d4f;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #8c8c8c;
+    margin-top: 2px;
+    line-height: 1.2;
 }
 
 .dashboard-title {
@@ -20,8 +99,166 @@
     margin-bottom: 32px !important;
 }
 
-.dashboard-stats-row {
-    margin-bottom: 32px;
+.stat-compact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 60px;
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #1890ff;
+}
+
+.stat-value.in-progress {
+    color: #faad14;
+}
+
+.stat-value.completed {
+    color: #52c41a;
+}
+
+.stat-value.blocked {
+    color: #ff4d4f;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #8c8c8c;
+    margin-top: 2px;
+    line-height: 1.2;
+}
+
+/* DevlogList specific styles */
+.devlog-list-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.devlog-list-header-compact {
+    padding: 0;
+}
+
+.devlog-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.devlog-list-title-compact {
+    margin: 0 !important;
+    font-size: 24px !important;
+}
+
+.devlog-list-subtitle-compact {
+    margin: 0 !important;
+    font-size: 14px;
+}
+
+.devlog-stats-compact {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+
+.devlog-list-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Table enhancements */
+.devlog-table-container {
+    /* Ensure smooth scrolling for the table */
+    overflow: hidden;
+}
+
+.devlog-table-container .ant-table-wrapper {
+    border-radius: 0;
+}
+
+.devlog-table-container .ant-table {
+    font-size: 14px;
+}
+
+.devlog-table-container .ant-table-tbody > tr:hover > td {
+    background-color: #f5f5f5 !important;
+    transition: background-color 0.2s ease;
+}
+
+/* Improve table cell spacing */
+.devlog-table-container .ant-table-tbody > tr > td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.devlog-table-container .ant-table-thead > tr > th {
+    padding: 12px 16px;
+    background-color: #fafafa;
+    font-weight: 600;
+    border-bottom: 2px solid #e8e8e8;
+}
+
+/* Responsive adjustments for compact stats */
+@media (max-width: 768px) {
+    .dashboard-header-section {
+        padding: 16px 16px 12px 16px;
+    }
+    
+    .dashboard-stats-section {
+        padding: 16px;
+    }
+    
+    .dashboard-stats-compact,
+    .devlog-stats-compact {
+        gap: 16px;
+    }
+    
+    .stat-compact {
+        min-width: 50px;
+    }
+    
+    .stat-value {
+        font-size: 18px;
+    }
+    
+    .stat-label {
+        font-size: 11px;
+    }
+    
+    .dashboard-title-row,
+    .devlog-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .dashboard-stats-compact,
+    .devlog-stats-compact {
+        justify-content: flex-start;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-stats-compact,
+    .devlog-stats-compact {
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    
+    .stat-compact {
+        min-width: 45px;
+    }
+    
+    .stat-value {
+        font-size: 16px;
+    }
 }
 
 .stats-card {
@@ -42,6 +279,7 @@
 
 /* Devlog components */
 .recent-devlogs-card {
+    margin-top: 24px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }

@@ -1,6 +1,4 @@
-export {
-  DevlogManager,
-} from './devlog-manager.js';
+export { DevlogManager } from './devlog-manager.js';
 export { ConfigurationManager } from './configuration-manager.js';
 
 // Integration Service
@@ -40,4 +38,5 @@ export type {
 } from '@devlog/types';
 
 // Utilities
+export * from './utils/common.js';
 export * from './utils/storage.js';

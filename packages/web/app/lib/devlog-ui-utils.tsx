@@ -3,6 +3,8 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   ExclamationCircleOutlined,
+  EyeOutlined,
+  FileProtectOutlined,
   MinusCircleOutlined,
   StopOutlined,
   SyncOutlined,
@@ -18,8 +20,14 @@ export const getStatusColor = (status: string): string => {
       return 'success';
     case 'in-progress':
       return 'processing';
+    case 'review':
+      return 'warning';
+    case 'testing':
+      return 'cyan';
     case 'blocked':
       return 'error';
+    case 'archived':
+      return 'default';
     case 'todo':
       return 'default';
     default:
@@ -36,8 +44,14 @@ export const getStatusIcon = (status: string): React.ReactNode => {
       return <CheckCircleOutlined />;
     case 'in-progress':
       return <SyncOutlined spin />;
+    case 'review':
+      return <EyeOutlined />;
+    case 'testing':
+      return <FileProtectOutlined />;
     case 'blocked':
       return <StopOutlined />;
+    case 'archived':
+      return <MinusCircleOutlined />;
     case 'todo':
       return <ClockCircleOutlined />;
     default:

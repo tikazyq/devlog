@@ -17,7 +17,10 @@ import {
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
+  EyeOutlined,
+  FileProtectOutlined,
   FileTextOutlined,
+  MinusCircleOutlined,
   PlusOutlined,
   SyncOutlined,
 } from '@ant-design/icons';
@@ -55,12 +58,24 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                 <span className="stat-label">In Progress</span>
               </div>
               <div className="stat-compact">
+                <span className="stat-value review">{stats.byStatus['review'] || 0}</span>
+                <span className="stat-label">Review</span>
+              </div>
+              <div className="stat-compact">
+                <span className="stat-value testing">{stats.byStatus['testing'] || 0}</span>
+                <span className="stat-label">Testing</span>
+              </div>
+              <div className="stat-compact">
                 <span className="stat-value completed">{stats.byStatus['done'] || 0}</span>
                 <span className="stat-label">Completed</span>
               </div>
               <div className="stat-compact">
                 <span className="stat-value todo">{stats.byStatus['todo'] || 0}</span>
                 <span className="stat-label">Todo</span>
+              </div>
+              <div className="stat-compact">
+                <span className="stat-value archived">{stats.byStatus['archived'] || 0}</span>
+                <span className="stat-label">Archived</span>
               </div>
             </div>
           )}
@@ -74,8 +89,8 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
       <div className="dashboard-stats-section">
         {!stats ? (
           <Row gutter={[24, 24]} className="dashboard-stats-row">
-            {[1, 2, 3, 4].map((i) => (
-              <Col key={i} xs={24} sm={12} lg={6}>
+            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+              <Col key={i} xs={24} sm={12} md={8} lg={8} xl={4}>
                 <Card className="stats-card">
                   <Skeleton.Input
                     active
@@ -89,7 +104,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
           </Row>
         ) : (
           <Row gutter={[24, 24]} className="dashboard-stats-row">
-            <Col xs={24} sm={12} lg={6}>
+            <Col xs={24} sm={12} md={8} lg={8} xl={4}>
               <Card className="stats-card">
                 <Statistic
                   title="Total Devlogs"
@@ -99,7 +114,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                 />
               </Card>
             </Col>
-            <Col xs={24} sm={12} lg={6}>
+            <Col xs={24} sm={12} md={8} lg={8} xl={4}>
               <Card className="stats-card">
                 <Statistic
                   title="In Progress"
@@ -109,7 +124,27 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                 />
               </Card>
             </Col>
-            <Col xs={24} sm={12} lg={6}>
+            <Col xs={24} sm={12} md={8} lg={8} xl={4}>
+              <Card className="stats-card">
+                <Statistic
+                  title="Review"
+                  value={stats.byStatus['review'] || 0}
+                  prefix={<EyeOutlined style={{ color: '#fa8c16' }} />}
+                  valueStyle={{ color: '#fa8c16' }}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={8} lg={8} xl={4}>
+              <Card className="stats-card">
+                <Statistic
+                  title="Testing"
+                  value={stats.byStatus['testing'] || 0}
+                  prefix={<FileProtectOutlined style={{ color: '#13c2c2' }} />}
+                  valueStyle={{ color: '#13c2c2' }}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={8} lg={8} xl={4}>
               <Card className="stats-card">
                 <Statistic
                   title="Completed"
@@ -119,13 +154,23 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                 />
               </Card>
             </Col>
-            <Col xs={24} sm={12} lg={6}>
+            <Col xs={24} sm={12} md={8} lg={8} xl={4}>
               <Card className="stats-card">
                 <Statistic
                   title="Todo"
                   value={stats.byStatus['todo'] || 0}
                   prefix={<ClockCircleOutlined style={{ color: '#8c8c8c' }} />}
                   valueStyle={{ color: '#8c8c8c' }}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={8} lg={8} xl={4}>
+              <Card className="stats-card">
+                <Statistic
+                  title="Archived"
+                  value={stats.byStatus['archived'] || 0}
+                  prefix={<MinusCircleOutlined style={{ color: '#595959' }} />}
+                  valueStyle={{ color: '#595959' }}
                 />
               </Card>
             </Col>

@@ -3,13 +3,10 @@
  */
 
 // Load environment variables from .env file if available
-import * as dotenv from 'dotenv';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import type { StorageConfig, DevlogConfig } from '@devlog/types';
+import type { DevlogConfig, StorageConfig } from '@devlog/types';
 import { getWorkspaceRoot } from './utils/storage.js';
-
-dotenv.config({ path: ['.env.local', '.env'] });
 
 export class ConfigurationManager {
   private workspaceRoot: string | null = null;

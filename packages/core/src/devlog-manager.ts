@@ -12,15 +12,11 @@ import type {
   DevlogNote,
   DevlogStats,
   DevlogStatus,
-  DevlogType,
-  EnterpriseIntegration,
-  StorageConfig,
-  UpdateDevlogRequest,
-  DevlogManagerOptions,
   DiscoverDevlogsRequest,
   DiscoveredDevlogEntry,
   DiscoveryResult,
   StorageProvider,
+  UpdateDevlogRequest,
 } from '@devlog/types';
 import { StorageProviderFactory } from './storage/storage-provider.js';
 import { ConfigurationManager } from './configuration-manager.js';

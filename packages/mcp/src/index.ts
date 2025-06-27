@@ -6,7 +6,6 @@
  */
 
 // Load environment variables from .env file
-import { config } from 'dotenv';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
@@ -15,8 +14,6 @@ import {
   Tool,
 } from '@modelcontextprotocol/sdk/types.js';
 import { MCPDevlogAdapter } from './mcp-adapter.js';
-
-config();
 
 const server = new Server(
   {

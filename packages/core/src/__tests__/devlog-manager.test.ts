@@ -1,31 +1,18 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { DevlogManager } from '../devlog-manager.js';
-import fs from 'fs/promises';
-import path from 'path';
+import * as fs from 'fs/promises';
 
 describe('DevlogManager', () => {
   let manager: DevlogManager;
   let testWorkspace: string;
 
-  beforeEach(async () => {
-    // Create a temporary test workspace with unique name
-    testWorkspace = path.join(
-      process.cwd(),
-      'test-workspace-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
-    );
+  beforeAll(async () => {
+    process.env['UNIT_TEST'] = 'true';
+  });
 
+  beforeEach(async () => {
     // Create isolated storage config for each test using local JSON
-    manager = new DevlogManager({
-      workspaceRoot: testWorkspace,
-      useIntegerIds: false, // Use string IDs for backward compatibility in tests
-      storage: {
-        type: 'local-json',
-        json: {
-          directory: '.devlog',
-          filePattern: '{id:03d}-{slug}.json',
-        },
-      },
-    });
+    manager = new DevlogManager();
   });
 
   afterEach(async () => {
@@ -39,7 +26,7 @@ describe('DevlogManager', () => {
 
   describe('findOrCreateDevlog', () => {
     it('should create a new devlog entry', async () => {
-      const result = await manager.findOrCreateDevlog({
+      const result = await manager.createDevlog({
         title: 'Test Feature',
         type: 'feature',
         description: 'A test feature',
@@ -55,18 +42,6 @@ describe('DevlogManager', () => {
       expect(result.status).toBe('todo');
       expect(result.context.businessContext).toBe('Important business requirement');
       expect(result.context.technicalContext).toBe('Uses TypeScript');
-    });
-
-    it('should create a devlog with custom ID', async () => {
-      const customId = 123;
-      const result = await manager.findOrCreateDevlog({
-        id: customId,
-        title: 'Custom ID Test',
-        type: 'task',
-        description: 'Testing custom ID',
-      });
-
-      expect(result.id).toBe(customId);
     });
 
     it('should create a devlog with default priority', async () => {

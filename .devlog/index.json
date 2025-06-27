@@ -80,8 +80,17 @@
       "priority": "high",
       "createdAt": "2025-06-27T05:53:02.534Z",
       "updatedAt": "2025-06-27T05:59:28.709Z"
+    },
+    "11": {
+      "filename": "011-add-support-for-all-entrystatus-values-in-dashboar.json",
+      "title": "Add support for all EntryStatus values in Dashboard statistics and UI utilities",
+      "status": "todo",
+      "type": "feature",
+      "priority": "medium",
+      "createdAt": "2025-06-27T09:01:42.931Z",
+      "updatedAt": "2025-06-27T09:01:42.931Z"
     }
   },
-  "lastId": 10,
+  "lastId": 11,
   "version": "1.0.0"
 }

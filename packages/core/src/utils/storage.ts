@@ -2,6 +2,7 @@ import path from 'path';
 import * as os from 'os';
 import * as fs from 'fs';
 import { JsonConfig } from '@devlog/types';
+import { parseBoolean } from './common.js';
 
 export function getDevlogDirFromJsonConfig(config: JsonConfig): string {
   const devlogDir = config.directory || '.devlog';
@@ -18,6 +19,9 @@ export function getWorkspaceRoot(startPath: string = process.cwd()): string {
   if (process.env.NODE_ENV === 'production') {
     // Use working directory in production
     return process.cwd();
+  } else if (parseBoolean(process.env.UNIT_TEST)) {
+    // Use temporary directory in unit tests
+    return fs.mkdtempSync('devlog-test');
   } else {
     // Use project root in development
     return findProjectRoot(startPath);

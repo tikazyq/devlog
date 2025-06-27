@@ -2,7 +2,6 @@
   "name": "devlog",
   "version": "1.0.0",
   "description": "Monorepo for development logging tools and MCP server",
-  "private": true,
   "scripts": {
     "build": "pnpm -r build",
     "start": "pnpm --filter @devlog/mcp start",

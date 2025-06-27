@@ -12,7 +12,7 @@
 
 /* Header section with title and compact stats */
 .dashboard-header-section {
-    padding: 24px 24px 16px 24px;
+    padding: 12px 24px;
     background: #f8f9fa;
     border-bottom: 1px solid #e8e8e8;
     flex-shrink: 0;
@@ -22,7 +22,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: 0;
 }
 
 .dashboard-title {
@@ -123,10 +123,6 @@
     margin-bottom: 8px !important;
 }
 
-.dashboard-subtitle {
-    margin-bottom: 32px !important;
-}
-
 .stat-compact {
     display: flex;
     flex-direction: column;
@@ -166,10 +162,11 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .devlog-list-header-compact {
-    padding: 0;
+    padding: 0 24px;
 }
 
 .devlog-title-row {
@@ -195,9 +192,9 @@
     align-items: center;
 }
 
-.devlog-list-card {
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+.devlog-list-table {
+    margin: 0 24px;
+    flex: 1;
 }
 
 /* Table enhancements */
@@ -307,7 +304,7 @@
 
 /* Devlog components */
 .recent-devlogs-card {
-    margin-top: 24px;
+    margin: 24px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }

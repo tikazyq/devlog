@@ -2,13 +2,15 @@
 
 import React from 'react';
 import { Button, Card, Empty, Popconfirm, Space, Spin, Table, Tag, Typography } from 'antd';
-import {
-  DeleteOutlined,
-  EyeOutlined,
-} from '@ant-design/icons';
+import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { DevlogEntry, DevlogId, DevlogListProps } from '@devlog/types';
-import { getStatusColor, getStatusIcon, getPriorityColor, getPriorityIcon } from '../lib/devlog-ui-utils';
+import {
+  getStatusColor,
+  getStatusIcon,
+  getPriorityColor,
+  getPriorityIcon,
+} from '../lib/devlog-ui-utils';
 import './styles.css';
 
 const { Title, Text } = Typography;
@@ -24,9 +26,9 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       render: (title: string, record: DevlogEntry) => (
         <div>
           <div className="devlog-title-container">
-            <Text 
-              strong 
-              className="devlog-title" 
+            <Text
+              strong
+              className="devlog-title"
               onClick={() => onViewDevlog(record)}
               ellipsis={{ tooltip: title }}
             >
@@ -34,7 +36,11 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
             </Text>
             <Tag color="blue">{record.type}</Tag>
           </div>
-          <Text type="secondary" ellipsis={{ tooltip: record.description }} className="devlog-description">
+          <Text
+            type="secondary"
+            ellipsis={{ tooltip: record.description }}
+            className="devlog-description"
+          >
             {record.description}
           </Text>
           {record.key && (
@@ -72,13 +78,16 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       dataIndex: 'assignee',
       key: 'assignee',
       width: 120,
-      render: (assignee: string) => (
+      render: (assignee: string) =>
         assignee ? (
-          <Text className="devlog-assignee" ellipsis={{ tooltip: assignee }}>{assignee}</Text>
+          <Text className="devlog-assignee" ellipsis={{ tooltip: assignee }}>
+            {assignee}
+          </Text>
         ) : (
-          <Text type="secondary" className="devlog-assignee">—</Text>
-        )
-      ),
+          <Text type="secondary" className="devlog-assignee">
+            —
+          </Text>
+        ),
     },
     {
       title: 'Tags',
@@ -87,7 +96,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       width: 140,
       render: (tags: string[]) => (
         <div>
-          {tags?.slice(0, 2).map(tag => (
+          {tags?.slice(0, 2).map((tag) => (
             <Tag key={tag} color="purple" className="devlog-tag-small">
               {tag}
             </Tag>
@@ -180,10 +189,13 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
 
   // Calculate stats for the sticky header
   const totalCount = devlogs.length;
-  const statusCounts = devlogs.reduce((acc, devlog) => {
-    acc[devlog.status] = (acc[devlog.status] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const statusCounts = devlogs.reduce(
+    (acc, devlog) => {
+      acc[devlog.status] = (acc[devlog.status] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   return (
     <div className="devlog-list-container">
@@ -191,69 +203,60 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       <div className="page-header-sticky">
         <div className="devlog-list-header-compact">
           <div className="devlog-title-row">
-            <Title level={2} className="devlog-list-title-compact">All Devlogs</Title>
+            <div>
+              <Title level={2} className="devlog-list-title-compact">
+                All Devlogs
+              </Title>
+              <Text type="secondary" className="devlog-list-subtitle-compact">
+                Manage and track your development logs
+              </Text>
+            </div>
             <div className="devlog-stats-compact">
               <div className="stat-compact">
                 <span className="stat-value">{totalCount}</span>
                 <span className="stat-label">Total</span>
               </div>
               <div className="stat-compact">
-                <span className="stat-value in-progress">
-                  {statusCounts['in-progress'] || 0}
-                </span>
+                <span className="stat-value in-progress">{statusCounts['in-progress'] || 0}</span>
                 <span className="stat-label">In Progress</span>
               </div>
               <div className="stat-compact">
-                <span className="stat-value completed">
-                  {statusCounts['done'] || 0}
-                </span>
+                <span className="stat-value completed">{statusCounts['done'] || 0}</span>
                 <span className="stat-label">Done</span>
               </div>
               <div className="stat-compact">
-                <span className="stat-value todo">
-                  {statusCounts['todo'] || 0}
-                </span>
+                <span className="stat-value todo">{statusCounts['todo'] || 0}</span>
                 <span className="stat-label">Todo</span>
               </div>
               {statusCounts['blocked'] && (
                 <div className="stat-compact">
-                  <span className="stat-value blocked">
-                    {statusCounts['blocked']}
-                  </span>
+                  <span className="stat-value blocked">{statusCounts['blocked']}</span>
                   <span className="stat-label">Blocked</span>
                 </div>
               )}
             </div>
           </div>
-          <Text type="secondary" className="devlog-list-subtitle-compact">
-            Manage and track your development logs
-          </Text>
         </div>
       </div>
 
-      {/* Scrollable Content */}
-      <div className="scrollable-content">
-        <Card className="devlog-list-card">
-          {devlogs.length === 0 ? (
-            <Empty description="No devlogs found" style={{ padding: '40px' }} />
-          ) : (
-            <div className="devlog-table-container">
-              <Table
-                columns={columns}
-                dataSource={devlogs}
-                rowKey="id"
-                scroll={{ x: 1200 }}
-                pagination={{
-                  pageSize: 10,
-                  showSizeChanger: true,
-                  showQuickJumper: true,
-                  showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} devlogs`,
-                }}
-                size="middle"
-              />
-            </div>
-          )}
-        </Card>
+      <div className="devlog-list-table">
+        {devlogs.length === 0 ? (
+          <Empty description="No devlogs found" style={{ padding: '40px' }} />
+        ) : (
+          <Table
+            columns={columns}
+            dataSource={devlogs}
+            rowKey="id"
+            scroll={{ x: 1200, y: 'calc(100vh - 300px)' }}
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              showQuickJumper: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} devlogs`,
+            }}
+            size="middle"
+          />
+        )}
       </div>
     </div>
   );

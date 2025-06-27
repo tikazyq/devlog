@@ -25,7 +25,6 @@
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 24px;
 }
 
 /* Sticky header for page content */
@@ -35,8 +34,8 @@
     z-index: 10;
     background: #f8f9fa;
     border-bottom: 1px solid #e8e8e8;
-    padding: 16px 24px 12px 24px;
-    margin: 0 -24px 24px -24px;
+    padding: 0;
+    margin: 0;
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     background: rgba(248, 249, 250, 0.9);
@@ -95,7 +94,7 @@
 
 /* Navigation styles */
 .navigation-breadcrumb {
-    margin: 0 0 24px 0;
+    margin: 12px 24px;
 }
 
 /* Loading container */

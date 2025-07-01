@@ -3,9 +3,8 @@
 import React from 'react';
 import { Button, Space } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { DevlogForm } from '../../components/DevlogForm';
-import { PageLayout } from '../../components/PageLayout';
-import { useDevlogs } from '../../hooks/useDevlogs';
+import { DevlogForm, PageLayout } from '@/components';
+import { useDevlogs } from '@/hooks/useDevlogs';
 import { useRouter } from 'next/navigation';
 
 export function DevlogCreatePage() {

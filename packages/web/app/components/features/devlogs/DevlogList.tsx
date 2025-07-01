@@ -10,7 +10,7 @@ import {
   getStatusIcon,
   getPriorityColor,
   getPriorityIcon,
-} from '../lib/devlog-ui-utils';
+} from '@/lib/devlog-ui-utils';
 import styles from './DevlogList.module.css';
 
 const { Title, Text } = Typography;

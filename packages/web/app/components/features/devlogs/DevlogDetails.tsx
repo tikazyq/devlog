@@ -36,7 +36,7 @@ import {
   WarningOutlined,
 } from '@ant-design/icons';
 import { DevlogDetailsProps } from '@devlog/types';
-import { MarkdownRenderer } from './MarkdownRenderer';
+import { MarkdownRenderer } from '@/components/ui';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;

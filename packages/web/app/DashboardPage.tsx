@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Dashboard } from './components/Dashboard';
-import { PageLayout } from './components/PageLayout';
-import { useDevlogs } from './hooks/useDevlogs';
+import { Dashboard, PageLayout } from '@/components';
+import { useDevlogs } from '@/hooks/useDevlogs';
 import { DevlogStats, DevlogEntry } from '@devlog/types';
 import { useRouter } from 'next/navigation';
 

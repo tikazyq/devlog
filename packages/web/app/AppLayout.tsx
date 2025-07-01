@@ -3,12 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, Layout } from 'antd';
 import { DevlogStats } from '@devlog/types';
-import { NavigationSidebar } from './components/NavigationSidebar';
-import { Header } from './components/Header';
-import { ErrorBoundary } from './components/ErrorBoundary';
-import { AppLayoutSkeleton } from './components/AppLayoutSkeleton';
-import { useDevlogs } from './hooks/useDevlogs';
-import { useWebSocket } from './hooks/useWebSocket';
+import { NavigationSidebar, Header, ErrorBoundary, AppLayoutSkeleton } from '@/components';
+import { useDevlogs } from '@/hooks/useDevlogs';
+import { useWebSocket } from '@/hooks/useWebSocket';
 
 const { Content } = Layout;
 

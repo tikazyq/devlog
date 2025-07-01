@@ -4,13 +4,11 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Breadcrumb, Button, Popconfirm, Space, Tag } from 'antd';
 import { ArrowLeftOutlined, DeleteOutlined, EditOutlined, CloseOutlined } from '@ant-design/icons';
 import Link from 'next/link';
-import { DevlogDetails } from '../../components/DevlogDetails';
-import { LoadingPage } from '../../components/LoadingPage';
-import { PageLayout } from '../../components/PageLayout';
-import { useDevlogs } from '../../hooks/useDevlogs';
+import { DevlogDetails, LoadingPage, PageLayout } from '@/components';
+import { useDevlogs } from '@/hooks/useDevlogs';
 import { DevlogEntry } from '@devlog/types';
 import { useRouter } from 'next/navigation';
-import { getStatusColor, getPriorityColor } from '../../lib/devlog-ui-utils';
+import { getStatusColor, getPriorityColor } from '@/lib/devlog-ui-utils';
 
 interface DevlogDetailsPageProps {
   id: string;

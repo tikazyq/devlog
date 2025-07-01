@@ -23,7 +23,7 @@ import {
   getPriorityIcon,
   getStatusColor,
   getStatusIcon,
-} from '../lib/devlog-ui-utils';
+} from '@/lib/devlog-ui-utils';
 import styles from './Dashboard.module.css';
 
 const { Title, Paragraph, Text } = Typography;

@@ -3,10 +3,8 @@
 import React from 'react';
 import { Button, Space } from 'antd';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
-import { DevlogList } from '../components/DevlogList';
-import { LoadingPage } from '../components/LoadingPage';
-import { PageLayout } from '../components/PageLayout';
-import { useDevlogs } from '../hooks/useDevlogs';
+import { DevlogList, LoadingPage, PageLayout } from '@/components';
+import { useDevlogs } from '@/hooks/useDevlogs';
 import { DevlogEntry, DevlogId } from '@devlog/types';
 import { useRouter } from 'next/navigation';
 

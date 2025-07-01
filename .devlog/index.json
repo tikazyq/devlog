@@ -188,8 +188,17 @@
       "priority": "medium",
       "createdAt": "2025-07-01T15:34:09.961Z",
       "updatedAt": "2025-07-01T15:50:36.094Z"
+    },
+    "25": {
+      "filename": "025-optimize-devlog-web-folder-structure-and-implement.json",
+      "title": "Optimize @devlog/web folder structure and implement root alias imports",
+      "status": "done",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-07-01T15:55:11.975Z",
+      "updatedAt": "2025-07-01T16:02:59.628Z"
     }
   },
-  "lastId": 24,
+  "lastId": 25,
   "version": "1.0.0"
 }

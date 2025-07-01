@@ -1,6 +1,7 @@
-/* Remaining global component styles that should be shared */
+/* Legacy global component styles - Use this file only for truly global layout classes */
+/* Most component-specific styles have been moved to individual .module.css files */
 
-/* Global layout styles */
+/* Global layout styles that need to be shared across components */
 .page-header-sticky {
     position: sticky;
     top: 0;

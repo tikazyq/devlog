@@ -1,388 +1,132 @@
-/* Component-specific styles */
+/* Global component styles - Layout and shared classes only */
 
-/* Dashboard components */
-.dashboard-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-/* Header section with title and compact stats */
-.dashboard-header-section {
-    padding: 12px 24px;
-    background: #f8f9fa;
-    border-bottom: 1px solid #e8e8e8;
-    flex-shrink: 0;
-}
-
-.dashboard-title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0;
-}
-
-.dashboard-title {
-    margin: 0 !important;
-    font-size: 28px !important;
-}
-
-.dashboard-subtitle {
-    margin: 0 !important;
-    font-size: 14px;
-}
-
-.dashboard-stats-compact {
-    display: flex;
-    gap: 24px;
-    align-items: center;
-}
-
-/* Fixed stats cards section */
-.dashboard-stats-section {
-    padding: 24px;
-    background: #f8f9fa;
-    border-bottom: 1px solid #e8e8e8;
-    flex-shrink: 0;
-}
-
-/* Charts section */
-.dashboard-charts-section {
-    padding: 24px;
-    background: #f8f9fa;
-    border-bottom: 1px solid #e8e8e8;
-    flex-shrink: 0;
-}
-
-.chart-card {
-    height: 380px;
-}
-
-.chart-card .ant-card-body {
-    padding: 20px;
-    height: calc(100% - 57px);
-    display: flex;
-    flex-direction: column;
-}
-
-.chart-card .ant-card-head-title {
-    font-weight: 600;
-    font-size: 16px;
-}
-
-.chart-legend-text {
-    font-size: 12px;
-}
-
-.dashboard-stats-row {
-    margin-bottom: 0;
-}
-
-.stat-compact {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    min-width: 60px;
-}
-
-.stat-value {
-    font-size: 20px;
-    font-weight: 600;
-    line-height: 1.2;
-    color: #1890ff;
-}
-
-.stat-value.in-progress {
-    color: #faad14;
-}
-
-.stat-value.completed {
-    color: #52c41a;
-}
-
-.stat-value.todo {
-    color: #8c8c8c;
-}
-
-.stat-value.blocked {
-    color: #ff4d4f;
-}
-
-.stat-label {
-    font-size: 12px;
-    color: #8c8c8c;
-    margin-top: 2px;
-    line-height: 1.2;
-}
-
-.dashboard-title {
-    margin-bottom: 8px !important;
-}
-
-.stat-compact {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    min-width: 60px;
-}
-
-.stat-value {
-    font-size: 20px;
-    font-weight: 600;
-    line-height: 1.2;
-    color: #1890ff;
-}
-
-.stat-value.in-progress {
-    color: #faad14;
-}
-
-.stat-value.completed {
-    color: #52c41a;
-}
-
-.stat-value.blocked {
-    color: #ff4d4f;
-}
-
-.stat-label {
-    font-size: 12px;
-    color: #8c8c8c;
-    margin-top: 2px;
-    line-height: 1.2;
-}
-
-/* DevlogList specific styles */
-.devlog-list-container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.devlog-list-header-compact {
-    padding: 0 24px;
-}
-
-.devlog-title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
-}
-
-.devlog-list-title-compact {
-    margin: 0 !important;
-    font-size: 24px !important;
-}
-
-.devlog-list-subtitle-compact {
-    margin: 0 !important;
-    font-size: 14px;
-}
-
-.devlog-stats-compact {
-    display: flex;
-    gap: 24px;
-    align-items: center;
-}
-
-.devlog-list-table {
-    margin: 0 24px;
-    flex: 1;
-}
-
-/* Table enhancements */
-.devlog-table-container {
-    /* Ensure smooth scrolling for the table */
-    overflow: hidden;
-}
-
-.devlog-table-container .ant-table-wrapper {
-    border-radius: 0;
-}
-
-.devlog-table-container .ant-table {
-    font-size: 14px;
-}
-
-.devlog-table-container .ant-table-tbody > tr:hover > td {
-    background-color: #f5f5f5 !important;
-    transition: background-color 0.2s ease;
-}
-
-/* Improve table cell spacing */
-.devlog-table-container .ant-table-tbody > tr > td {
-    padding: 12px 16px;
+/* Global layout styles */
+.page-header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #fff;
     border-bottom: 1px solid #f0f0f0;
 }
 
-.devlog-table-container .ant-table-thead > tr > th {
-    padding: 12px 16px;
-    background-color: #fafafa;
-    font-weight: 600;
-    border-bottom: 2px solid #e8e8e8;
+.page-header {
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
 }
 
-/* Responsive adjustments for compact stats */
+.page-header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+}
+
+.page-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.page-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.page-layout {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.scrollable-content {
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Global layout classes that multiple components use */
+.app-layout {
+    height: 100vh;
+}
+
+.app-content {
+    padding: 0;
+    background: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.app-content-wrapper {
+    padding: 24px;
+    flex: 1;
+    overflow: auto;
+}
+
+.app-error-alert {
+    margin: 16px 24px;
+}
+
+/* Navigation breadcrumb styles */
+.navigation-breadcrumb {
+    margin-bottom: 16px;
+}
+
+/* Breadcrumb with tags layout */
+.breadcrumb-with-tags {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+/* Responsive adjustments for global layout */
 @media (max-width: 768px) {
-    .dashboard-header-section {
-        padding: 16px 16px 12px 16px;
+    .page-header-content {
+        padding: 12px 16px;
     }
     
-    .dashboard-stats-section {
+    .page-content {
         padding: 16px;
     }
     
-    .dashboard-stats-compact,
-    .devlog-stats-compact {
-        gap: 16px;
+    .app-content-wrapper {
+        padding: 16px;
     }
     
-    .stat-compact {
-        min-width: 50px;
+    .page-header-left {
+        gap: 12px;
     }
     
-    .stat-value {
-        font-size: 18px;
+    .page-header-right {
+        gap: 8px;
     }
     
-    .stat-label {
-        font-size: 11px;
-    }
-    
-    .dashboard-title-row,
-    .devlog-title-row {
+    .breadcrumb-with-tags {
         flex-direction: column;
         align-items: flex-start;
         gap: 12px;
     }
-    
-    .dashboard-stats-compact,
-    .devlog-stats-compact {
-        justify-content: flex-start;
-        width: 100%;
-    }
 }
 
 @media (max-width: 480px) {
-    .dashboard-stats-compact,
-    .devlog-stats-compact {
-        gap: 12px;
-        flex-wrap: wrap;
+    .page-header-content {
+        padding: 8px 12px;
     }
     
-    .stat-compact {
-        min-width: 45px;
+    .page-content {
+        padding: 12px;
     }
     
-    .stat-value {
-        font-size: 16px;
+    .app-content-wrapper {
+        padding: 12px;
     }
-}
-
-.stats-card {
-    text-align: center;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    transition: all 0.3s ease;
-}
-
-.stats-card:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-    transform: translateY(-2px);
-}
-
-.dashboard-card {
-    margin-bottom: 16px;
-}
-
-/* Devlog components */
-.recent-devlogs-card {
-    margin: 24px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.recent-devlogs-title {
-    margin: 0 !important;
-}
-
-.empty-devlogs {
-    padding: 60px 24px;
-}
-
-.devlog-list-item {
-    cursor: pointer;
-    padding: 20px 24px !important;
-    border-bottom: 1px solid #f0f0f0 !important;
-    transition: background-color 0.2s ease;
-}
-
-.devlog-list-item:hover {
-    background-color: #fafafa;
-}
-
-.devlog-list-item:last-child {
-    border-bottom: none !important;
-}
-
-.devlog-date {
-    font-size: 14px;
-}
-
-.devlog-title-section {
-    margin-bottom: 8px;
-}
-
-.devlog-title-text {
-    font-size: 16px !important;
-    display: block;
-    margin-bottom: 8px;
-    line-height: 1.4;
-}
-
-.devlog-description {
-    font-size: 14px !important;
-    line-height: 1.5 !important;
-}
-
-.recent-devlogs-meta {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-.devlog-tag {
-    margin: 0 !important;
-}
-
-.devlog-item {
-    margin-bottom: 16px;
-    padding: 16px;
-    border: 1px solid #d9d9d9;
-    border-radius: 6px;
-    background: #fff;
-}
-
-.devlog-item:hover {
-    border-color: #1890ff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
-}
-
-/* Form components */
-.form-container {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.details-container {
-    max-width: 1000px;
-    margin: 0 auto;
 }

@@ -44,7 +44,7 @@
 1. **🔍 ALWAYS** run `discover_related_devlogs` first
 2. **🔧 CHECK ERRORS** using `problems` tool before building/running
 3. **📊 CHECK STATUS** using `git_status` to understand repo state
-4. **🧪 RUN TESTS** using `pnpm test` to ensure everything works before changes
+4. **🧪 VALIDATE CHANGES** using appropriate testing method (formal tests, temp scripts, or Playwright MCP)
 
 ### Git Operations Priority
 **Use Git MCP tools as primary method:**
@@ -52,11 +52,14 @@
 - **Fallback to terminal only when MCP tools unavailable**
 
 ### Testing Requirements
-**⚠️ CRITICAL: Use proper testing frameworks, NOT temporary scripts**
-- **Use Vitest**: Write proper test cases in `packages/*/src/__tests__/` directories
-- **Run tests**: Use `pnpm test` or `pnpm test:watch` commands
-- **NO temporary scripts**: Never create test scripts in `.` (root), `src/`, `scripts/`, or tracked directories
-- **For debugging only**: Use `tmp/` directory (gitignored) and clean up when done
+**⚠️ EARLY DEVELOPMENT: Flexible testing approach for rapid prototyping**
+- **Preferred**: Use Vitest for formal test cases in `packages/*/src/__tests__/` directories when appropriate
+- **⚠️ Formal test modifications**: Only update existing formal test cases when you are confident about the correct approach and test logic
+- **Temporary scripts**: Allowed in `tmp/` directory (gitignored) for quick validation and debugging
+- **Browser-based testing**: Use Playwright MCP tools for UI and integration testing
+- **Prohibited**: Never create test scripts in tracked directories (`.` root, `src/`, `scripts/`, etc.)
+- **Run formal tests**: Use `pnpm test` or `pnpm test:watch` when formal tests exist
+- **Clean up**: Remove temporary files from `tmp/` when done
 
 ### Commit Early and Often
 - After completing features/fixes

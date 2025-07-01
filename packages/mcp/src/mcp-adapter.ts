@@ -43,11 +43,15 @@ export class MCPDevlogAdapter {
 
     const entry = await this.devlogManager.updateDevlog(args);
 
+    // Check if AI context was updated
+    const aiFieldsProvided = !!(args.currentSummary || args.keyInsights || args.openQuestions || args.suggestedNextSteps);
+    const aiContextNote = aiFieldsProvided ? `\nAI Context Updated: ${entry.aiContext.lastAIUpdate}` : '';
+
     return {
       content: [
         {
           type: 'text',
-          text: `Updated devlog entry: ${entry.id}\nTitle: ${entry.title}\nStatus: ${entry.status}\nLast Updated: ${entry.updatedAt}\n\nTotal Notes: ${entry.notes.length}`,
+          text: `Updated devlog entry: ${entry.id}\nTitle: ${entry.title}\nStatus: ${entry.status}\nLast Updated: ${entry.updatedAt}${aiContextNote}\n\nTotal Notes: ${entry.notes.length}`,
         },
       ],
     };
@@ -156,11 +160,21 @@ export class MCPDevlogAdapter {
     id: number;
     note: string;
     category?: string;
+    files?: string[];
+    codeChanges?: string;
   }): Promise<CallToolResult> {
     await this.ensureInitialized();
 
     const category = (args.category as any) || 'progress';
-    const entry = await this.devlogManager.addNote(args.id, args.note, category);
+    const entry = await this.devlogManager.addNote(
+      args.id, 
+      args.note, 
+      category,
+      {
+        files: args.files,
+        codeChanges: args.codeChanges,
+      }
+    );
 
     return {
       content: [
@@ -349,7 +363,7 @@ export class MCPDevlogAdapter {
       content: [
         {
           type: 'text',
-          text: `Updated AI context for devlog '${entry.id}':\n${JSON.stringify(contextUpdate, null, 2)}`,
+          text: `[DEPRECATED] Updated AI context for devlog '${entry.id}'. Use update_devlog with AI context fields instead.\n\n${JSON.stringify(contextUpdate, null, 2)}`,
         },
       ],
     };
@@ -429,6 +443,41 @@ export class MCPDevlogAdapter {
             `- Keywords: ${args.keywords?.join(', ') || 'None'}\n` +
             `- Scope: ${args.scope || 'Not specified'}\n\n` +
             `**Found ${discoveryResult.relatedEntries.length} related entries:**\n\n${analysis}\n\n${discoveryResult.recommendation}`,
+        },
+      ],
+    };
+  }
+
+  async updateDevlogWithProgress(args: {
+    id: number;
+    progress: string;
+    status?: string;
+    priority?: string;
+    codeChanges?: string;
+    files?: string[];
+  }): Promise<CallToolResult> {
+    await this.ensureInitialized();
+
+    const updates: any = {};
+    if (args.status) updates.status = args.status;
+    if (args.priority) updates.priority = args.priority;
+
+    const entry = await this.devlogManager.updateWithProgress(
+      args.id,
+      updates,
+      args.progress,
+      {
+        category: 'progress',
+        files: args.files,
+        codeChanges: args.codeChanges,
+      }
+    );
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Updated devlog '${entry.id}' and added progress note:\n${args.progress}\n\nStatus: ${entry.status}\nTotal notes: ${entry.notes.length}`,
         },
       ],
     };

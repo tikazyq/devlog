@@ -15,6 +15,7 @@ import type {
   DiscoverDevlogsRequest,
   DiscoveredDevlogEntry,
   DiscoveryResult,
+  NoteCategory,
   StorageProvider,
   TimeSeriesDataPoint,
   TimeSeriesRequest,
@@ -159,17 +160,29 @@ export class DevlogManager {
     if (request.initialInsights !== undefined) updated.aiContext.keyInsights = request.initialInsights;
     if (request.relatedPatterns !== undefined) updated.aiContext.relatedPatterns = request.relatedPatterns;
 
-    // Add progress note if provided
-    if (request.progress) {
-      const note: DevlogNote = {
-        id: crypto.randomUUID(),
-        timestamp: new Date().toISOString(),
-        category: request.noteCategory || 'progress',
-        content: request.progress,
-        files: request.files,
-        codeChanges: request.codeChanges,
-      };
-      updated.notes.push(note);
+    // Update AI context fields (embedded from updateAIContext functionality)
+    let aiContextUpdated = false;
+    if (request.currentSummary !== undefined) {
+      updated.aiContext.currentSummary = request.currentSummary;
+      aiContextUpdated = true;
+    }
+    if (request.keyInsights !== undefined) {
+      updated.aiContext.keyInsights = request.keyInsights;
+      aiContextUpdated = true;
+    }
+    if (request.openQuestions !== undefined) {
+      updated.aiContext.openQuestions = request.openQuestions;
+      aiContextUpdated = true;
+    }
+    if (request.suggestedNextSteps !== undefined) {
+      updated.aiContext.suggestedNextSteps = request.suggestedNextSteps;
+      aiContextUpdated = true;
+    }
+
+    // Update AI context metadata if any AI fields were modified
+    if (aiContextUpdated) {
+      updated.aiContext.lastAIUpdate = new Date().toISOString();
+      updated.aiContext.contextVersion = (updated.aiContext.contextVersion || 0) + 1;
     }
 
     await this.storageProvider.save(updated);
@@ -183,6 +196,10 @@ export class DevlogManager {
     id: DevlogId,
     content: string,
     category: DevlogNote['category'] = 'progress',
+    options?: {
+      files?: string[];
+      codeChanges?: string;
+    }
   ): Promise<DevlogEntry> {
     await this.ensureInitialized();
 
@@ -196,6 +213,8 @@ export class DevlogManager {
       timestamp: new Date().toISOString(),
       category,
       content,
+      files: options?.files,
+      codeChanges: options?.codeChanges,
     };
 
     const updated: DevlogEntry = {
@@ -206,6 +225,34 @@ export class DevlogManager {
 
     await this.storageProvider.save(updated);
     return updated;
+  }
+
+  /**
+   * Convenience method to update a devlog and add a progress note in one operation
+   */
+  async updateWithProgress(
+    id: DevlogId,
+    updates: UpdateDevlogRequest,
+    progressNote: string,
+    options?: {
+      category?: NoteCategory;
+      files?: string[];
+      codeChanges?: string;
+    }
+  ): Promise<DevlogEntry> {
+    // First update the devlog
+    const updated = await this.updateDevlog({ ...updates, id });
+    
+    // Then add the progress note
+    return await this.addNote(
+      id, 
+      progressNote, 
+      options?.category || 'progress',
+      {
+        files: options?.files,
+        codeChanges: options?.codeChanges,
+      }
+    );
   }
 
   /**
@@ -356,6 +403,7 @@ export class DevlogManager {
 
   /**
    * Update AI context for a devlog entry
+   * @deprecated Use updateDevlog with AI context fields instead. This method will be removed in v2.0.0.
    */
   async updateAIContext(
     id: DevlogId,
@@ -363,22 +411,16 @@ export class DevlogManager {
   ): Promise<DevlogEntry> {
     await this.ensureInitialized();
 
-    const existing = await this.storageProvider.get(id);
-    if (!existing) {
-      throw new Error(`Devlog entry with ID '${id}' not found`);
-    }
-
-    const updated: DevlogEntry = {
-      ...existing,
-      aiContext: {
-        ...existing.aiContext,
-        ...context,
-      },
-      updatedAt: new Date().toISOString(),
+    // Convert to updateDevlog call for consistency
+    const updateRequest: UpdateDevlogRequest = {
+      id,
+      currentSummary: context.currentSummary,
+      keyInsights: context.keyInsights,
+      openQuestions: context.openQuestions,
+      suggestedNextSteps: context.suggestedNextSteps,
     };
 
-    await this.storageProvider.save(updated);
-    return updated;
+    return await this.updateDevlog(updateRequest);
   }
 
   /**

@@ -128,10 +128,6 @@ const tools: Tool[] = [
           enum: ['todo', 'in-progress', 'blocked', 'review', 'testing', 'done'],
           description: 'Current status of the task',
         },
-        progress: {
-          type: 'string',
-          description: 'Progress notes or updates',
-        },
         blockers: {
           type: 'string',
           description: 'Any blockers or issues encountered',
@@ -144,10 +140,6 @@ const tools: Tool[] = [
           type: 'array',
           items: { type: 'string' },
           description: 'List of files that were modified',
-        },
-        codeChanges: {
-          type: 'string',
-          description: 'Summary of code changes made',
         },
         businessContext: {
           type: 'string',
@@ -171,6 +163,26 @@ const tools: Tool[] = [
           type: 'array',
           items: { type: 'string' },
           description: 'Related patterns or examples from other projects',
+        },
+        // AI context fields (embedded from update_ai_context)
+        currentSummary: {
+          type: 'string',
+          description: 'Updated summary of current understanding',
+        },
+        keyInsights: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Key insights or learnings',
+        },
+        openQuestions: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Open questions that need resolution',
+        },
+        suggestedNextSteps: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Suggested next steps based on current progress',
         },
       },
       required: ['id'],
@@ -240,7 +252,7 @@ const tools: Tool[] = [
         },
         note: {
           type: 'string',
-          description: 'Note to add',
+          description: 'Note content',
         },
         category: {
           type: 'string',
@@ -248,8 +260,54 @@ const tools: Tool[] = [
           default: 'progress',
           description: 'Category of the note',
         },
+        files: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Files related to this note',
+        },
+        codeChanges: {
+          type: 'string',
+          description: 'Summary of code changes made',
+        },
       },
       required: ['id', 'note'],
+    },
+  },
+  {
+    name: 'update_devlog_with_progress',
+    description: 'Update devlog status/fields and add a progress note in one operation',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'number',
+          description: 'Numeric ID of the devlog entry',
+        },
+        status: {
+          type: 'string',
+          enum: ['todo', 'in-progress', 'review', 'testing', 'done', 'archived'],
+          description: 'New status for the devlog entry',
+        },
+        progress: {
+          type: 'string',
+          description: 'Progress note content',
+        },
+        codeChanges: {
+          type: 'string',
+          description: 'Summary of code changes made',
+        },
+        files: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Files modified in this update',
+        },
+        priority: {
+          type: 'string',
+          enum: ['low', 'medium', 'high', 'critical'],
+          description: 'Updated priority level',
+        },
+      },
+      required: ['id', 'progress'],
     },
   },
   {
@@ -331,7 +389,7 @@ const tools: Tool[] = [
   },
   {
     name: 'update_ai_context',
-    description: 'Update AI context for a devlog entry with insights, questions, and next steps',
+    description: '[DEPRECATED] Update AI context for a devlog entry. Use update_devlog with AI context fields instead. This tool will be removed in v2.0.0.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -398,6 +456,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case 'add_devlog_note':
         return await adapter.addDevlogNote(args as any);
+
+      case 'update_devlog_with_progress':
+        return await adapter.updateDevlogWithProgress(args as any);
 
       case 'add_decision':
         return await adapter.addDecision(args as any);

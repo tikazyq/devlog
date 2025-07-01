@@ -1,10 +1,8 @@
-import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { DevlogManager } from '../devlog-manager.js';
-import * as fs from 'fs/promises';
 
 describe('DevlogManager', () => {
   let manager: DevlogManager;
-  let testWorkspace: string;
 
   beforeAll(async () => {
     process.env['UNIT_TEST'] = 'true';
@@ -15,16 +13,7 @@ describe('DevlogManager', () => {
     manager = new DevlogManager();
   });
 
-  afterEach(async () => {
-    // Clean up test workspace
-    try {
-      await fs.rm(testWorkspace, { recursive: true, force: true });
-    } catch (error) {
-      // Ignore cleanup errors
-    }
-  });
-
-  describe('findOrCreateDevlog', () => {
+  describe('createDevlog', () => {
     it('should create a new devlog entry', async () => {
       const result = await manager.createDevlog({
         title: 'Test Feature',
@@ -64,15 +53,13 @@ describe('DevlogManager', () => {
       });
 
       const result = await manager.updateDevlog({
-        id: created.id,
+        id: created.id!,
         status: 'in-progress',
-        progress: 'Made good progress today',
       });
 
       expect(result.status).toBe('in-progress');
-      expect(result.notes).toHaveLength(1);
-      expect(result.notes[0].content).toBe('Made good progress today');
-      expect(result.notes[0].category).toBe('progress');
+      // Notes should not be created by updateDevlog - use addNote method instead
+      expect(result.notes).toHaveLength(0);
     });
 
     it('should update multiple fields', async () => {
@@ -83,7 +70,7 @@ describe('DevlogManager', () => {
       });
 
       const result = await manager.updateDevlog({
-        id: created.id,
+        id: created.id!,
         title: 'Updated Title',
         priority: 'critical',
         files: ['file1.ts', 'file2.ts'],
@@ -103,7 +90,7 @@ describe('DevlogManager', () => {
         description: 'Testing retrieval',
       });
 
-      const result = await manager.getDevlog(created.id);
+      const result = await manager.getDevlog(created.id!);
 
       expect(result).not.toBeNull();
       expect(result!.title).toBe('Get Test');
@@ -152,7 +139,7 @@ describe('DevlogManager', () => {
       });
 
       await manager.updateDevlog({
-        id: created2.id,
+        id: created2.id!,
         status: 'done',
       });
 
@@ -221,7 +208,7 @@ describe('DevlogManager', () => {
       });
 
       const result = await manager.addNote(
-        created.id,
+        created.id!,
         'Made some progress on this task',
         'progress',
       );
@@ -240,7 +227,7 @@ describe('DevlogManager', () => {
         description: 'Testing completion',
       });
 
-      const result = await manager.completeDevlog(created.id, 'Task completed successfully');
+      const result = await manager.completeDevlog(created.id!, 'Task completed successfully');
 
       expect(result.status).toBe('done');
       expect(result.notes).toHaveLength(1);
@@ -270,7 +257,7 @@ describe('DevlogManager', () => {
         description: 'A completed task',
       });
 
-      await manager.completeDevlog(completed.id);
+      await manager.completeDevlog(completed.id!);
 
       const context = await manager.getActiveContext();
 
@@ -310,7 +297,7 @@ describe('DevlogManager', () => {
         priority: 'medium',
       });
 
-      await manager.completeDevlog(bugfix.id);
+      await manager.completeDevlog(bugfix.id!);
 
       const stats = await manager.getStats();
 
@@ -332,9 +319,9 @@ describe('DevlogManager', () => {
         description: 'Testing deletion',
       });
 
-      await manager.deleteDevlog(created.id);
+      await manager.deleteDevlog(created.id!);
 
-      const result = await manager.getDevlog(created.id);
+      const result = await manager.getDevlog(created.id!);
       expect(result).toBeNull();
     });
 

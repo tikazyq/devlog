@@ -125,8 +125,53 @@
       "priority": "high",
       "createdAt": "2025-07-01T13:54:03.560Z",
       "updatedAt": "2025-07-01T14:01:06.847Z"
+    },
+    "18": {
+      "filename": "018-remove-redundant-note-addition-logic-from-updatede.json",
+      "title": "Remove redundant note addition logic from updateDevlog method in DevlogManager",
+      "status": "done",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-07-01T14:13:57.177Z",
+      "updatedAt": "2025-07-01T14:19:15.204Z"
+    },
+    "19": {
+      "filename": "019-evaluate-and-propose-solutions-for-removed-updated.json",
+      "title": "Evaluate and propose solutions for removed updateDevlog convenience fields",
+      "status": "done",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-07-01T14:21:53.449Z",
+      "updatedAt": "2025-07-01T14:39:04.579Z"
+    },
+    "20": {
+      "filename": "020-add-aggregated-file-code-changes-summary-to-devlog.json",
+      "title": "Add aggregated file/code changes summary to DevlogEntry",
+      "status": "todo",
+      "type": "feature",
+      "priority": "low",
+      "createdAt": "2025-07-01T14:27:18.275Z",
+      "updatedAt": "2025-07-01T14:27:18.275Z"
+    },
+    "21": {
+      "filename": "021-embed-updateaicontext-functionality-into-updatedev.json",
+      "title": "Embed updateAIContext functionality into updateDevlog method",
+      "status": "todo",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-07-01T14:44:29.305Z",
+      "updatedAt": "2025-07-01T14:44:29.305Z"
+    },
+    "22": {
+      "filename": "022-update-testing-methodology-in-copilot-instructions.json",
+      "title": "Update testing methodology in copilot instructions for early stage development",
+      "status": "done",
+      "type": "docs",
+      "priority": "medium",
+      "createdAt": "2025-07-01T14:54:56.548Z",
+      "updatedAt": "2025-07-01T14:55:27.686Z"
     }
   },
-  "lastId": 17,
+  "lastId": 22,
   "version": "1.0.0"
 }

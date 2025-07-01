@@ -31,12 +31,9 @@ export interface UpdateDevlogRequest {
   actualHours?: number;
   assignee?: string;
   tags?: string[];
-  progress?: string;
   blockers?: string;
   nextSteps?: string;
   files?: string[];
-  codeChanges?: string;
-  noteCategory?: NoteCategory;
 
   // Enhanced context fields - matching CreateDevlogRequest
   businessContext?: string;
@@ -44,6 +41,12 @@ export interface UpdateDevlogRequest {
   acceptanceCriteria?: string[];
   initialInsights?: string[];
   relatedPatterns?: string[];
+
+  // AI context fields - embedded from updateAIContext
+  currentSummary?: string;
+  keyInsights?: string[];
+  openQuestions?: string[];
+  suggestedNextSteps?: string[];
 }
 
 export interface DiscoverDevlogsRequest {

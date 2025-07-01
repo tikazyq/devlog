@@ -365,16 +365,19 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
 
               <Row gutter={[16, 8]} style={{ marginBottom: '16px' }}>
                 <Col xs={24} sm={12} md={8}>
-                  <Text type="secondary">Created:</Text><br />
+                  <Text type="secondary">Created:</Text>
+                  <br />
                   <Text>{new Date(devlog.createdAt).toLocaleString()}</Text>
                 </Col>
                 <Col xs={24} sm={12} md={8}>
-                  <Text type="secondary">Updated:</Text><br />
+                  <Text type="secondary">Updated:</Text>
+                  <br />
                   <Text>{new Date(devlog.updatedAt).toLocaleString()}</Text>
                 </Col>
                 {devlog.assignee && (
                   <Col xs={24} sm={12} md={8}>
-                    <Text type="secondary">Assignee:</Text><br />
+                    <Text type="secondary">Assignee:</Text>
+                    <br />
                     <Text>{devlog.assignee}</Text>
                   </Col>
                 )}
@@ -384,13 +387,15 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
                 <Row gutter={[16, 8]} style={{ marginBottom: '16px' }}>
                   {devlog.estimatedHours && (
                     <Col xs={12} md={6}>
-                      <Text type="secondary">Estimated Hours:</Text><br />
+                      <Text type="secondary">Estimated Hours:</Text>
+                      <br />
                       <Text>{devlog.estimatedHours}h</Text>
                     </Col>
                   )}
                   {devlog.actualHours && (
                     <Col xs={12} md={6}>
-                      <Text type="secondary">Actual Hours:</Text><br />
+                      <Text type="secondary">Actual Hours:</Text>
+                      <br />
                       <Text>{devlog.actualHours}h</Text>
                     </Col>
                   )}
@@ -399,10 +404,14 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
 
               {devlog.tags && devlog.tags.length > 0 && (
                 <div style={{ marginBottom: '16px' }}>
-                  <Text type="secondary" style={{ marginRight: '8px' }}>Tags:</Text>
+                  <Text type="secondary" style={{ marginRight: '8px' }}>
+                    Tags:
+                  </Text>
                   <Space wrap>
                     {devlog.tags.map((tag, index) => (
-                      <Tag key={index} color="purple">{tag}</Tag>
+                      <Tag key={index} color="purple">
+                        {tag}
+                      </Tag>
                     ))}
                   </Space>
                 </div>
@@ -463,7 +472,13 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
                 <Space direction="vertical" style={{ width: '100%' }}>
                   {devlog.context.dependencies.map((dep, index) => (
                     <Card key={index} size="small" style={{ width: '100%' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                        }}
+                      >
                         <div>
                           <Text strong>{dep.description}</Text>
                           {dep.externalId && (
@@ -474,7 +489,15 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
                             </div>
                           )}
                         </div>
-                        <Tag color={dep.type === 'blocks' ? 'red' : dep.type === 'blocked-by' ? 'orange' : 'blue'}>
+                        <Tag
+                          color={
+                            dep.type === 'blocks'
+                              ? 'red'
+                              : dep.type === 'blocked-by'
+                                ? 'orange'
+                                : 'blue'
+                          }
+                        >
                           {dep.type}
                         </Tag>
                       </div>
@@ -503,7 +526,8 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
                         </div>
                       )}
                       <Text type="secondary" style={{ fontSize: '12px' }}>
-                        By {decision.decisionMaker} • {new Date(decision.timestamp).toLocaleString()}
+                        By {decision.decisionMaker} •{' '}
+                        {new Date(decision.timestamp).toLocaleString()}
                       </Text>
                     </Timeline.Item>
                   ))}
@@ -518,13 +542,36 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
                   {devlog.context.risks.map((risk, index) => (
                     <Card key={index} size="small" style={{ width: '100%' }}>
                       <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: '8px',
+                          }}
+                        >
                           <Text strong>{risk.description}</Text>
                           <Space>
-                            <Tag color={risk.impact === 'high' ? 'red' : risk.impact === 'medium' ? 'orange' : 'green'}>
+                            <Tag
+                              color={
+                                risk.impact === 'high'
+                                  ? 'red'
+                                  : risk.impact === 'medium'
+                                    ? 'orange'
+                                    : 'green'
+                              }
+                            >
                               Impact: {risk.impact}
                             </Tag>
-                            <Tag color={risk.probability === 'high' ? 'red' : risk.probability === 'medium' ? 'orange' : 'green'}>
+                            <Tag
+                              color={
+                                risk.probability === 'high'
+                                  ? 'red'
+                                  : risk.probability === 'medium'
+                                    ? 'orange'
+                                    : 'green'
+                              }
+                            >
                               Probability: {risk.probability}
                             </Tag>
                           </Space>
@@ -576,7 +623,7 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
                       <MarkdownRenderer content={devlog.aiContext.currentSummary} />
                     </div>
                   )}
-                  
+
                   {devlog.aiContext.keyInsights && devlog.aiContext.keyInsights.length > 0 && (
                     <div style={{ marginBottom: '16px' }}>
                       <Text strong>Key Insights:</Text>
@@ -606,7 +653,9 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
                         renderItem={(question, index) => (
                           <List.Item style={{ padding: '4px 0', border: 'none' }}>
                             <Space align="start">
-                              <QuestionCircleOutlined style={{ color: '#f5222d', marginTop: '2px' }} />
+                              <QuestionCircleOutlined
+                                style={{ color: '#f5222d', marginTop: '2px' }}
+                              />
                               <Text>{question}</Text>
                             </Space>
                           </List.Item>
@@ -615,39 +664,43 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
                     </div>
                   )}
 
-                  {devlog.aiContext.suggestedNextSteps && devlog.aiContext.suggestedNextSteps.length > 0 && (
-                    <div style={{ marginBottom: '16px' }}>
-                      <Text strong>Suggested Next Steps:</Text>
-                      <List
-                        size="small"
-                        style={{ marginTop: '8px' }}
-                        dataSource={devlog.aiContext.suggestedNextSteps}
-                        renderItem={(step, index) => (
-                          <List.Item style={{ padding: '4px 0', border: 'none' }}>
-                            <Space align="start">
-                              <RightOutlined style={{ color: '#52c41a', marginTop: '2px' }} />
-                              <Text>{step}</Text>
-                            </Space>
-                          </List.Item>
-                        )}
-                      />
-                    </div>
-                  )}
+                  {devlog.aiContext.suggestedNextSteps &&
+                    devlog.aiContext.suggestedNextSteps.length > 0 && (
+                      <div style={{ marginBottom: '16px' }}>
+                        <Text strong>Suggested Next Steps:</Text>
+                        <List
+                          size="small"
+                          style={{ marginTop: '8px' }}
+                          dataSource={devlog.aiContext.suggestedNextSteps}
+                          renderItem={(step, index) => (
+                            <List.Item style={{ padding: '4px 0', border: 'none' }}>
+                              <Space align="start">
+                                <RightOutlined style={{ color: '#52c41a', marginTop: '2px' }} />
+                                <Text>{step}</Text>
+                              </Space>
+                            </List.Item>
+                          )}
+                        />
+                      </div>
+                    )}
 
-                  {devlog.aiContext.relatedPatterns && devlog.aiContext.relatedPatterns.length > 0 && (
-                    <div style={{ marginBottom: '16px' }}>
-                      <Text strong>Related Patterns:</Text>
-                      <Space wrap style={{ marginTop: '8px' }}>
-                        {devlog.aiContext.relatedPatterns.map((pattern, index) => (
-                          <Tag key={index} color="geekblue">{pattern}</Tag>
-                        ))}
-                      </Space>
-                    </div>
-                  )}
+                  {devlog.aiContext.relatedPatterns &&
+                    devlog.aiContext.relatedPatterns.length > 0 && (
+                      <div style={{ marginBottom: '16px' }}>
+                        <Text strong>Related Patterns:</Text>
+                        <Space wrap style={{ marginTop: '8px' }}>
+                          {devlog.aiContext.relatedPatterns.map((pattern, index) => (
+                            <Tag key={index} color="geekblue">
+                              {pattern}
+                            </Tag>
+                          ))}
+                        </Space>
+                      </div>
+                    )}
 
                   <div>
                     <Text type="secondary" style={{ fontSize: '12px' }}>
-                      Last AI Update: {new Date(devlog.aiContext.lastAIUpdate).toLocaleString()} • 
+                      Last AI Update: {new Date(devlog.aiContext.lastAIUpdate).toLocaleString()} •
                       Version: {devlog.aiContext.contextVersion}
                     </Text>
                   </div>
@@ -661,7 +714,13 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
                 <Space direction="vertical" style={{ width: '100%' }}>
                   {devlog.externalReferences.map((ref, index) => (
                     <Card key={index} size="small">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                        }}
+                      >
                         <div>
                           <Text strong>{ref.title || ref.id}</Text>
                           {ref.url && (

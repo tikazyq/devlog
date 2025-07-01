@@ -56,7 +56,8 @@
 - **Preferred**: Use Vitest for formal test cases in `packages/*/src/__tests__/` directories when appropriate
 - **⚠️ Formal test modifications**: Only update existing formal test cases when you are confident about the correct approach and test logic
 - **Temporary scripts**: Allowed in `tmp/` directory (gitignored) for quick validation and debugging
-- **Browser-based testing**: Use Playwright MCP tools for UI and integration testing
+- **Browser-based testing**: Use Playwright MCP tools for UI and integration testing (clicking, typing, etc.)
+- **Web application**: Use "Web: Dev (Full Stack)" VS Code task to start the web app for UI and integration testing
 - **Prohibited**: Never create test scripts in tracked directories (`.` root, `src/`, `scripts/`, etc.)
 - **Run formal tests**: Use `pnpm test` or `pnpm test:watch` when formal tests exist
 - **Clean up**: Remove temporary files from `tmp/` when done

@@ -3,10 +3,10 @@
   "title": "Optimize line height in markdown rendered content",
   "type": "task",
   "description": "Reduce the line height in markdown rendered content to improve visual density and readability. Current line-height of 1.6 for paragraphs and list items appears too large, making the content feel sparse.",
-  "status": "review",
+  "status": "done",
   "priority": "medium",
   "createdAt": "2025-07-01T13:48:34.379Z",
-  "updatedAt": "2025-07-01T13:51:53.669Z",
+  "updatedAt": "2025-07-01T14:01:58.551Z",
   "tags": [],
   "notes": [
     {
@@ -46,5 +46,6 @@
     "lastAIUpdate": "2025-07-01T13:48:34.379Z",
     "contextVersion": 1
   },
-  "id": 15
+  "id": 15,
+  "assignee": ""
 }

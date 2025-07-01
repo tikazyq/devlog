@@ -152,6 +152,13 @@ export class DevlogManager {
     if (request.tags !== undefined) updated.tags = request.tags;
     if (request.files !== undefined) updated.files = request.files;
 
+    // Update enhanced context fields
+    if (request.businessContext !== undefined) updated.context.businessContext = request.businessContext;
+    if (request.technicalContext !== undefined) updated.context.technicalContext = request.technicalContext;
+    if (request.acceptanceCriteria !== undefined) updated.context.acceptanceCriteria = request.acceptanceCriteria;
+    if (request.initialInsights !== undefined) updated.aiContext.keyInsights = request.initialInsights;
+    if (request.relatedPatterns !== undefined) updated.aiContext.relatedPatterns = request.relatedPatterns;
+
     // Add progress note if provided
     if (request.progress) {
       const note: DevlogNote = {

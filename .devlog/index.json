@@ -111,13 +111,31 @@
     "15": {
       "filename": "015-optimize-line-height-in-markdown-rendered-content.json",
       "title": "Optimize line height in markdown rendered content",
-      "status": "review",
+      "status": "done",
       "type": "task",
       "priority": "medium",
       "createdAt": "2025-07-01T13:48:34.379Z",
-      "updatedAt": "2025-07-01T13:51:53.669Z"
+      "updatedAt": "2025-07-01T14:01:58.551Z"
+    },
+    "16": {
+      "filename": "016-add-missing-context-fields-to-updatedevlogrequest-.json",
+      "title": "Add missing context fields to UpdateDevlogRequest interface and implementation",
+      "status": "done",
+      "type": "bugfix",
+      "priority": "high",
+      "createdAt": "2025-07-01T13:54:03.560Z",
+      "updatedAt": "2025-07-01T14:01:06.847Z"
+    },
+    "17": {
+      "filename": "017-test-devlog-for-context-updates.json",
+      "title": "Test devlog for context updates",
+      "status": "done",
+      "type": "task",
+      "priority": "medium",
+      "createdAt": "2025-07-01T13:56:10.775Z",
+      "updatedAt": "2025-07-01T14:01:12.843Z"
     }
   },
-  "lastId": 15,
+  "lastId": 17,
   "version": "1.0.0"
 }

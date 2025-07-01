@@ -136,18 +136,41 @@ const tools: Tool[] = [
           type: 'string',
           description: 'Any blockers or issues encountered',
         },
-        next_steps: {
+        nextSteps: {
           type: 'string',
           description: 'Next steps to take',
         },
-        files_changed: {
+        files: {
           type: 'array',
           items: { type: 'string' },
           description: 'List of files that were modified',
         },
-        code_changes: {
+        codeChanges: {
           type: 'string',
           description: 'Summary of code changes made',
+        },
+        businessContext: {
+          type: 'string',
+          description: 'Business context - why this work matters and what problem it solves',
+        },
+        technicalContext: {
+          type: 'string',
+          description: 'Technical context - architecture decisions, constraints, assumptions',
+        },
+        acceptanceCriteria: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Acceptance criteria or definition of done',
+        },
+        initialInsights: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Initial insights or knowledge about this work',
+        },
+        relatedPatterns: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Related patterns or examples from other projects',
         },
       },
       required: ['id'],

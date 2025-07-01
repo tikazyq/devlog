@@ -32,9 +32,18 @@ export interface UpdateDevlogRequest {
   assignee?: string;
   tags?: string[];
   progress?: string;
+  blockers?: string;
+  nextSteps?: string;
   files?: string[];
   codeChanges?: string;
   noteCategory?: NoteCategory;
+
+  // Enhanced context fields - matching CreateDevlogRequest
+  businessContext?: string;
+  technicalContext?: string;
+  acceptanceCriteria?: string[];
+  initialInsights?: string[];
+  relatedPatterns?: string[];
 }
 
 export interface DiscoverDevlogsRequest {

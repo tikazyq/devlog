@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Layout, Skeleton } from 'antd';
-import './styles.css';
+import styles from './AppLayoutSkeleton.module.css';
 
 const { Sider, Content } = Layout;
 
@@ -11,17 +11,17 @@ export function AppLayoutSkeleton() {
     <Layout className="app-layout">
       <Sider
         width={280}
-        className="sidebar-skeleton"
+        className={styles.sidebarSkeleton}
       >
-        <div className="sidebar-skeleton-content">
+        <div className={styles.sidebarSkeletonContent}>
           <Skeleton active paragraph={{ rows: 2 }} />
           <br />
           <Skeleton active paragraph={{ rows: 8 }} />
         </div>
       </Sider>
       <Layout>
-        <div className="header-skeleton">
-          <Skeleton.Button active className="header-skeleton-button" />
+        <div className={styles.headerSkeleton}>
+          <Skeleton.Button active className={styles.headerSkeletonButton} />
         </div>
         <Content className="app-content">
           <div className="app-content-wrapper">

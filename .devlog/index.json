@@ -39,11 +39,11 @@
     "6": {
       "filename": "006-add-missing-fields-to-devloglist-table-component.json",
       "title": "Add missing fields to DevlogList table component",
-      "status": "testing",
+      "status": "done",
       "type": "bugfix",
       "priority": "medium",
       "createdAt": "2025-06-26T15:15:39.185Z",
-      "updatedAt": "2025-06-26T15:27:03.117Z"
+      "updatedAt": "2025-07-01T15:42:13.775Z"
     },
     "7": {
       "filename": "007-optimize-ui-display-for-acceptance-criteria-and-ai.json",
@@ -179,8 +179,17 @@
       "priority": "medium",
       "createdAt": "2025-07-01T15:17:21.908Z",
       "updatedAt": "2025-07-01T15:27:34.624Z"
+    },
+    "24": {
+      "filename": "024-refactor-component-css-to-use-css-modules-pattern.json",
+      "title": "Refactor component CSS to use CSS modules pattern",
+      "status": "done",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-07-01T15:34:09.961Z",
+      "updatedAt": "2025-07-01T15:44:14.528Z"
     }
   },
-  "lastId": 23,
+  "lastId": 24,
   "version": "1.0.0"
 }

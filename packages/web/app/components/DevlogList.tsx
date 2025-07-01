@@ -11,7 +11,7 @@ import {
   getPriorityColor,
   getPriorityIcon,
 } from '../lib/devlog-ui-utils';
-import './styles.css';
+import styles from './DevlogList.module.css';
 
 const { Title, Text } = Typography;
 
@@ -25,10 +25,10 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       width: 280,
       render: (title: string, record: DevlogEntry) => (
         <div>
-          <div className="devlog-title-container">
+          <div className={styles.devlogTitleContainer}>
             <Text
               strong
-              className="devlog-title"
+              className={styles.devlogTitle}
               onClick={() => onViewDevlog(record)}
               ellipsis={{ tooltip: title }}
             >
@@ -39,12 +39,12 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
           <Text
             type="secondary"
             ellipsis={{ tooltip: record.description }}
-            className="devlog-description"
+            className={styles.devlogDescription}
           >
             {record.description}
           </Text>
           {record.key && (
-            <Text type="secondary" className="devlog-key" ellipsis={{ tooltip: record.key }}>
+            <Text type="secondary" className={styles.devlogKey} ellipsis={{ tooltip: record.key }}>
               {record.key}
             </Text>
           )}
@@ -80,11 +80,11 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       width: 120,
       render: (assignee: string) =>
         assignee ? (
-          <Text className="devlog-assignee" ellipsis={{ tooltip: assignee }}>
+          <Text className={styles.devlogAssignee} ellipsis={{ tooltip: assignee }}>
             {assignee}
           </Text>
         ) : (
-          <Text type="secondary" className="devlog-assignee">
+          <Text type="secondary" className={styles.devlogAssignee}>
             —
           </Text>
         ),
@@ -97,12 +97,12 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       render: (tags: string[]) => (
         <div>
           {tags?.slice(0, 2).map((tag) => (
-            <Tag key={tag} color="purple" className="devlog-tag-small">
+            <Tag key={tag} color="purple" className={styles.devlogTagSmall}>
               {tag}
             </Tag>
           ))}
           {tags?.length > 2 && (
-            <Tag color="default" className="devlog-tag-small">
+            <Tag color="default" className={styles.devlogTagSmall}>
               +{tags.length - 2}
             </Tag>
           )}
@@ -114,7 +114,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       key: 'hours',
       width: 100,
       render: (_, record: DevlogEntry) => (
-        <div className="devlog-hours">
+        <div className={styles.devlogHours}>
           {record.estimatedHours || record.actualHours ? (
             <>
               <div>{record.estimatedHours ? `Est: ${record.estimatedHours}h` : '—'}</div>
@@ -132,7 +132,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       key: 'createdAt',
       width: 100,
       render: (createdAt: string) => (
-        <Text type="secondary" className="devlog-date-small">
+        <Text type="secondary" className={styles.devlogDateSmall}>
           {new Date(createdAt).toLocaleDateString()}
         </Text>
       ),
@@ -143,7 +143,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       key: 'updatedAt',
       width: 100,
       render: (updatedAt: string) => (
-        <Text type="secondary" className="devlog-date-small">
+        <Text type="secondary" className={styles.devlogDateSmall}>
           {new Date(updatedAt).toLocaleDateString()}
         </Text>
       ),
@@ -181,7 +181,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
 
   if (loading) {
     return (
-      <div className="loading-container">
+      <div className={styles.loadingContainer}>
         <Spin size="large" tip="Loading devlogs..." />
       </div>
     );
@@ -198,40 +198,40 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
   );
 
   return (
-    <div className="devlog-list-container">
+    <div className={styles.devlogListContainer}>
       {/* Sticky Header with Summary */}
       <div className="page-header-sticky">
-        <div className="devlog-list-header-compact">
-          <div className="devlog-title-row">
+        <div className={styles.devlogListHeaderCompact}>
+          <div className={styles.devlogTitleRow}>
             <div>
-              <Title level={2} className="devlog-list-title-compact">
+              <Title level={2} className={styles.devlogListTitleCompact}>
                 All Devlogs
               </Title>
-              <Text type="secondary" className="devlog-list-subtitle-compact">
+              <Text type="secondary" className={styles.devlogListSubtitleCompact}>
                 Manage and track your development logs
               </Text>
             </div>
-            <div className="devlog-stats-compact">
-              <div className="stat-compact">
-                <span className="stat-value">{totalCount}</span>
-                <span className="stat-label">Total</span>
+            <div className={styles.devlogStatsCompact}>
+              <div className={styles.statCompact}>
+                <span className={styles.statValue}>{totalCount}</span>
+                <span className={styles.statLabel}>Total</span>
               </div>
-              <div className="stat-compact">
-                <span className="stat-value in-progress">{statusCounts['in-progress'] || 0}</span>
-                <span className="stat-label">In Progress</span>
+              <div className={styles.statCompact}>
+                <span className={`${styles.statValue} ${styles.inProgress}`}>{statusCounts['in-progress'] || 0}</span>
+                <span className={styles.statLabel}>In Progress</span>
               </div>
-              <div className="stat-compact">
-                <span className="stat-value completed">{statusCounts['done'] || 0}</span>
-                <span className="stat-label">Done</span>
+              <div className={styles.statCompact}>
+                <span className={`${styles.statValue} ${styles.completed}`}>{statusCounts['done'] || 0}</span>
+                <span className={styles.statLabel}>Done</span>
               </div>
-              <div className="stat-compact">
-                <span className="stat-value todo">{statusCounts['todo'] || 0}</span>
-                <span className="stat-label">Todo</span>
+              <div className={styles.statCompact}>
+                <span className={`${styles.statValue} ${styles.todo}`}>{statusCounts['todo'] || 0}</span>
+                <span className={styles.statLabel}>Todo</span>
               </div>
               {statusCounts['blocked'] && (
-                <div className="stat-compact">
-                  <span className="stat-value blocked">{statusCounts['blocked']}</span>
-                  <span className="stat-label">Blocked</span>
+                <div className={styles.statCompact}>
+                  <span className={`${styles.statValue} ${styles.blocked}`}>{statusCounts['blocked']}</span>
+                  <span className={styles.statLabel}>Blocked</span>
                 </div>
               )}
             </div>
@@ -239,7 +239,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
         </div>
       </div>
 
-      <div className="devlog-list-table">
+      <div className={styles.devlogListTable}>
         {devlogs.length === 0 ? (
           <Empty description="No devlogs found" style={{ padding: '40px' }} />
         ) : (

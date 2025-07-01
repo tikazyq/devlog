@@ -1,0 +1,219 @@
+/* Dashboard Component Styles */
+
+.dashboardHeaderSection {
+  padding: 12px 24px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e8e8e8;
+  flex-shrink: 0;
+}
+
+.dashboardTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
+}
+
+.dashboardTitle {
+  margin: 0 !important;
+  font-size: 28px !important;
+}
+
+.dashboardSubtitle {
+  margin: 0 !important;
+  font-size: 14px;
+}
+
+.dashboardStatsCompact {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.dashboardChartsSection {
+  padding: 24px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e8e8e8;
+  flex-shrink: 0;
+}
+
+.chartCard {
+  height: 380px;
+}
+
+.chartCard :global(.ant-card-body) {
+  padding: 20px;
+  height: calc(100% - 57px);
+  display: flex;
+  flex-direction: column;
+}
+
+.chartCard :global(.ant-card-head-title) {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.chartLegendText {
+  font-size: 12px;
+}
+
+.recentDevlogsCard {
+  margin: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.recentDevlogsTitle {
+  margin: 0 !important;
+}
+
+.emptyDevlogs {
+  padding: 60px 24px;
+}
+
+.devlogListItem {
+  cursor: pointer;
+  padding: 20px 24px !important;
+  border-bottom: 1px solid #f0f0f0 !important;
+  transition: background-color 0.2s ease;
+}
+
+.devlogListItem:hover {
+  background-color: #fafafa;
+}
+
+.devlogListItem:last-child {
+  border-bottom: none !important;
+}
+
+.devlogDate {
+  font-size: 14px;
+}
+
+.devlogTitleSection {
+  margin-bottom: 8px;
+}
+
+.devlogTitleText {
+  font-size: 16px !important;
+  display: block;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.devlogDescription {
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+}
+
+.recentDevlogsMeta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.devlogTag {
+  margin: 0 !important;
+}
+
+/* Stats component styles */
+.statCompact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 60px;
+}
+
+.statValue {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #1890ff;
+}
+
+.statValue.todo {
+  color: #8c8c8c;
+}
+
+.statValue.inProgress {
+  color: #faad14;
+}
+
+.statValue.review {
+  color: #fa8c16;
+}
+
+.statValue.testing {
+  color: #13c2c2;
+}
+
+.statValue.completed {
+  color: #52c41a;
+}
+
+.statValue.archived {
+  color: #595959;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: #8c8c8c;
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboardHeaderSection {
+    padding: 16px 16px 12px 16px;
+  }
+  
+  .dashboardChartsSection {
+    padding: 16px;
+  }
+  
+  .dashboardStatsCompact {
+    gap: 16px;
+  }
+  
+  .statCompact {
+    min-width: 50px;
+  }
+  
+  .statValue {
+    font-size: 18px;
+  }
+  
+  .statLabel {
+    font-size: 11px;
+  }
+  
+  .dashboardTitleRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .dashboardStatsCompact {
+    justify-content: flex-start;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboardStatsCompact {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .statCompact {
+    min-width: 45px;
+  }
+  
+  .statValue {
+    font-size: 16px;
+  }
+}

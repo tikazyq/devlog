@@ -25,6 +25,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    background: #fff;
 }
 
 .page-header {
@@ -60,6 +61,7 @@
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
+    padding: 12px 24px;
 }
 
 /* Sticky header for page content */
@@ -127,13 +129,13 @@
         align-items: flex-start;
         gap: 8px;
     }
-    
+
     .page-header-right {
         margin-left: 0;
         align-self: stretch;
         justify-content: flex-end;
     }
-    
+
     .page-content {
         padding: 16px;
     }

@@ -1,0 +1,28 @@
+/* DevlogDetails Component Styles */
+
+.devlogDetailsHeader {
+  margin-bottom: 24px;
+}
+
+.devlogDetailsActions {
+  margin-bottom: 24px;
+}
+
+.devlogDetailsContent {
+  margin-bottom: 24px;
+}
+
+.devlogSection {
+  margin-bottom: 24px;
+}
+
+.devlogFormActions {
+  margin-top: 24px;
+}
+
+/* Better spacing for mobile */
+@media (max-width: 576px) {
+  .devlogDetailsHeader {
+    margin-bottom: 16px;
+  }
+}

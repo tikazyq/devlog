@@ -3,10 +3,10 @@
   "title": "Add missing fields to DevlogList table component",
   "type": "bugfix",
   "description": "The DevlogList table component only shows basic fields (Title, Status, Priority, Updated, Actions) but DevlogEntry has many more important fields that should be visible in the table view for better project management.",
-  "status": "testing",
+  "status": "done",
   "priority": "medium",
   "createdAt": "2025-06-26T15:15:39.185Z",
-  "updatedAt": "2025-06-26T15:27:03.117Z",
+  "updatedAt": "2025-07-01T15:42:13.775Z",
   "tags": [],
   "notes": [
     {
@@ -66,5 +66,6 @@
     "lastAIUpdate": "2025-06-26T15:15:39.185Z",
     "contextVersion": 1
   },
-  "id": 6
+  "id": 6,
+  "assignee": ""
 }

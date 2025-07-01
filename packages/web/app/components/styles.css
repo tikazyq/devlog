@@ -1,229 +1,39 @@
-/* Component-specific styles to replace inline styles */
+/* Remaining global component styles that should be shared */
 
-/* Loading states */
-.loading-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 400px;
-}
-
-/* DevlogList styles */
-.devlog-list-header {
-    margin-bottom: 24px;
-}
-
-.devlog-title-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-}
-
-.devlog-title {
-    cursor: pointer;
-    max-width: 200px;
-    display: block;
-}
-
-.devlog-description {
-    font-size: 12px;
-    max-width: 200px;
-    display: block;
-}
-
-.devlog-key {
-    font-size: 11px;
-    font-family: monospace;
-    max-width: 150px;
-    display: block;
-}
-
-.devlog-assignee {
-    font-size: 12px;
-}
-
-.devlog-tag-small {
-    font-size: 10px;
-    margin: 1px;
-}
-
-.devlog-hours {
-    font-size: 11px;
-}
-
-.devlog-date-small {
-    font-size: 11px;
-}
-
-/* Table improvements */
-.devlog-table-container {
-    overflow-x: auto;
-}
-
-.devlog-table-container .ant-table-thead > tr > th.ant-table-cell-fix-left,
-.devlog-table-container .ant-table-tbody > tr > td.ant-table-cell-fix-left {
-    background: #fff;
-    z-index: 1;
-}
-
-.devlog-table-container .ant-table-thead > tr > th.ant-table-cell-fix-right,
-.devlog-table-container .ant-table-tbody > tr > td.ant-table-cell-fix-right {
-    background: #fff;
-    z-index: 1;
-}
-
-/* Dashboard styles */
-.dashboard-header {
-    margin-bottom: 24px;
-}
-
-.recent-devlogs-meta {
-    margin-top: 4px;
-}
-
-/* DevlogDetails styles */
-.devlog-details-header {
-    margin-bottom: 24px;
-}
-
-.devlog-details-actions {
-    margin-bottom: 24px;
-}
-
-.devlog-details-content {
-    margin-bottom: 24px;
-}
-
-.devlog-section {
-    margin-bottom: 24px;
-}
-
-.devlog-form-actions {
-    margin-top: 24px;
-}
-
-/* Header styles */
-.header-container {
-    padding: 0 24px;
+/* Global layout styles */
+.page-header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 10;
     background: #fff;
     border-bottom: 1px solid #f0f0f0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 }
 
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.header-title {
-    margin: 0 !important;
-    color: #1f2937;
-}
-
-/* Sidebar styles */
-.sidebar-header {
-    padding: 24px 24px 16px;
-}
-
-.sidebar-brand {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.sidebar-brand-icon {
-    font-size: 24px;
-    color: #3b82f6;
-}
-
-.sidebar-brand-title {
-    margin: 0 !important;
-    color: #1f2937;
-}
-
-.sidebar-stats {
-    padding: 24px 16px;
-}
-
-.sidebar-stats-title {
-    margin-bottom: 16px;
-    color: #6b7280;
-}
-
-.sidebar-stats-card {
-    background: #fafafa;
-}
-
-/* Loading skeleton styles */
-.sidebar-skeleton {
+.page-header {
     background: #fff;
-    border-right: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
 }
 
-.sidebar-skeleton-content {
+.scrollable-content {
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Global layout classes that multiple components use */
+.app-layout {
+    height: 100vh;
+}
+
+.app-content {
+    padding: 0;
+    background: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.app-content-wrapper {
     padding: 24px;
-}
-
-.header-skeleton {
-    height: 64px;
-    background: #fff;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.header-skeleton-button {
-    margin: 16px 24px;
-    width: 200px;
-}
-
-/* Responsive improvements */
-@media (max-width: 768px) {
-    .dashboard-stats-row .ant-col {
-        margin-bottom: 16px;
-    }
-
-    .header-container {
-        padding: 0 16px;
-    }
-
-    .header-left {
-        gap: 12px;
-    }
-
-    .sidebar-header {
-        padding: 16px;
-    }
-
-    .sidebar-stats {
-        padding: 16px 12px;
-    }
-}
-
-/* Improved focus states */
-.devlog-title:hover {
-    color: #1890ff;
-}
-
-.devlog-title:focus {
-    outline: 2px solid #1890ff;
-    outline-offset: 2px;
-}
-
-/* Better spacing for mobile */
-@media (max-width: 576px) {
-    .devlog-list-header {
-        margin-bottom: 16px;
-    }
-
-    .dashboard-header {
-        margin-bottom: 16px;
-    }
-
-    .devlog-details-header {
-        margin-bottom: 16px;
-    }
+    flex: 1;
+    overflow: auto;
 }

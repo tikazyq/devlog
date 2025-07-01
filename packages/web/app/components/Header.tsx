@@ -3,6 +3,7 @@
 import React from 'react';
 import { Badge, Button, Layout, Space, Typography } from 'antd';
 import { MenuOutlined, ReloadOutlined, WifiOutlined } from '@ant-design/icons';
+import styles from './Header.module.css';
 
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
@@ -16,17 +17,16 @@ interface HeaderProps {
 
 export function Header({ connected, onRefresh, sidebarCollapsed, onSidebarToggle }: HeaderProps) {
   return (
-    <AntHeader className="header-container">
-      <div className="header-left">
+    <AntHeader className={styles.headerContainer}>
+      <div className={styles.headerLeft}>
         {onSidebarToggle && (
           <Button
             type="text"
             icon={<MenuOutlined />}
             onClick={onSidebarToggle}
-            className="mobile-menu-button"
           />
         )}
-        <Typography.Title level={3} className="header-title">
+        <Typography.Title level={3} className={styles.headerTitle}>
           Devlog Dashboard
         </Typography.Title>
       </div>

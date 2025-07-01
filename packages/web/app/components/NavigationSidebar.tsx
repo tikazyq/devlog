@@ -5,7 +5,7 @@ import { Card, Col, Layout, Menu, Row, Statistic, Typography } from 'antd';
 import { CodeOutlined, DashboardOutlined, FileTextOutlined, PlusOutlined } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 import { DevlogStats } from '@devlog/types';
-import './styles.css';
+import styles from './NavigationSidebar.module.css';
 
 const { Sider } = Layout;
 const { Title, Text } = Typography;
@@ -84,10 +84,10 @@ export function NavigationSidebar({ stats, collapsed = false }: NavigationSideba
           borderRight: '1px solid #f0f0f0',
         }}
       >
-        <div className="sidebar-header">
-          <div className="sidebar-brand">
-            <CodeOutlined className="sidebar-brand-icon" />
-            <Title level={3} className="sidebar-brand-title">
+        <div className={styles.sidebarHeader}>
+          <div className={styles.sidebarBrand}>
+            <CodeOutlined className={styles.sidebarBrandIcon} />
+            <Title level={3} className={styles.sidebarBrandTitle}>
               Devlog
             </Title>
           </div>
@@ -110,10 +110,10 @@ export function NavigationSidebar({ stats, collapsed = false }: NavigationSideba
         borderRight: '1px solid #f0f0f0',
       }}
     >
-      <div className="sidebar-header">
-        <div className="sidebar-brand">
-          <CodeOutlined className="sidebar-brand-icon" />
-          <Title level={3} className="sidebar-brand-title">
+      <div className={styles.sidebarHeader}>
+        <div className={styles.sidebarBrand}>
+          <CodeOutlined className={styles.sidebarBrandIcon} />
+          <Title level={3} className={styles.sidebarBrandTitle}>
             Devlog
           </Title>
         </div>
@@ -129,11 +129,11 @@ export function NavigationSidebar({ stats, collapsed = false }: NavigationSideba
       />
 
       {stats && (
-        <div className="sidebar-stats">
-          <Title level={5} className="sidebar-stats-title">
+        <div className={styles.sidebarStats}>
+          <Title level={5} className={styles.sidebarStatsTitle}>
             QUICK STATS
           </Title>
-          <Card size="small" className="sidebar-stats-card">
+          <Card size="small" className={styles.sidebarStatsCard}>
             <Row gutter={[16, 16]}>
               <Col span={24}>
                 <Statistic

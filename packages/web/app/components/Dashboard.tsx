@@ -24,6 +24,7 @@ import {
   getStatusColor,
   getStatusIcon,
 } from '../lib/devlog-ui-utils';
+import styles from './Dashboard.module.css';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -88,45 +89,45 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
   return (
     <div className="flex flex-col h-full w-full overflow-hidden">
       {/* Fixed Header */}
-      <div className="dashboard-header-section">
-        <div className="dashboard-title-row">
+      <div className={styles.dashboardHeaderSection}>
+        <div className={styles.dashboardTitleRow}>
           <div>
-            <Title level={2} className="dashboard-title">
+            <Title level={2} className={styles.dashboardTitle}>
               Dashboard
             </Title>
-            <Paragraph type="secondary" className="dashboard-subtitle">
+            <Paragraph type="secondary" className={styles.dashboardSubtitle}>
               Overview of your development progress
             </Paragraph>
           </div>
           {stats && (
-            <div className="dashboard-stats-compact">
-              <div className="stat-compact">
-                <span className="stat-value">{stats.totalEntries}</span>
-                <span className="stat-label">Total</span>
+            <div className={styles.dashboardStatsCompact}>
+              <div className={styles.statCompact}>
+                <span className={styles.statValue}>{stats.totalEntries}</span>
+                <span className={styles.statLabel}>Total</span>
               </div>
-              <div className="stat-compact">
-                <span className="stat-value todo">{stats.byStatus['todo'] || 0}</span>
-                <span className="stat-label">Todo</span>
+              <div className={styles.statCompact}>
+                <span className={`${styles.statValue} ${styles.todo}`}>{stats.byStatus['todo'] || 0}</span>
+                <span className={styles.statLabel}>Todo</span>
               </div>
-              <div className="stat-compact">
-                <span className="stat-value in-progress">{stats.byStatus['in-progress'] || 0}</span>
-                <span className="stat-label">In Progress</span>
+              <div className={styles.statCompact}>
+                <span className={`${styles.statValue} ${styles.inProgress}`}>{stats.byStatus['in-progress'] || 0}</span>
+                <span className={styles.statLabel}>In Progress</span>
               </div>
-              <div className="stat-compact">
-                <span className="stat-value review">{stats.byStatus['review'] || 0}</span>
-                <span className="stat-label">Review</span>
+              <div className={styles.statCompact}>
+                <span className={`${styles.statValue} ${styles.review}`}>{stats.byStatus['review'] || 0}</span>
+                <span className={styles.statLabel}>Review</span>
               </div>
-              <div className="stat-compact">
-                <span className="stat-value testing">{stats.byStatus['testing'] || 0}</span>
-                <span className="stat-label">Testing</span>
+              <div className={styles.statCompact}>
+                <span className={`${styles.statValue} ${styles.testing}`}>{stats.byStatus['testing'] || 0}</span>
+                <span className={styles.statLabel}>Testing</span>
               </div>
-              <div className="stat-compact">
-                <span className="stat-value completed">{stats.byStatus['done'] || 0}</span>
-                <span className="stat-label">Completed</span>
+              <div className={styles.statCompact}>
+                <span className={`${styles.statValue} ${styles.completed}`}>{stats.byStatus['done'] || 0}</span>
+                <span className={styles.statLabel}>Completed</span>
               </div>
-              <div className="stat-compact">
-                <span className="stat-value archived">{stats.byStatus['archived'] || 0}</span>
-                <span className="stat-label">Archived</span>
+              <div className={styles.statCompact}>
+                <span className={`${styles.statValue} ${styles.archived}`}>{stats.byStatus['archived'] || 0}</span>
+                <span className={styles.statLabel}>Archived</span>
               </div>
             </div>
           )}
@@ -135,16 +136,16 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
 
       <div className="scrollable-content">
         {/* Charts Section */}
-        <div className="dashboard-charts-section">
+        <div className={styles.dashboardChartsSection}>
           {isLoadingTimeSeries ? (
             <Row gutter={[24, 24]}>
               <Col xs={24} lg={14}>
-                <Card title="Development Activity (Last 30 Days)" className="chart-card">
+                <Card title="Development Activity (Last 30 Days)" className={styles.chartCard}>
                   <Skeleton active paragraph={{ rows: 8 }} />
                 </Card>
               </Col>
               <Col xs={24} lg={10}>
-                <Card title="Current Status Distribution" className="chart-card">
+                <Card title="Current Status Distribution" className={styles.chartCard}>
                   <Skeleton active paragraph={{ rows: 8 }} />
                 </Card>
               </Col>
@@ -152,7 +153,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
           ) : chartData.length === 0 ? (
             <Row gutter={[24, 24]}>
               <Col xs={24}>
-                <Card className="chart-card">
+                <Card className={styles.chartCard}>
                   <Empty
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
                     description="No historical data available yet"
@@ -163,7 +164,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
           ) : (
             <Row gutter={[24, 24]}>
               <Col xs={24} lg={14}>
-                <Card title="Development Activity (Last 30 Days)" className="chart-card">
+                <Card title="Development Activity (Last 30 Days)" className={styles.chartCard}>
                   <ResponsiveContainer width="100%" height={300}>
                     <AreaChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -199,7 +200,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                 </Card>
               </Col>
               <Col xs={24} lg={10}>
-                <Card title="Current Status Distribution" className="chart-card">
+                <Card title="Current Status Distribution" className={styles.chartCard}>
                   <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
                       <Pie
@@ -227,7 +228,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                         verticalAlign="bottom"
                         height={36}
                         formatter={(value: string) => (
-                          <span className="chart-legend-text">{value}</span>
+                          <span className={styles.chartLegendText}>{value}</span>
                         )}
                       />
                     </PieChart>
@@ -241,18 +242,18 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
         {/* Scrollable Content */}
         <Card
           title={
-            <Title level={3} className="recent-devlogs-title">
+            <Title level={3} className={styles.recentDevlogsTitle}>
               Recent Devlogs
             </Title>
           }
           styles={{ body: { padding: 0, overflowX: 'hidden', overflowY: 'auto' } }}
-          className="recent-devlogs-card flex-1 overflow-hidden flex flex-col"
+          className={`${styles.recentDevlogsCard} flex-1 overflow-hidden flex flex-col`}
         >
           {recentDevlogs.length === 0 ? (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
               description="No devlogs found"
-              className="empty-devlogs"
+              className={styles.emptyDevlogs}
             />
           ) : (
             <List
@@ -260,10 +261,10 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
               dataSource={recentDevlogs}
               renderItem={(devlog) => (
                 <List.Item
-                  className="devlog-list-item"
+                  className={styles.devlogListItem}
                   onClick={() => onViewDevlog(devlog)}
                   actions={[
-                    <Text type="secondary" key="date" className="devlog-date">
+                    <Text type="secondary" key="date" className={styles.devlogDate}>
                       {new Date(devlog.updatedAt).toLocaleDateString()}
                     </Text>,
                   ]}
@@ -286,22 +287,22 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                       />
                     }
                     title={
-                      <div className="devlog-title-section">
-                        <Text strong className="devlog-title-text">
+                      <div className={styles.devlogTitleSection}>
+                        <Text strong className={styles.devlogTitleText}>
                           {devlog.title}
                         </Text>
-                        <div className="recent-devlogs-meta">
+                        <div className={styles.recentDevlogsMeta}>
                           <Tag
                             color={getStatusColor(devlog.status)}
                             icon={getStatusIcon(devlog.status)}
-                            className="devlog-tag"
+                            className={styles.devlogTag}
                           >
                             {devlog.status}
                           </Tag>
                           <Tag
                             color={getPriorityColor(devlog.priority)}
                             icon={getPriorityIcon(devlog.priority)}
-                            className="devlog-tag"
+                            className={styles.devlogTag}
                           >
                             {devlog.priority}
                           </Tag>
@@ -309,7 +310,7 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                       </div>
                     }
                     description={
-                      <Text type="secondary" ellipsis className="devlog-description">
+                      <Text type="secondary" ellipsis className={styles.devlogDescription}>
                         {devlog.description}
                       </Text>
                     }

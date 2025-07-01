@@ -20,7 +20,6 @@ import {
   Typography,
 } from 'antd';
 import {
-  ArrowLeftOutlined,
   BookOutlined,
   BugOutlined,
   BulbOutlined,
@@ -47,13 +46,21 @@ const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
-export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDetailsProps) {
-  const [isEditing, setIsEditing] = useState(false);
+export function DevlogDetails({ devlog, onUpdate, onDelete, isEditing: externalIsEditing, onEditToggle }: DevlogDetailsProps) {
+  const [internalIsEditing, setInternalIsEditing] = useState(false);
   const [form] = Form.useForm();
+
+  // Use external editing state if provided, otherwise use internal state
+  const isEditing = externalIsEditing !== undefined ? externalIsEditing : internalIsEditing;
+  const setIsEditing = onEditToggle || setInternalIsEditing;
 
   const handleSubmit = (values: any) => {
     onUpdate({ id: devlog.id, ...values });
-    setIsEditing(false);
+    if (onEditToggle) {
+      onEditToggle();
+    } else {
+      setInternalIsEditing(false);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -143,40 +150,6 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
 
   return (
     <div>
-      <div
-        style={{
-          marginBottom: '24px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <Button type="text" icon={<ArrowLeftOutlined />} onClick={onBack} size="large">
-          Back to List
-        </Button>
-        <Space>
-          <Button
-            type={isEditing ? 'default' : 'primary'}
-            icon={isEditing ? <CloseOutlined /> : <EditOutlined />}
-            onClick={() => setIsEditing(!isEditing)}
-          >
-            {isEditing ? 'Cancel' : 'Edit'}
-          </Button>
-          <Popconfirm
-            title="Delete Devlog"
-            description="Are you sure you want to delete this devlog? This action cannot be undone."
-            onConfirm={onDelete}
-            okText="Yes, Delete"
-            cancelText="Cancel"
-            okButtonProps={{ danger: true }}
-          >
-            <Button danger icon={<DeleteOutlined />}>
-              Delete
-            </Button>
-          </Popconfirm>
-        </Space>
-      </div>
-
       <Card>
         {isEditing ? (
           <Form
@@ -312,7 +285,7 @@ export function DevlogDetails({ devlog, onUpdate, onDelete, onBack }: DevlogDeta
 
             <Form.Item style={{ marginBottom: 0 }}>
               <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-                <Button onClick={() => setIsEditing(false)}>Cancel</Button>
+                <Button onClick={() => onEditToggle ? onEditToggle() : setInternalIsEditing(false)}>Cancel</Button>
                 <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
                   Save Changes
                 </Button>

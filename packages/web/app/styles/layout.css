@@ -20,6 +20,41 @@
     min-height: 0; /* Allow flex children to shrink */
 }
 
+/* Page Layout component styles */
+.page-layout {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.page-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e8e8e8;
+    padding: 0;
+    margin: 0;
+}
+
+.page-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    min-height: 48px;
+}
+
+.page-header-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.page-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 16px;
+}
+
 .page-content {
     background: transparent;
     flex: 1;
@@ -39,6 +74,14 @@
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     background: rgba(248, 249, 250, 0.9);
+}
+
+.page-header-sticky .page-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    min-height: 48px;
 }
 
 /* Enhanced scrollable content container */
@@ -77,9 +120,18 @@
 
 /* Responsive adjustments for mobile */
 @media (max-width: 768px) {
-    .page-header-sticky {
-        padding: 12px 16px 8px 16px;
-        margin: 0 -16px 16px -16px;
+    .page-header-sticky .page-header-content,
+    .page-header-content {
+        padding: 12px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .page-header-right {
+        margin-left: 0;
+        align-self: stretch;
+        justify-content: flex-end;
     }
     
     .page-content {
@@ -92,9 +144,15 @@
     border-radius: 8px;
 }
 
-/* Navigation styles */
+/* Navigation styles - updated to work within PageLayout */
 .navigation-breadcrumb {
-    margin: 12px 24px;
+    margin: 0;
+}
+
+.breadcrumb-with-tags {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 /* Loading container */

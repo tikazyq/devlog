@@ -170,8 +170,17 @@
       "priority": "medium",
       "createdAt": "2025-07-01T14:54:56.548Z",
       "updatedAt": "2025-07-01T14:55:27.686Z"
+    },
+    "23": {
+      "filename": "023-create-flexible-pagelayout-component-for-better-br.json",
+      "title": "Create flexible PageLayout component for better breadcrumb and header customization",
+      "status": "done",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-07-01T15:17:21.908Z",
+      "updatedAt": "2025-07-01T15:27:34.624Z"
     }
   },
-  "lastId": 22,
+  "lastId": 23,
   "version": "1.0.0"
 }

@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Layout } from 'antd';
 import { DevlogStats } from '@devlog/types';
 import { NavigationSidebar } from './components/NavigationSidebar';
-import { NavigationBreadcrumb } from './components/NavigationBreadcrumb';
 import { Header } from './components/Header';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { AppLayoutSkeleton } from './components/AppLayoutSkeleton';
@@ -78,10 +77,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                   className="app-error-alert"
                 />
               )}
-              <NavigationBreadcrumb />
-              <div className="page-content">
-                {children}
-              </div>
+              {children}
             </div>
           </Content>
         </Layout>

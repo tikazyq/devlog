@@ -10,7 +10,8 @@ export interface DevlogDetailsProps {
   devlog: DevlogEntry;
   onUpdate: (data: any) => void;
   onDelete: () => void;
-  onBack: () => void;
+  isEditing?: boolean;
+  onEditToggle?: () => void;
 }
 
 export interface NavigationSidebarProps {

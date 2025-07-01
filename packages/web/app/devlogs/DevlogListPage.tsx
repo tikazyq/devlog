@@ -1,14 +1,17 @@
 'use client';
 
 import React from 'react';
+import { Button, Space } from 'antd';
+import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import { DevlogList } from '../components/DevlogList';
 import { LoadingPage } from '../components/LoadingPage';
+import { PageLayout } from '../components/PageLayout';
 import { useDevlogs } from '../hooks/useDevlogs';
 import { DevlogEntry, DevlogId } from '@devlog/types';
 import { useRouter } from 'next/navigation';
 
 export function DevlogListPage() {
-  const { devlogs, loading, deleteDevlog } = useDevlogs();
+  const { devlogs, loading, deleteDevlog, refetch } = useDevlogs();
   const router = useRouter();
 
   const handleViewDevlog = (devlog: DevlogEntry) => {
@@ -23,16 +26,45 @@ export function DevlogListPage() {
     }
   };
 
+  const handleCreateDevlog = () => {
+    router.push('/devlogs/create');
+  };
+
+  const handleRefresh = () => {
+    refetch();
+  };
+
   if (loading) {
     return <LoadingPage message="Loading devlogs..." />;
   }
 
+  const actions = (
+    <Space>
+      <Button 
+        icon={<ReloadOutlined />} 
+        onClick={handleRefresh}
+        disabled={loading}
+      >
+        Refresh
+      </Button>
+      <Button 
+        type="primary" 
+        icon={<PlusOutlined />} 
+        onClick={handleCreateDevlog}
+      >
+        Create Devlog
+      </Button>
+    </Space>
+  );
+
   return (
-    <DevlogList
-      devlogs={devlogs}
-      loading={loading}
-      onViewDevlog={handleViewDevlog}
-      onDeleteDevlog={handleDeleteDevlog}
-    />
+    <PageLayout actions={actions}>
+      <DevlogList
+        devlogs={devlogs}
+        loading={loading}
+        onViewDevlog={handleViewDevlog}
+        onDeleteDevlog={handleDeleteDevlog}
+      />
+    </PageLayout>
   );
 }

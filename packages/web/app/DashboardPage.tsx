@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Dashboard } from './components/Dashboard';
+import { PageLayout } from './components/PageLayout';
 import { useDevlogs } from './hooks/useDevlogs';
 import { DevlogStats, DevlogEntry } from '@devlog/types';
 import { useRouter } from 'next/navigation';
@@ -33,10 +34,12 @@ export function DashboardPage() {
   };
 
   return (
-    <Dashboard
-      stats={stats}
-      recentDevlogs={devlogs.slice(0, 5)}
-      onViewDevlog={handleViewDevlog}
-    />
+    <PageLayout showBreadcrumb={false}>
+      <Dashboard
+        stats={stats}
+        recentDevlogs={devlogs.slice(0, 5)}
+        onViewDevlog={handleViewDevlog}
+      />
+    </PageLayout>
   );
 }

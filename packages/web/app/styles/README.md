@@ -8,8 +8,7 @@ This directory contains modular CSS files that are imported into the main `globa
 styles/
 ├── base.css           # Base styles, CSS resets, and typography
 ├── antd-overrides.css # Ant Design component customizations
-├── layout.css         # App layout and navigation styles
-├── components.css     # Component-specific styles (dashboard, devlog, forms)
+├── layout.css         # App layout, navigation, and component styles
 └── responsive.css     # Responsive design and mobile styles
 ```
 
@@ -21,9 +20,8 @@ The CSS files are imported in a specific order to maintain the cascade:
 2. **Third-party styles** - External libraries (highlight.js)
 3. **Base styles** - Custom base styles and typography
 4. **Ant Design overrides** - Framework component customizations
-5. **Layout styles** - App structure and navigation
-6. **Component styles** - Specific component styles
-7. **Responsive styles** - Media queries and mobile overrides
+5. **Layout styles** - App structure, navigation, and component styles
+6. **Responsive styles** - Media queries and mobile overrides
 
 ## Guidelines
 

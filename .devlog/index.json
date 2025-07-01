@@ -197,8 +197,17 @@
       "priority": "medium",
       "createdAt": "2025-07-01T15:55:11.975Z",
       "updatedAt": "2025-07-01T16:02:59.628Z"
+    },
+    "26": {
+      "filename": "026-consolidate-duplicate-css-files-merge-layout-css-a.json",
+      "title": "Consolidate duplicate CSS files - merge layout.css and components.css",
+      "status": "in-progress",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-07-01T16:07:06.225Z",
+      "updatedAt": "2025-07-01T16:07:11.266Z"
     }
   },
-  "lastId": 25,
+  "lastId": 26,
   "version": "1.0.0"
 }

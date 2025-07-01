@@ -1,4 +1,4 @@
-/* App layout and navigation styles */
+/* Consolidated layout and component styles */
 
 /* App Layout styles */
 .app-layout {
@@ -18,6 +18,11 @@
     display: flex;
     flex-direction: column;
     min-height: 0; /* Allow flex children to shrink */
+}
+
+.app-error-alert {
+    margin-bottom: 24px;
+    border-radius: 8px;
 }
 
 /* Page Layout component styles */
@@ -134,10 +139,40 @@
         margin-left: 0;
         align-self: stretch;
         justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .page-header-left {
+        gap: 12px;
     }
 
     .page-content {
         padding: 16px;
+    }
+
+    .app-content-wrapper {
+        padding: 16px;
+    }
+
+    .breadcrumb-with-tags {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header-sticky .page-header-content,
+    .page-header-content {
+        padding: 8px 12px;
+    }
+    
+    .page-content {
+        padding: 12px;
+    }
+    
+    .app-content-wrapper {
+        padding: 12px;
     }
 }
 
@@ -146,11 +181,12 @@
     border-radius: 8px;
 }
 
-/* Navigation styles - updated to work within PageLayout */
+/* Navigation breadcrumb styles */
 .navigation-breadcrumb {
     margin: 0;
 }
 
+/* Breadcrumb with tags layout */
 .breadcrumb-with-tags {
     display: flex;
     align-items: center;

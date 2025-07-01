@@ -125,15 +125,6 @@
       "priority": "high",
       "createdAt": "2025-07-01T13:54:03.560Z",
       "updatedAt": "2025-07-01T14:01:06.847Z"
-    },
-    "17": {
-      "filename": "017-test-devlog-for-context-updates.json",
-      "title": "Test devlog for context updates",
-      "status": "done",
-      "type": "task",
-      "priority": "medium",
-      "createdAt": "2025-07-01T13:56:10.775Z",
-      "updatedAt": "2025-07-01T14:01:12.843Z"
     }
   },
   "lastId": 17,

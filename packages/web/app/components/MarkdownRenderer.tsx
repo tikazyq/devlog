@@ -10,16 +10,38 @@ import styles from './MarkdownRenderer.module.css';
 
 const { Text, Paragraph } = Typography;
 
+/**
+ * Preprocesses markdown content to handle single line breaks from LLMs
+ * Converts single line breaks to double line breaks for proper markdown rendering
+ */
+function preprocessContent(content: string): string {
+  return content
+    // First, protect code blocks from processing
+    .replace(/(```[\s\S]*?```)/g, (match) => {
+      // Replace newlines in code blocks with a placeholder
+      return match.replace(/\n/g, '__CODE_NEWLINE__');
+    })
+    // Handle single line breaks that aren't already double
+    .replace(/(?<![\n\r])\n(?![\n\r])/g, '\n\n')
+    // Restore code block newlines
+    .replace(/__CODE_NEWLINE__/g, '\n')
+    // Clean up any triple+ newlines back to double
+    .replace(/\n{3,}/g, '\n\n');
+}
+
 interface MarkdownRendererProps {
   content: string;
   className?: string;
+  preserveLineBreaks?: boolean;
 }
 
-export function MarkdownRenderer({ content, className }: MarkdownRendererProps) {
+export function MarkdownRenderer({ content, className, preserveLineBreaks = true }: MarkdownRendererProps) {
   if (!content || content.trim() === '') {
     return null;
   }
 
+  // Preprocess content to handle single line breaks
+  const processedContent = preserveLineBreaks ? preprocessContent(content) : content;
   const combinedClassName = `${styles.markdownRenderer} ${className || ''}`.trim();
 
   return (
@@ -68,7 +90,7 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
           hr: () => <hr />,
         }}
       >
-        {content}
+        {processedContent}
       </ReactMarkdown>
     </div>
   );

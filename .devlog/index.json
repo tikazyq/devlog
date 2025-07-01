@@ -107,8 +107,17 @@
       "priority": "high",
       "createdAt": "2025-06-27T09:48:14.131Z",
       "updatedAt": "2025-06-27T10:02:04.548Z"
+    },
+    "15": {
+      "filename": "015-optimize-line-height-in-markdown-rendered-content.json",
+      "title": "Optimize line height in markdown rendered content",
+      "status": "review",
+      "type": "task",
+      "priority": "medium",
+      "createdAt": "2025-07-01T13:48:34.379Z",
+      "updatedAt": "2025-07-01T13:51:53.669Z"
     }
   },
-  "lastId": 13,
+  "lastId": 15,
   "version": "1.0.0"
 }

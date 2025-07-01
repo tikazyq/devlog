@@ -43,13 +43,9 @@ export function PageLayout({
   // If headerContent is provided, use it completely
   if (headerContent) {
     return (
-      <div className={`page-layout ${className}`}>
-        <div className={stickyHeader ? 'page-header-sticky' : 'page-header'}>
-          {headerContent}
-        </div>
-        <div className="page-content">
-          {children}
-        </div>
+      <div className={`page-layout scrollable-content ${className}`}>
+        <div className={stickyHeader ? 'page-header-sticky' : 'page-header'}>{headerContent}</div>
+        <div className="page-content scrollable-content">{children}</div>
       </div>
     );
   }
@@ -57,34 +53,26 @@ export function PageLayout({
   // If no breadcrumb should be shown and no actions, render children directly
   if (!showBreadcrumb && !actions) {
     return (
-      <div className={`page-layout ${className}`}>
-        <div className="page-content">
-          {children}
-        </div>
+      <div className={`page-layout scrollable-content ${className}`}>
+        <div className="page-content scrollable-content">{children}</div>
       </div>
     );
   }
 
   // Default layout with breadcrumb and/or actions
   return (
-    <div className={`page-layout ${className}`}>
+    <div className={`page-layout scrollable-content ${className}`}>
       {(showBreadcrumb || actions) && (
         <div className={stickyHeader ? 'page-header-sticky' : 'page-header'}>
           <div className="page-header-content">
             <div className="page-header-left">
               {showBreadcrumb && (breadcrumb || <NavigationBreadcrumb />)}
             </div>
-            {actions && (
-              <div className="page-header-right">
-                {actions}
-              </div>
-            )}
+            {actions && <div className="page-header-right">{actions}</div>}
           </div>
         </div>
       )}
-      <div className="page-content">
-        {children}
-      </div>
+      <div className="page-content scrollable-content">{children}</div>
     </div>
   );
 }

@@ -10,5 +10,4 @@
 @import './styles/base.css';
 @import './styles/antd-overrides.css';
 @import './styles/layout.css';
-@import './components/styles.css';
 @import './styles/responsive.css';

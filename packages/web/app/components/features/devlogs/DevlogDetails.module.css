@@ -1,7 +1,16 @@
 /* DevlogDetails Component Styles */
 
 .devlogDetailsHeader {
-  margin-bottom: 24px;
+  padding: 12px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #fff;
+}
+
+.devlogDetailsTitle {
+  margin-bottom: 0;
 }
 
 .devlogDetailsActions {
@@ -10,6 +19,7 @@
 
 .devlogDetailsContent {
   margin-bottom: 24px;
+  padding: 12px 24px;
 }
 
 .devlogSection {

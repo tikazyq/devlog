@@ -2,13 +2,19 @@
 
 import React, { useEffect, useState } from 'react';
 import { Alert, Breadcrumb, Button, Popconfirm, Space, Tag } from 'antd';
-import { ArrowLeftOutlined, DeleteOutlined, EditOutlined, CloseOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { DevlogDetails, LoadingPage, PageLayout } from '@/components';
 import { useDevlogs } from '@/hooks/useDevlogs';
 import { DevlogEntry } from '@devlog/types';
 import { useRouter } from 'next/navigation';
-import { getStatusColor, getPriorityColor } from '@/lib/devlog-ui-utils';
+import {
+  getPriorityColor,
+  getPriorityIcon,
+  getStatusColor,
+  getStatusIcon,
+  getTypeIcon,
+} from '@/lib/devlog-ui-utils';
 
 interface DevlogDetailsPageProps {
   id: string;
@@ -67,12 +73,7 @@ export function DevlogDetailsPage({ id }: DevlogDetailsPageProps) {
   if (error) {
     return (
       <PageLayout>
-        <Alert
-          message="Error"
-          description={error}
-          type="error"
-          showIcon
-        />
+        <Alert message="Error" description={error} type="error" showIcon />
       </PageLayout>
     );
   }
@@ -80,12 +81,7 @@ export function DevlogDetailsPage({ id }: DevlogDetailsPageProps) {
   if (!devlog) {
     return (
       <PageLayout>
-        <Alert
-          message="Not Found"
-          description="Devlog not found"
-          type="warning"
-          showIcon
-        />
+        <Alert message="Not Found" description="Devlog not found" type="warning" showIcon />
       </PageLayout>
     );
   }
@@ -96,27 +92,29 @@ export function DevlogDetailsPage({ id }: DevlogDetailsPageProps) {
         items={[
           { title: <Link href="/">Dashboard</Link> },
           { title: <Link href="/devlogs">Devlogs</Link> },
-          { title: <span>#{id}</span> }
+          { title: <span>#{id}</span> },
         ]}
       />
-      <Tag color={getStatusColor(devlog.status)}>{devlog.status}</Tag>
-      <Tag color={getPriorityColor(devlog.priority)}>{devlog.priority}</Tag>
+      <Space>
+        <Tag color={getStatusColor(devlog.status)} icon={getStatusIcon(devlog.status)}>
+          {devlog.status}
+        </Tag>
+        <Tag color={getPriorityColor(devlog.priority)} icon={getPriorityIcon(devlog.priority)}>
+          {devlog.priority}
+        </Tag>
+        <Tag color="blue" icon={getTypeIcon(devlog.type)}>
+          {devlog.type}
+        </Tag>
+      </Space>
     </div>
   );
 
   const actions = (
     <Space>
-      <Button 
-        icon={<ArrowLeftOutlined />} 
-        onClick={handleBack}
-      >
+      <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
         Back to List
       </Button>
-      <Button 
-        type="default" 
-        icon={<EditOutlined />}
-        onClick={() => setIsEditing(!isEditing)}
-      >
+      <Button type="default" icon={<EditOutlined />} onClick={() => setIsEditing(!isEditing)}>
         {isEditing ? 'Cancel' : 'Edit'}
       </Button>
       <Popconfirm
@@ -126,10 +124,7 @@ export function DevlogDetailsPage({ id }: DevlogDetailsPageProps) {
         okText="Yes"
         cancelText="No"
       >
-        <Button 
-          danger 
-          icon={<DeleteOutlined />}
-        >
+        <Button danger icon={<DeleteOutlined />}>
           Delete
         </Button>
       </Popconfirm>

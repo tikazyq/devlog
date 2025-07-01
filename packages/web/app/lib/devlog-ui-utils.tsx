@@ -1,5 +1,7 @@
 import React from 'react';
 import {
+  BookOutlined,
+  BugOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
   ExclamationCircleOutlined,
@@ -8,13 +10,15 @@ import {
   MinusCircleOutlined,
   StopOutlined,
   SyncOutlined,
+  ToolOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
+import { DevlogPriority, DevlogStatus, DevlogType } from '@devlog/types';
 
 /**
  * Gets the Ant Design tag color for a devlog status
  */
-export const getStatusColor = (status: string): string => {
+export const getStatusColor = (status: DevlogStatus): string => {
   switch (status) {
     case 'done':
       return 'success';
@@ -24,8 +28,6 @@ export const getStatusColor = (status: string): string => {
       return 'warning';
     case 'testing':
       return 'cyan';
-    case 'blocked':
-      return 'error';
     case 'archived':
       return 'default';
     case 'todo':
@@ -38,7 +40,7 @@ export const getStatusColor = (status: string): string => {
 /**
  * Gets the appropriate icon component for a devlog status
  */
-export const getStatusIcon = (status: string): React.ReactNode => {
+export const getStatusIcon = (status: DevlogStatus): React.ReactNode => {
   switch (status) {
     case 'done':
       return <CheckCircleOutlined />;
@@ -48,8 +50,6 @@ export const getStatusIcon = (status: string): React.ReactNode => {
       return <EyeOutlined />;
     case 'testing':
       return <FileProtectOutlined />;
-    case 'blocked':
-      return <StopOutlined />;
     case 'archived':
       return <MinusCircleOutlined />;
     case 'todo':
@@ -62,7 +62,7 @@ export const getStatusIcon = (status: string): React.ReactNode => {
 /**
  * Gets the Ant Design tag color for a devlog priority
  */
-export const getPriorityColor = (priority: string): string => {
+export const getPriorityColor = (priority: DevlogPriority): string => {
   switch (priority) {
     case 'critical':
       return 'red';
@@ -92,5 +92,22 @@ export const getPriorityIcon = (priority: string): React.ReactNode => {
       return <CheckCircleOutlined />;
     default:
       return <MinusCircleOutlined />;
+  }
+};
+
+export const getTypeIcon = (type: DevlogType): React.ReactNode => {
+  switch (type) {
+    case 'feature':
+      return '✨';
+    case 'bugfix':
+      return <BugOutlined />;
+    case 'task':
+      return '📋';
+    case 'refactor':
+      return <ToolOutlined />;
+    case 'docs':
+      return <BookOutlined />;
+    default:
+      return '📝';
   }
 };

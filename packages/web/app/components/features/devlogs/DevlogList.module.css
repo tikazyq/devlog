@@ -14,39 +14,38 @@
   overflow: hidden;
 }
 
-.devlogListHeaderCompact {
-  padding: 0 24px;
+.devlogListHeader {
+  padding: 12px 24px;
+  background: #fff;
 }
 
 .devlogTitleRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
 }
 
-.devlogListTitleCompact {
+.devlogListTitle {
   margin: 0 !important;
   font-size: 24px !important;
 }
 
-.devlogListSubtitleCompact {
-  margin: 0 !important;
-  font-size: 14px;
-}
-
-.devlogStatsCompact {
+.devlogStats {
   display: flex;
   gap: 24px;
   align-items: center;
 }
 
 .devlogListTable {
-  margin: 0 24px;
+  margin: 0;
   flex: 1;
 }
 
-.devlogTitleContainer {
+.devlogTitleCellContainer {
+  margin-left: 16px;
+}
+
+.devlogTitleCell {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -156,11 +155,11 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .devlogListHeaderCompact {
+  .devlogListHeader {
     padding: 16px 16px 12px 16px;
   }
   
-  .devlogStatsCompact {
+  .devlogStats {
     gap: 16px;
   }
   
@@ -182,14 +181,14 @@
     gap: 12px;
   }
   
-  .devlogStatsCompact {
+  .devlogStats {
     justify-content: flex-start;
     width: 100%;
   }
 }
 
 @media (max-width: 480px) {
-  .devlogStatsCompact {
+  .devlogStats {
     gap: 12px;
     flex-wrap: wrap;
   }
@@ -204,7 +203,7 @@
 }
 
 @media (max-width: 576px) {
-  .devlogListHeaderCompact {
+  .devlogListHeader {
     margin-bottom: 16px;
   }
 }

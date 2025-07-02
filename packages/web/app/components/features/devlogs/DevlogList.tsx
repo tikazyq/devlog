@@ -1,15 +1,15 @@
 'use client';
 
 import React from 'react';
-import { Button, Card, Empty, Popconfirm, Space, Spin, Table, Tag, Typography } from 'antd';
+import { Button, Empty, Popconfirm, Space, Spin, Table, Tag, Typography } from 'antd';
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import { DevlogEntry, DevlogId, DevlogListProps } from '@devlog/types';
+import { DevlogEntry, DevlogListProps, DevlogPriority, DevlogStatus } from '@devlog/types';
 import {
-  getStatusColor,
-  getStatusIcon,
   getPriorityColor,
   getPriorityIcon,
+  getStatusColor,
+  getStatusIcon,
 } from '@/lib/devlog-ui-utils';
 import styles from './DevlogList.module.css';
 
@@ -22,10 +22,10 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       dataIndex: 'title',
       key: 'title',
       fixed: 'left',
-      width: 280,
+      width: 400,
       render: (title: string, record: DevlogEntry) => (
-        <div>
-          <div className={styles.devlogTitleContainer}>
+        <div className={styles.devlogTitleCellContainer}>
+          <div className={styles.devlogTitleCell}>
             <Text
               strong
               className={styles.devlogTitle}
@@ -43,20 +43,20 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
           >
             {record.description}
           </Text>
-          {record.key && (
-            <Text type="secondary" className={styles.devlogKey} ellipsis={{ tooltip: record.key }}>
-              {record.key}
-            </Text>
-          )}
         </div>
       ),
+      onHeaderCell: (column) => ({
+        style: {
+          paddingLeft: '24px',
+        },
+      }),
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
       width: 120,
-      render: (status: string) => (
+      render: (status: DevlogStatus) => (
         <Tag color={getStatusColor(status)} icon={getStatusIcon(status)}>
           {status}
         </Tag>
@@ -67,7 +67,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       dataIndex: 'priority',
       key: 'priority',
       width: 120,
-      render: (priority: string) => (
+      render: (priority: DevlogPriority) => (
         <Tag color={getPriorityColor(priority)} icon={getPriorityIcon(priority)}>
           {priority}
         </Tag>
@@ -152,7 +152,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       title: 'Actions',
       key: 'actions',
       fixed: 'right',
-      width: 140,
+      width: 180,
       render: (_, record: DevlogEntry) => (
         <Space size="small">
           <Button
@@ -201,36 +201,39 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
     <div className={styles.devlogListContainer}>
       {/* Sticky Header with Summary */}
       <div className="page-header-sticky">
-        <div className={styles.devlogListHeaderCompact}>
+        <div className={styles.devlogListHeader}>
           <div className={styles.devlogTitleRow}>
-            <div>
-              <Title level={2} className={styles.devlogListTitleCompact}>
-                All Devlogs
-              </Title>
-              <Text type="secondary" className={styles.devlogListSubtitleCompact}>
-                Manage and track your development logs
-              </Text>
-            </div>
-            <div className={styles.devlogStatsCompact}>
+            <Title level={2} className={styles.devlogListTitle}>
+              All Devlogs
+            </Title>
+            <div className={styles.devlogStats}>
               <div className={styles.statCompact}>
                 <span className={styles.statValue}>{totalCount}</span>
                 <span className={styles.statLabel}>Total</span>
               </div>
               <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.inProgress}`}>{statusCounts['in-progress'] || 0}</span>
+                <span className={`${styles.statValue} ${styles.inProgress}`}>
+                  {statusCounts['in-progress'] || 0}
+                </span>
                 <span className={styles.statLabel}>In Progress</span>
               </div>
               <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.completed}`}>{statusCounts['done'] || 0}</span>
+                <span className={`${styles.statValue} ${styles.completed}`}>
+                  {statusCounts['done'] || 0}
+                </span>
                 <span className={styles.statLabel}>Done</span>
               </div>
               <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.todo}`}>{statusCounts['todo'] || 0}</span>
+                <span className={`${styles.statValue} ${styles.todo}`}>
+                  {statusCounts['todo'] || 0}
+                </span>
                 <span className={styles.statLabel}>Todo</span>
               </div>
               {statusCounts['blocked'] && (
                 <div className={styles.statCompact}>
-                  <span className={`${styles.statValue} ${styles.blocked}`}>{statusCounts['blocked']}</span>
+                  <span className={`${styles.statValue} ${styles.blocked}`}>
+                    {statusCounts['blocked']}
+                  </span>
                   <span className={styles.statLabel}>Blocked</span>
                 </div>
               )}
@@ -255,6 +258,11 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
               showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} devlogs`,
             }}
             size="middle"
+            onHeaderRow={() => ({
+              style: {
+                backgroundColor: '#fff',
+              },
+            })}
           />
         )}
       </div>

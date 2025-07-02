@@ -2,7 +2,7 @@
 
 .dashboardHeaderSection {
   padding: 12px 24px;
-  background: #f8f9fa;
+  background: #fff;
   border-bottom: 1px solid #e8e8e8;
   flex-shrink: 0;
 }
@@ -32,7 +32,7 @@
 
 .dashboardChartsSection {
   padding: 24px;
-  background: #f8f9fa;
+  background: #fff;
   border-bottom: 1px solid #e8e8e8;
   flex-shrink: 0;
 }

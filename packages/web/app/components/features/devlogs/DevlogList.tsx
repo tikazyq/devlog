@@ -4,7 +4,14 @@ import React from 'react';
 import { Button, Empty, Popconfirm, Space, Spin, Table, Tag, Typography } from 'antd';
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import { DevlogEntry, DevlogListProps, DevlogPriority, DevlogStatus, DevlogStats, DevlogType } from '@devlog/types';
+import {
+  DevlogEntry,
+  DevlogListProps,
+  DevlogPriority,
+  DevlogStatus,
+  DevlogStats,
+  DevlogType,
+} from '@devlog/types';
 import {
   getPriorityColor,
   getPriorityIcon,
@@ -20,20 +27,29 @@ const { Title, Text } = Typography;
 export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: DevlogListProps) {
   // Calculate stats from devlogs array
   const calculateStats = (): DevlogStats => {
-    const byStatus = devlogs.reduce((acc, devlog) => {
-      acc[devlog.status] = (acc[devlog.status] || 0) + 1;
-      return acc;
-    }, {} as Record<DevlogStatus, number>);
+    const byStatus = devlogs.reduce(
+      (acc, devlog) => {
+        acc[devlog.status] = (acc[devlog.status] || 0) + 1;
+        return acc;
+      },
+      {} as Record<DevlogStatus, number>,
+    );
 
-    const byType = devlogs.reduce((acc, devlog) => {
-      acc[devlog.type] = (acc[devlog.type] || 0) + 1;
-      return acc;
-    }, {} as Record<DevlogType, number>);
+    const byType = devlogs.reduce(
+      (acc, devlog) => {
+        acc[devlog.type] = (acc[devlog.type] || 0) + 1;
+        return acc;
+      },
+      {} as Record<DevlogType, number>,
+    );
 
-    const byPriority = devlogs.reduce((acc, devlog) => {
-      acc[devlog.priority] = (acc[devlog.priority] || 0) + 1;
-      return acc;
-    }, {} as Record<DevlogPriority, number>);
+    const byPriority = devlogs.reduce(
+      (acc, devlog) => {
+        acc[devlog.priority] = (acc[devlog.priority] || 0) + 1;
+        return acc;
+      },
+      {} as Record<DevlogPriority, number>,
+    );
 
     return {
       totalEntries: devlogs.length,
@@ -227,9 +243,12 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       <div className="page-header-sticky">
         <div className={styles.devlogListHeader}>
           <div className={styles.devlogTitleRow}>
-            <Title level={2} className={styles.devlogListTitle}>
-              All Devlogs
-            </Title>
+            <div>
+              <Title level={2} className={styles.devlogListTitle}>
+                All Devlogs
+              </Title>
+              <Text type="secondary">List of all development items</Text>
+            </div>
             <OverviewStats stats={stats} variant="detailed" />
           </div>
         </div>

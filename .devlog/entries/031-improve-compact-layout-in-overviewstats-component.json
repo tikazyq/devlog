@@ -3,10 +3,10 @@
   "title": "Improve compact layout in OverviewStats component",
   "type": "task",
   "description": "Improve the user experience of the compact variant in OverviewStats component by addressing three layout issues: 1) Reduce excessive spacing between stats items, 2) Reorder layout so labels come before values for better intuitiveness, 3) Position information icon right next to the \"QUICK STATS\" title instead of separated",
-  "status": "in-progress",
+  "status": "done",
   "priority": "medium",
   "createdAt": "2025-07-03T16:15:52.269Z",
-  "updatedAt": "2025-07-03T16:32:16.050Z",
+  "updatedAt": "2025-07-03T16:41:30.044Z",
   "tags": [],
   "notes": [
     {
@@ -166,5 +166,6 @@
     "lastAIUpdate": "2025-07-03T16:15:52.269Z",
     "contextVersion": 1
   },
-  "id": 31
+  "id": 31,
+  "assignee": ""
 }

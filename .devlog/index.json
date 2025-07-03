@@ -246,13 +246,22 @@
     "31": {
       "filename": "031-improve-compact-layout-in-overviewstats-component.json",
       "title": "Improve compact layout in OverviewStats component",
-      "status": "in-progress",
+      "status": "done",
       "type": "task",
       "priority": "medium",
       "createdAt": "2025-07-03T16:15:52.269Z",
-      "updatedAt": "2025-07-03T16:32:16.050Z"
+      "updatedAt": "2025-07-03T16:41:30.044Z"
+    },
+    "32": {
+      "filename": "032-fix-notes-ordering-in-devlogdetails-to-show-most-r.json",
+      "title": "Fix notes ordering in DevlogDetails to show most recent first",
+      "status": "done",
+      "type": "bugfix",
+      "priority": "medium",
+      "createdAt": "2025-07-03T16:39:21.675Z",
+      "updatedAt": "2025-07-03T16:40:53.391Z"
     }
   },
-  "lastId": 31,
+  "lastId": 32,
   "version": "1.0.0"
 }

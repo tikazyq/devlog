@@ -608,7 +608,7 @@ export function DevlogDetails({
               <div>
                 <Title level={4}>Notes</Title>
                 <Timeline>
-                  {devlog.notes.map((note) => (
+                  {[...devlog.notes].reverse().map((note) => (
                     <Timeline.Item key={note.id}>
                       <div style={{ marginBottom: '8px' }}>
                         <MarkdownRenderer content={note.content} />

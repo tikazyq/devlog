@@ -17,9 +17,11 @@
 .devlogListHeader {
   padding: 12px 24px;
   background: #fff;
+  height: 80px;
 }
 
 .devlogTitleRow {
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -158,29 +160,29 @@
   .devlogListHeader {
     padding: 16px 16px 12px 16px;
   }
-  
+
   .devlogStats {
     gap: 16px;
   }
-  
+
   .statCompact {
     min-width: 50px;
   }
-  
+
   .statValue {
     font-size: 18px;
   }
-  
+
   .statLabel {
     font-size: 11px;
   }
-  
+
   .devlogTitleRow {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .devlogStats {
     justify-content: flex-start;
     width: 100%;
@@ -192,11 +194,11 @@
     gap: 12px;
     flex-wrap: wrap;
   }
-  
+
   .statCompact {
     min-width: 45px;
   }
-  
+
   .statValue {
     font-size: 16px;
   }

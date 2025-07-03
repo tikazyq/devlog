@@ -62,13 +62,30 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
   const stats = calculateStats();
   const columns: ColumnsType<DevlogEntry> = [
     {
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
+      fixed: 'left',
+      width: 60,
+      render: (id: number) => (
+        <Text strong className={styles.devlogId}>
+          {id}
+        </Text>
+      ),
+      onHeaderCell: (column) => ({
+        style: {
+          paddingLeft: '24px',
+        },
+      }),
+    },
+    {
       title: 'Title',
       dataIndex: 'title',
       key: 'title',
       fixed: 'left',
       width: 400,
       render: (title: string, record: DevlogEntry) => (
-        <div className={styles.devlogTitleCellContainer}>
+        <>
           <div className={styles.devlogTitleCell}>
             <Text
               strong
@@ -87,13 +104,8 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
           >
             {record.description}
           </Text>
-        </div>
+        </>
       ),
-      onHeaderCell: (column) => ({
-        style: {
-          paddingLeft: '24px',
-        },
-      }),
     },
     {
       title: 'Status',

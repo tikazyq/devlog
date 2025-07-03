@@ -260,8 +260,17 @@
       "priority": "medium",
       "createdAt": "2025-07-03T16:39:21.675Z",
       "updatedAt": "2025-07-03T16:40:53.391Z"
+    },
+    "33": {
+      "filename": "033-add-id-column-as-first-column-in-devloglist-table.json",
+      "title": "Add ID column as first column in DevlogList table",
+      "status": "done",
+      "type": "feature",
+      "priority": "medium",
+      "createdAt": "2025-07-03T16:49:08.727Z",
+      "updatedAt": "2025-07-03T16:50:43.183Z"
     }
   },
-  "lastId": 32,
+  "lastId": 33,
   "version": "1.0.0"
 }

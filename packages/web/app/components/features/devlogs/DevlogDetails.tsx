@@ -28,6 +28,7 @@ import {
 } from '@ant-design/icons';
 import { DevlogDetailsProps } from '@devlog/types';
 import { MarkdownRenderer } from '@/components/ui';
+import { formatTimeAgoWithTooltip } from '@/lib/time-utils';
 import styles from './DevlogDetails.module.css';
 
 const { Title, Text } = Typography;
@@ -211,8 +212,18 @@ export function DevlogDetails({
                 <Text type="secondary" style={{ fontSize: '14px' }}>
                   ID: #{devlog.id}
                 </Text>
-                <Text type="secondary">Created: {new Date(devlog.createdAt).toLocaleString()}</Text>
-                <Text type="secondary">Updated: {new Date(devlog.updatedAt).toLocaleString()}</Text>
+                <Text 
+                  type="secondary" 
+                  title={formatTimeAgoWithTooltip(devlog.createdAt).fullDate}
+                >
+                  Created: {formatTimeAgoWithTooltip(devlog.createdAt).timeAgo}
+                </Text>
+                <Text 
+                  type="secondary"
+                  title={formatTimeAgoWithTooltip(devlog.updatedAt).fullDate}
+                >
+                  Updated: {formatTimeAgoWithTooltip(devlog.updatedAt).timeAgo}
+                </Text>
               </Space>
             </div>
 
@@ -361,7 +372,9 @@ export function DevlogDetails({
                       )}
                       <Text type="secondary" style={{ fontSize: '12px' }}>
                         By {decision.decisionMaker} •{' '}
-                        {new Date(decision.timestamp).toLocaleString()}
+                        <span title={formatTimeAgoWithTooltip(decision.timestamp).fullDate}>
+                          {formatTimeAgoWithTooltip(decision.timestamp).timeAgo}
+                        </span>
                       </Text>
                     </Timeline.Item>
                   ))}
@@ -534,8 +547,11 @@ export function DevlogDetails({
 
                   <div>
                     <Text type="secondary" style={{ fontSize: '12px' }}>
-                      Last AI Update: {new Date(devlog.aiContext.lastAIUpdate).toLocaleString()} •
-                      Version: {devlog.aiContext.contextVersion}
+                      Last AI Update:{' '}
+                      <span title={formatTimeAgoWithTooltip(devlog.aiContext.lastAIUpdate).fullDate}>
+                        {formatTimeAgoWithTooltip(devlog.aiContext.lastAIUpdate).timeAgo}
+                      </span>{' '}
+                      • Version: {devlog.aiContext.contextVersion}
                     </Text>
                   </div>
                 </Card>
@@ -572,7 +588,10 @@ export function DevlogDetails({
                           {ref.lastSync && (
                             <div>
                               <Text type="secondary" style={{ fontSize: '12px' }}>
-                                Last Sync: {new Date(ref.lastSync).toLocaleString()}
+                                Last Sync:{' '}
+                                <span title={formatTimeAgoWithTooltip(ref.lastSync).fullDate}>
+                                  {formatTimeAgoWithTooltip(ref.lastSync).timeAgo}
+                                </span>
                               </Text>
                             </div>
                           )}
@@ -595,7 +614,10 @@ export function DevlogDetails({
                         <MarkdownRenderer content={note.content} />
                       </div>
                       <Text type="secondary" style={{ fontSize: '12px' }}>
-                        {note.category} • {new Date(note.timestamp).toLocaleString()}
+                        {note.category} •{' '}
+                        <span title={formatTimeAgoWithTooltip(note.timestamp).fullDate}>
+                          {formatTimeAgoWithTooltip(note.timestamp).timeAgo}
+                        </span>
                       </Text>
                     </Timeline.Item>
                   ))}

@@ -24,6 +24,7 @@ import {
   getStatusColor,
   getStatusIcon,
 } from '@/lib/devlog-ui-utils';
+import { formatTimeAgoWithTooltip } from '@/lib/time-utils';
 import styles from './Dashboard.module.css';
 import { Gutter } from 'antd/es/grid/row';
 
@@ -288,8 +289,13 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                     className={styles.devlogListItem}
                     onClick={() => onViewDevlog(devlog)}
                     actions={[
-                      <Text type="secondary" key="date" className={styles.devlogDate}>
-                        {new Date(devlog.updatedAt).toLocaleDateString()}
+                      <Text 
+                        type="secondary" 
+                        key="date" 
+                        className={styles.devlogDate}
+                        title={formatTimeAgoWithTooltip(devlog.updatedAt).fullDate}
+                      >
+                        {formatTimeAgoWithTooltip(devlog.updatedAt).timeAgo}
                       </Text>,
                     ]}
                   >

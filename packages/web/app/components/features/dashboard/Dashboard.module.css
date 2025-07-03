@@ -74,20 +74,16 @@
 
 .devlogListItem {
   cursor: pointer;
-  padding: 0 24px !important;
+  padding: 12px 24px !important;
   margin: 0 !important;
   transition: background-color 0.2s ease;
   border-bottom: none !important;
-
-  &:hover {
-    background-color: #fafafa;
-  }
 }
 
 .devlogListItemMeta {
-  &:not(:last-child) {
-    border-bottom: 1px solid #e8e8e8 !important;
-  }
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
 .devlogDate {
@@ -95,7 +91,7 @@
 }
 
 .devlogTitleSection {
-  margin-bottom: 8px;
+  margin: 0;
 }
 
 .devlogTitleText {

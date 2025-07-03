@@ -1,8 +1,8 @@
 {
     "servers": {
-        "github": {
-            "url": "https://api.githubcopilot.com/mcp/"
-        },
+        // "github": {
+        //     "url": "https://api.githubcopilot.com/mcp/"
+        // },
         "devlog": {
             "type": "stdio",
             "command": "pnpm",

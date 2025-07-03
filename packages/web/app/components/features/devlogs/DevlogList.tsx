@@ -11,6 +11,7 @@ import {
   getStatusColor,
   getStatusIcon,
 } from '@/lib/devlog-ui-utils';
+import { formatTimeAgoWithTooltip } from '@/lib/time-utils';
 import styles from './DevlogList.module.css';
 
 const { Title, Text } = Typography;
@@ -131,22 +132,28 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 100,
-      render: (createdAt: string) => (
-        <Text type="secondary" className={styles.devlogDateSmall}>
-          {new Date(createdAt).toLocaleDateString()}
-        </Text>
-      ),
+      render: (createdAt: string) => {
+        const { timeAgo, fullDate } = formatTimeAgoWithTooltip(createdAt);
+        return (
+          <Text type="secondary" className={styles.devlogDateSmall} title={fullDate}>
+            {timeAgo}
+          </Text>
+        );
+      },
     },
     {
       title: 'Updated',
       dataIndex: 'updatedAt',
       key: 'updatedAt',
       width: 100,
-      render: (updatedAt: string) => (
-        <Text type="secondary" className={styles.devlogDateSmall}>
-          {new Date(updatedAt).toLocaleDateString()}
-        </Text>
-      ),
+      render: (updatedAt: string) => {
+        const { timeAgo, fullDate } = formatTimeAgoWithTooltip(updatedAt);
+        return (
+          <Text type="secondary" className={styles.devlogDateSmall} title={fullDate}>
+            {timeAgo}
+          </Text>
+        );
+      },
     },
     {
       title: 'Actions',

@@ -3,7 +3,7 @@
   "title": "Embed updateAIContext functionality into updateDevlog method",
   "type": "refactor",
   "description": "Embed updateAIContext functionality into the updateDevlog method to simplify the DevlogManager API and remove a rarely used method. This will make AI context updates part of the natural devlog update workflow.",
-  "status": "todo",
+  "status": "new",
   "priority": "medium",
   "createdAt": "2025-07-01T14:44:29.305Z",
   "updatedAt": "2025-07-01T14:44:29.305Z",

@@ -147,7 +147,7 @@
     "20": {
       "filename": "020-add-aggregated-file-code-changes-summary-to-devlog.json",
       "title": "Add aggregated file/code changes summary to DevlogEntry",
-      "status": "todo",
+      "status": "new",
       "type": "feature",
       "priority": "low",
       "createdAt": "2025-07-01T14:27:18.275Z",
@@ -156,7 +156,7 @@
     "21": {
       "filename": "021-embed-updateaicontext-functionality-into-updatedev.json",
       "title": "Embed updateAIContext functionality into updateDevlog method",
-      "status": "todo",
+      "status": "new",
       "type": "refactor",
       "priority": "medium",
       "createdAt": "2025-07-01T14:44:29.305Z",
@@ -228,7 +228,7 @@
     "29": {
       "filename": "029-consolidate-overview-stats-components-into-shared-.json",
       "title": "Consolidate overview stats components into shared OverviewStats component",
-      "status": "todo",
+      "status": "new",
       "type": "refactor",
       "priority": "medium",
       "createdAt": "2025-07-03T15:39:42.303Z",
@@ -242,8 +242,17 @@
       "priority": "medium",
       "createdAt": "2025-07-03T16:01:15.989Z",
       "updatedAt": "2025-07-03T16:13:09.146Z"
+    },
+    "31": {
+      "filename": "031-improve-compact-layout-in-overviewstats-component.json",
+      "title": "Improve compact layout in OverviewStats component",
+      "status": "in-progress",
+      "type": "task",
+      "priority": "medium",
+      "createdAt": "2025-07-03T16:15:52.269Z",
+      "updatedAt": "2025-07-03T16:32:16.050Z"
     }
   },
-  "lastId": 30,
+  "lastId": 31,
   "version": "1.0.0"
 }

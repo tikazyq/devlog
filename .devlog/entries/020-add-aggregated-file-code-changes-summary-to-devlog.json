@@ -3,7 +3,7 @@
   "title": "Add aggregated file/code changes summary to DevlogEntry",
   "type": "feature",
   "description": "Add fields to DevlogEntry to provide quick overview of all files and code changes across all notes, without needing to traverse individual notes. This would include aggregate file lists, change summaries, and timeline of modifications for better project understanding.",
-  "status": "todo",
+  "status": "new",
   "priority": "low",
   "createdAt": "2025-07-01T14:27:18.275Z",
   "updatedAt": "2025-07-01T14:27:18.275Z",

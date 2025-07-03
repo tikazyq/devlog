@@ -1,8 +1,14 @@
 'use client';
 
 import React from 'react';
-import { InfoCircleOutlined } from '@ant-design/icons';
-import { Popover, Typography } from 'antd';
+import { 
+  InfoCircleOutlined, 
+  NumberOutlined, 
+  PlusCircleOutlined,
+  ClockCircleOutlined,
+  CheckCircleOutlined 
+} from '@ant-design/icons';
+import { Popover, Typography, Tooltip } from 'antd';
 import { DevlogStats } from '@devlog/types';
 import styles from './OverviewStats.module.css';
 
@@ -155,22 +161,36 @@ export function OverviewStats({
           </div>
         )}
         <div className={styles.compactStats}>
-          <div className={styles.statCompact}>
-            <span className={styles.statValue}>{stats.totalEntries}</span>
-            <span className={styles.statLabel}>Total</span>
-          </div>
-          <div className={styles.statCompact}>
-            <span className={`${styles.statValue} ${styles.inProgress}`}>
-              {stats.byStatus['in-progress'] || 0}
-            </span>
-            <span className={styles.statLabel}>In Progress</span>
-          </div>
-          <div className={styles.statCompact}>
-            <span className={`${styles.statValue} ${styles.completed}`}>
-              {stats.byStatus['done'] || 0}
-            </span>
-            <span className={styles.statLabel}>Done</span>
-          </div>
+          <Tooltip title="Total">
+            <div className={styles.statCompact}>
+              <NumberOutlined className={`${styles.statIcon} ${styles.statValue}`} />
+              <span className={styles.statValue}>{stats.totalEntries}</span>
+            </div>
+          </Tooltip>
+          <Tooltip title="New">
+            <div className={styles.statCompact}>
+              <PlusCircleOutlined className={`${styles.statIcon} ${styles.statValue} ${styles.new}`} />
+              <span className={`${styles.statValue} ${styles.new}`}>
+                {stats.byStatus['new'] || 0}
+              </span>
+            </div>
+          </Tooltip>
+          <Tooltip title="In Progress">
+            <div className={styles.statCompact}>
+              <ClockCircleOutlined className={`${styles.statIcon} ${styles.statValue} ${styles.inProgress}`} />
+              <span className={`${styles.statValue} ${styles.inProgress}`}>
+                {stats.byStatus['in-progress'] || 0}
+              </span>
+            </div>
+          </Tooltip>
+          <Tooltip title="Done">
+            <div className={styles.statCompact}>
+              <CheckCircleOutlined className={`${styles.statIcon} ${styles.statValue} ${styles.completed}`} />
+              <span className={`${styles.statValue} ${styles.completed}`}>
+                {stats.byStatus['done'] || 0}
+              </span>
+            </div>
+          </Tooltip>
         </div>
       </div>
     );

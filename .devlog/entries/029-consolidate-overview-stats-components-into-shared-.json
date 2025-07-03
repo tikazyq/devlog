@@ -3,7 +3,7 @@
   "title": "Consolidate overview stats components into shared OverviewStats component",
   "type": "refactor",
   "description": "Consolidate the duplicate overview stats display logic currently scattered across Dashboard, NavigationSidebar, and DevlogList components into a single, reusable OverviewStats component. This will ensure consistent display across the application and eliminate code duplication.",
-  "status": "todo",
+  "status": "new",
   "priority": "medium",
   "createdAt": "2025-07-03T15:39:42.303Z",
   "updatedAt": "2025-07-03T15:39:42.303Z",

@@ -5,6 +5,7 @@
   background: #fff;
   border-bottom: 1px solid #e8e8e8;
   flex-shrink: 0;
+  height: 80px;
 }
 
 .dashboardTitleRow {
@@ -61,11 +62,17 @@
 }
 
 .recentDevlogs {
-  padding: 12px 0;
+  padding: 0;
+  position: relative;
 }
 
 .recentDevlogsTitle {
-  padding: 0 24px;
+  padding: 12px 24px;
+  margin-bottom: 0 !important;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 999;
 }
 
 .emptyDevlogs {
@@ -78,6 +85,14 @@
   margin: 0 !important;
   transition: background-color 0.2s ease;
   border-bottom: none !important;
+
+  &:hover {
+    background-color: #fafafa;
+
+    .devlogTitleText {
+      color: #1890ff;
+    }
+  }
 }
 
 .devlogListItemMeta {
@@ -163,6 +178,31 @@
   color: #8c8c8c;
   margin-top: 2px;
   line-height: 1.2;
+}
+
+/* Skeleton loading styles */
+.skeletonTitle {
+  width: 80% !important;
+  height: 16px !important;
+}
+
+.skeletonDescription {
+  width: 300px;
+  height: 14px;
+}
+
+.skeletonTag {
+  width: 60px;
+  height: 22px;
+}
+
+.skeletonDate {
+  width: 80px;
+  height: 14px;
+}
+
+.skeletonDateContainer {
+  width: 80px;
 }
 
 /* Responsive adjustments */

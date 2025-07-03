@@ -27,41 +27,28 @@ import {
 import { formatTimeAgoWithTooltip } from '@/lib/time-utils';
 import styles from './Dashboard.module.css';
 import { Gutter } from 'antd/es/grid/row';
+import classNames from 'classnames';
 
 const { Title, Paragraph, Text } = Typography;
 
 interface DashboardProps {
   stats: DevlogStats | null;
+  timeSeriesData: TimeSeriesStats | null;
+  isLoadingTimeSeries: boolean;
   recentDevlogs: DevlogEntry[];
+  isLoadingDevlogs: boolean;
   onViewDevlog: (devlog: DevlogEntry) => void;
 }
 
-export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps) {
+export function Dashboard({
+  stats,
+  timeSeriesData,
+  isLoadingTimeSeries,
+  recentDevlogs,
+  isLoadingDevlogs,
+  onViewDevlog,
+}: DashboardProps) {
   const router = useRouter();
-  const [timeSeriesData, setTimeSeriesData] = React.useState<TimeSeriesStats | null>(null);
-  const [isLoadingTimeSeries, setIsLoadingTimeSeries] = React.useState(true);
-
-  // Fetch time series data from the API
-  React.useEffect(() => {
-    async function fetchTimeSeriesData() {
-      try {
-        setIsLoadingTimeSeries(true);
-        const response = await fetch('/api/devlogs/stats/timeseries?days=30');
-        if (response.ok) {
-          const data: TimeSeriesStats = await response.json();
-          setTimeSeriesData(data);
-        } else {
-          console.error('Failed to fetch time series data');
-        }
-      } catch (error) {
-        console.error('Error fetching time series data:', error);
-      } finally {
-        setIsLoadingTimeSeries(false);
-      }
-    }
-
-    fetchTimeSeriesData();
-  }, []);
 
   // Format data for charts
   const chartData = React.useMemo(() => {
@@ -274,7 +261,23 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
             Recent Devlogs
           </Title>
           <div className="flex-1 overflow-x-hidden overflow-y-auto">
-            {recentDevlogs.length === 0 ? (
+            {isLoadingDevlogs ? (
+              <List
+                itemLayout="horizontal"
+                dataSource={Array.from({ length: 10 }, (_, index) => ({
+                  key: `skeleton-${index}`,
+                }))}
+                renderItem={() => (
+                  <List.Item className={styles.devlogListItem}>
+                    <List.Item.Meta
+                      className={styles.devlogListItemMeta}
+                      avatar={<Skeleton.Avatar size={40} active />}
+                      title={<Skeleton paragraph={{ rows: 2 }} active />}
+                    />
+                  </List.Item>
+                )}
+              />
+            ) : recentDevlogs.length === 0 ? (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
                 description="No devlogs found"
@@ -289,9 +292,9 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                     className={styles.devlogListItem}
                     onClick={() => onViewDevlog(devlog)}
                     actions={[
-                      <Text 
-                        type="secondary" 
-                        key="date" 
+                      <Text
+                        type="secondary"
+                        key="date"
                         className={styles.devlogDate}
                         title={formatTimeAgoWithTooltip(devlog.updatedAt).fullDate}
                       >

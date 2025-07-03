@@ -206,8 +206,26 @@
       "priority": "medium",
       "createdAt": "2025-07-01T16:07:06.225Z",
       "updatedAt": "2025-07-01T16:11:10.272Z"
+    },
+    "27": {
+      "filename": "027-move-api-fetching-from-dashboard-component-to-dash.json",
+      "title": "Move API fetching from Dashboard component to DashboardPage",
+      "status": "done",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-07-03T14:34:53.322Z",
+      "updatedAt": "2025-07-03T14:36:48.280Z"
+    },
+    "28": {
+      "filename": "028-add-skeleton-loading-state-for-recent-devlogs-in-d.json",
+      "title": "Add skeleton loading state for recent devlogs in Dashboard",
+      "status": "done",
+      "type": "feature",
+      "priority": "medium",
+      "createdAt": "2025-07-03T14:38:48.269Z",
+      "updatedAt": "2025-07-03T14:47:48.908Z"
     }
   },
-  "lastId": 26,
+  "lastId": 28,
   "version": "1.0.0"
 }

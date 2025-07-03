@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDevlogManager } from '../../lib/devlog-manager';
+import { getDevlogManager } from '@/lib/devlog-manager';
 
 // GET /api/devlogs - List all devlogs
 export async function GET(request: NextRequest) {

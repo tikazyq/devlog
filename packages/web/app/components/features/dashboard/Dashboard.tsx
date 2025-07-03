@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Avatar, Card, Col, Empty, FloatButton, List, Row, Skeleton, Tag, Typography } from 'antd';
+import { Avatar, Col, Empty, FloatButton, List, Row, Skeleton, Tag, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import {
   Area,
@@ -25,6 +25,7 @@ import {
   getStatusIcon,
 } from '@/lib/devlog-ui-utils';
 import styles from './Dashboard.module.css';
+import { Gutter } from 'antd/es/grid/row';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -86,6 +87,9 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
     ].filter((item) => item.value > 0);
   }, [stats]);
 
+  // Define gutter for chart rows
+  const chartRowGutter = [48, 24] as [Gutter, Gutter];
+
   return (
     <div className="flex flex-col h-full w-full overflow-hidden">
       {/* Fixed Header */}
@@ -100,33 +104,45 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
             </Paragraph>
           </div>
           {stats && (
-            <div className={styles.dashboardStatsCompact}>
+            <div className={styles.dashboardStats}>
               <div className={styles.statCompact}>
                 <span className={styles.statValue}>{stats.totalEntries}</span>
                 <span className={styles.statLabel}>Total</span>
               </div>
               <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.todo}`}>{stats.byStatus['todo'] || 0}</span>
+                <span className={`${styles.statValue} ${styles.todo}`}>
+                  {stats.byStatus['todo'] || 0}
+                </span>
                 <span className={styles.statLabel}>Todo</span>
               </div>
               <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.inProgress}`}>{stats.byStatus['in-progress'] || 0}</span>
+                <span className={`${styles.statValue} ${styles.inProgress}`}>
+                  {stats.byStatus['in-progress'] || 0}
+                </span>
                 <span className={styles.statLabel}>In Progress</span>
               </div>
               <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.review}`}>{stats.byStatus['review'] || 0}</span>
+                <span className={`${styles.statValue} ${styles.review}`}>
+                  {stats.byStatus['review'] || 0}
+                </span>
                 <span className={styles.statLabel}>Review</span>
               </div>
               <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.testing}`}>{stats.byStatus['testing'] || 0}</span>
+                <span className={`${styles.statValue} ${styles.testing}`}>
+                  {stats.byStatus['testing'] || 0}
+                </span>
                 <span className={styles.statLabel}>Testing</span>
               </div>
               <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.completed}`}>{stats.byStatus['done'] || 0}</span>
+                <span className={`${styles.statValue} ${styles.completed}`}>
+                  {stats.byStatus['done'] || 0}
+                </span>
                 <span className={styles.statLabel}>Completed</span>
               </div>
               <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.archived}`}>{stats.byStatus['archived'] || 0}</span>
+                <span className={`${styles.statValue} ${styles.archived}`}>
+                  {stats.byStatus['archived'] || 0}
+                </span>
                 <span className={styles.statLabel}>Archived</span>
               </div>
             </div>
@@ -138,33 +154,42 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
         {/* Charts Section */}
         <div className={styles.dashboardChartsSection}>
           {isLoadingTimeSeries ? (
-            <Row gutter={[24, 24]}>
-              <Col xs={24} lg={14}>
-                <Card title="Development Activity (Last 30 Days)" className={styles.chartCard}>
+            <Row gutter={chartRowGutter} className={styles.chartRow}>
+              <Col xs={24} lg={12}>
+                <div className={styles.chartCard}>
+                  <Title level={4} className="mb-4">
+                    Development Activity (Last 30 Days)
+                  </Title>
                   <Skeleton active paragraph={{ rows: 8 }} />
-                </Card>
+                </div>
               </Col>
-              <Col xs={24} lg={10}>
-                <Card title="Current Status Distribution" className={styles.chartCard}>
+              <Col xs={24} lg={12}>
+                <div className={styles.chartCard}>
+                  <Title level={4} className="mb-4">
+                    Current Status Distribution
+                  </Title>
                   <Skeleton active paragraph={{ rows: 8 }} />
-                </Card>
+                </div>
               </Col>
             </Row>
           ) : chartData.length === 0 ? (
-            <Row gutter={[24, 24]}>
+            <Row gutter={chartRowGutter}>
               <Col xs={24}>
-                <Card className={styles.chartCard}>
+                <div className={styles.chartCard}>
                   <Empty
                     image={Empty.PRESENTED_IMAGE_SIMPLE}
                     description="No historical data available yet"
                   />
-                </Card>
+                </div>
               </Col>
             </Row>
           ) : (
-            <Row gutter={[24, 24]}>
-              <Col xs={24} lg={14}>
-                <Card title="Development Activity (Last 30 Days)" className={styles.chartCard}>
+            <Row gutter={chartRowGutter}>
+              <Col xs={24} lg={12}>
+                <div className={styles.chartCard}>
+                  <Title level={4} className="mb-4">
+                    Development Activity (Last 30 Days)
+                  </Title>
                   <ResponsiveContainer width="100%" height={300}>
                     <AreaChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -197,10 +222,13 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                       />
                     </AreaChart>
                   </ResponsiveContainer>
-                </Card>
+                </div>
               </Col>
-              <Col xs={24} lg={10}>
-                <Card title="Current Status Distribution" className={styles.chartCard}>
+              <Col xs={24} lg={12}>
+                <div className={styles.chartCard}>
+                  <Title level={4} className="mb-4">
+                    Current Status Distribution
+                  </Title>
                   <ResponsiveContainer width="100%" height={300}>
                     <PieChart>
                       <Pie
@@ -233,93 +261,91 @@ export function Dashboard({ stats, recentDevlogs, onViewDevlog }: DashboardProps
                       />
                     </PieChart>
                   </ResponsiveContainer>
-                </Card>
+                </div>
               </Col>
             </Row>
           )}
         </div>
 
         {/* Scrollable Content */}
-        <Card
-          title={
-            <Title level={3} className={styles.recentDevlogsTitle}>
-              Recent Devlogs
-            </Title>
-          }
-          styles={{ body: { padding: 0, overflowX: 'hidden', overflowY: 'auto' } }}
-          className={`${styles.recentDevlogsCard} flex-1 overflow-hidden flex flex-col`}
-        >
-          {recentDevlogs.length === 0 ? (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No devlogs found"
-              className={styles.emptyDevlogs}
-            />
-          ) : (
-            <List
-              itemLayout="horizontal"
-              dataSource={recentDevlogs}
-              renderItem={(devlog) => (
-                <List.Item
-                  className={styles.devlogListItem}
-                  onClick={() => onViewDevlog(devlog)}
-                  actions={[
-                    <Text type="secondary" key="date" className={styles.devlogDate}>
-                      {new Date(devlog.updatedAt).toLocaleDateString()}
-                    </Text>,
-                  ]}
-                >
-                  <List.Item.Meta
-                    avatar={
-                      <Avatar
-                        size={40}
-                        icon={getStatusIcon(devlog.status)}
-                        style={{
-                          backgroundColor:
-                            getStatusColor(devlog.status) === 'success'
-                              ? '#52c41a'
-                              : getStatusColor(devlog.status) === 'processing'
-                                ? '#1890ff'
-                                : getStatusColor(devlog.status) === 'error'
-                                  ? '#ff4d4f'
-                                  : '#d9d9d9',
-                        }}
-                      />
-                    }
-                    title={
-                      <div className={styles.devlogTitleSection}>
-                        <Text strong className={styles.devlogTitleText}>
-                          {devlog.title}
-                        </Text>
-                        <div className={styles.recentDevlogsMeta}>
-                          <Tag
-                            color={getStatusColor(devlog.status)}
-                            icon={getStatusIcon(devlog.status)}
-                            className={styles.devlogTag}
-                          >
-                            {devlog.status}
-                          </Tag>
-                          <Tag
-                            color={getPriorityColor(devlog.priority)}
-                            icon={getPriorityIcon(devlog.priority)}
-                            className={styles.devlogTag}
-                          >
-                            {devlog.priority}
-                          </Tag>
+        <div className={`${styles.recentDevlogs} flex-1 overflow-hidden flex flex-col`}>
+          <Title level={3} className={styles.recentDevlogsTitle}>
+            Recent Devlogs
+          </Title>
+          <div className="flex-1 overflow-x-hidden overflow-y-auto">
+            {recentDevlogs.length === 0 ? (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No devlogs found"
+                className={styles.emptyDevlogs}
+              />
+            ) : (
+              <List
+                itemLayout="horizontal"
+                dataSource={recentDevlogs}
+                renderItem={(devlog) => (
+                  <List.Item
+                    className={styles.devlogListItem}
+                    onClick={() => onViewDevlog(devlog)}
+                    actions={[
+                      <Text type="secondary" key="date" className={styles.devlogDate}>
+                        {new Date(devlog.updatedAt).toLocaleDateString()}
+                      </Text>,
+                    ]}
+                  >
+                    <List.Item.Meta
+                      className={styles.devlogListItemMeta}
+                      avatar={
+                        <Avatar
+                          size={40}
+                          icon={getStatusIcon(devlog.status)}
+                          style={{
+                            backgroundColor:
+                              getStatusColor(devlog.status) === 'success'
+                                ? '#52c41a'
+                                : getStatusColor(devlog.status) === 'processing'
+                                  ? '#1890ff'
+                                  : getStatusColor(devlog.status) === 'error'
+                                    ? '#ff4d4f'
+                                    : '#d9d9d9',
+                          }}
+                        />
+                      }
+                      title={
+                        <div className={styles.devlogTitleSection}>
+                          <Text strong className={styles.devlogTitleText}>
+                            {devlog.title}
+                          </Text>
+                          <div className={styles.recentDevlogsMeta}>
+                            <Tag
+                              color={getStatusColor(devlog.status)}
+                              icon={getStatusIcon(devlog.status)}
+                              className={styles.devlogTag}
+                            >
+                              {devlog.status}
+                            </Tag>
+                            <Tag
+                              color={getPriorityColor(devlog.priority)}
+                              icon={getPriorityIcon(devlog.priority)}
+                              className={styles.devlogTag}
+                            >
+                              {devlog.priority}
+                            </Tag>
+                          </div>
                         </div>
-                      </div>
-                    }
-                    description={
-                      <Text type="secondary" ellipsis className={styles.devlogDescription}>
-                        {devlog.description}
-                      </Text>
-                    }
-                  />
-                </List.Item>
-              )}
-            />
-          )}
-        </Card>
+                      }
+                      description={
+                        <Text type="secondary" ellipsis className={styles.devlogDescription}>
+                          {devlog.description}
+                        </Text>
+                      }
+                    />
+                  </List.Item>
+                )}
+              />
+            )}
+          </div>
+        </div>
       </div>
 
       <FloatButton

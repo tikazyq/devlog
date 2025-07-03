@@ -25,6 +25,7 @@ import {
   getStatusIcon,
 } from '@/lib/devlog-ui-utils';
 import { formatTimeAgoWithTooltip } from '@/lib/time-utils';
+import { OverviewStats } from '@/components';
 import styles from './Dashboard.module.css';
 import { Gutter } from 'antd/es/grid/row';
 import classNames from 'classnames';
@@ -66,12 +67,13 @@ export function Dashboard({
     if (!stats) return [];
 
     return [
-      { name: 'Todo', value: stats.byStatus['todo'] || 0, color: '#8c8c8c' },
+      { name: 'New', value: stats.byStatus['new'] || 0, color: '#722ed1' },
       { name: 'In Progress', value: stats.byStatus['in-progress'] || 0, color: '#faad14' },
-      { name: 'Review', value: stats.byStatus['review'] || 0, color: '#fa8c16' },
+      { name: 'Blocked', value: stats.byStatus['blocked'] || 0, color: '#ff4d4f' },
+      { name: 'In Review', value: stats.byStatus['in-review'] || 0, color: '#fa8c16' },
       { name: 'Testing', value: stats.byStatus['testing'] || 0, color: '#13c2c2' },
       { name: 'Done', value: stats.byStatus['done'] || 0, color: '#52c41a' },
-      { name: 'Archived', value: stats.byStatus['archived'] || 0, color: '#595959' },
+      { name: 'Closed', value: stats.byStatus['closed'] || 0, color: '#595959' },
     ].filter((item) => item.value > 0);
   }, [stats]);
 
@@ -91,50 +93,7 @@ export function Dashboard({
               Overview of your development progress
             </Paragraph>
           </div>
-          {stats && (
-            <div className={styles.dashboardStats}>
-              <div className={styles.statCompact}>
-                <span className={styles.statValue}>{stats.totalEntries}</span>
-                <span className={styles.statLabel}>Total</span>
-              </div>
-              <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.todo}`}>
-                  {stats.byStatus['todo'] || 0}
-                </span>
-                <span className={styles.statLabel}>Todo</span>
-              </div>
-              <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.inProgress}`}>
-                  {stats.byStatus['in-progress'] || 0}
-                </span>
-                <span className={styles.statLabel}>In Progress</span>
-              </div>
-              <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.review}`}>
-                  {stats.byStatus['review'] || 0}
-                </span>
-                <span className={styles.statLabel}>Review</span>
-              </div>
-              <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.testing}`}>
-                  {stats.byStatus['testing'] || 0}
-                </span>
-                <span className={styles.statLabel}>Testing</span>
-              </div>
-              <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.completed}`}>
-                  {stats.byStatus['done'] || 0}
-                </span>
-                <span className={styles.statLabel}>Completed</span>
-              </div>
-              <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.archived}`}>
-                  {stats.byStatus['archived'] || 0}
-                </span>
-                <span className={styles.statLabel}>Archived</span>
-              </div>
-            </div>
-          )}
+          <OverviewStats stats={stats} variant="detailed" />
         </div>
       </div>
 

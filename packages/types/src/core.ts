@@ -4,7 +4,7 @@
 
 export type DevlogType = 'feature' | 'bugfix' | 'task' | 'refactor' | 'docs';
 
-export type DevlogStatus = 'todo' | 'in-progress' | 'review' | 'testing' | 'done' | 'archived';
+export type DevlogStatus = 'new' | 'in-progress' | 'blocked' | 'in-review' | 'testing' | 'done' | 'closed';
 
 export type DevlogPriority = 'low' | 'medium' | 'high' | 'critical';
 
@@ -129,10 +129,12 @@ export interface TimeSeriesDataPoint {
   created: number;
   completed: number;
   inProgress: number;
-  review: number;
+  inReview: number;
   testing: number;
-  todo: number;
-  archived: number;
+  new: number;
+  blocked: number;
+  done: number;
+  closed: number;
 }
 
 export interface TimeSeriesStats {

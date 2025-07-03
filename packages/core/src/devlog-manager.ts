@@ -331,10 +331,12 @@ export class DevlogManager {
         created,
         completed,
         inProgress: statusCounts['in-progress'] || 0,
-        review: statusCounts['review'] || 0,
+        inReview: statusCounts['in-review'] || 0,
         testing: statusCounts['testing'] || 0,
-        todo: statusCounts['todo'] || 0,
-        archived: statusCounts['archived'] || 0,
+        new: statusCounts['new'] || 0,
+        blocked: statusCounts['blocked'] || 0,
+        done: statusCounts['done'] || 0,
+        closed: statusCounts['closed'] || 0,
       });
 
       currentDate.setDate(currentDate.getDate() + 1);
@@ -517,11 +519,12 @@ export class DevlogManager {
       };
       const statusOrder: Record<DevlogStatus, number> = {
         'in-progress': 0,
-        review: 1,
-        todo: 2,
-        testing: 3,
-        done: 4,
-        archived: 5,
+        'in-review': 1,
+        new: 2,
+        blocked: 3,
+        testing: 4,
+        done: 5,
+        closed: 6,
       };
 
       const relevanceDiff =
@@ -533,7 +536,7 @@ export class DevlogManager {
 
     // Calculate active entries and generate recommendation
     const activeCount = relatedEntries.filter((r) =>
-      ['todo', 'in-progress', 'review', 'testing'].includes(r.entry.status),
+      ['new', 'in-progress', 'in-review', 'testing'].includes(r.entry.status),
     ).length;
 
     const recommendation =

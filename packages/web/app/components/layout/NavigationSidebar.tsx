@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Card, Col, Layout, Menu, Row, Statistic, Typography } from 'antd';
+import { Layout, Menu, Typography } from 'antd';
 import { CodeOutlined, DashboardOutlined, FileTextOutlined, PlusOutlined } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 import { DevlogStats } from '@devlog/types';
+import { OverviewStats } from '@/components';
 import styles from './NavigationSidebar.module.css';
 
 const { Sider } = Layout;
@@ -128,38 +129,11 @@ export function NavigationSidebar({ stats, collapsed = false }: NavigationSideba
         onClick={handleMenuClick}
       />
 
-      {stats && (
-        <div className={styles.sidebarStats}>
-          <Title level={5} className={styles.sidebarStatsTitle}>
-            QUICK STATS
-          </Title>
-          <Card size="small" className={styles.sidebarStatsCard}>
-            <Row gutter={[16, 16]}>
-              <Col span={24}>
-                <Statistic
-                  title="Total"
-                  value={stats.totalEntries || 0}
-                  valueStyle={{ fontSize: '16px' }}
-                />
-              </Col>
-              <Col span={12}>
-                <Statistic
-                  title="In Progress"
-                  value={stats.byStatus?.['in-progress'] || 0}
-                  valueStyle={{ fontSize: '14px', color: '#1890ff' }}
-                />
-              </Col>
-              <Col span={12}>
-                <Statistic
-                  title="Completed"
-                  value={stats.byStatus?.done || 0}
-                  valueStyle={{ fontSize: '14px', color: '#52c41a' }}
-                />
-              </Col>
-            </Row>
-          </Card>
-        </div>
-      )}
+      <OverviewStats 
+        stats={stats || null} 
+        variant="compact" 
+        title="QUICK STATS" 
+      />
     </Sider>
   );
 }

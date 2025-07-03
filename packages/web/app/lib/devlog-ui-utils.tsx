@@ -24,14 +24,16 @@ export const getStatusColor = (status: DevlogStatus): string => {
       return 'success';
     case 'in-progress':
       return 'processing';
-    case 'review':
+    case 'blocked':
+      return 'error';
+    case 'in-review':
       return 'warning';
     case 'testing':
       return 'cyan';
-    case 'archived':
+    case 'closed':
       return 'default';
-    case 'todo':
-      return 'default';
+    case 'new':
+      return 'purple';
     default:
       return 'default';
   }
@@ -46,13 +48,15 @@ export const getStatusIcon = (status: DevlogStatus): React.ReactNode => {
       return <CheckCircleOutlined />;
     case 'in-progress':
       return <SyncOutlined spin />;
-    case 'review':
+    case 'blocked':
+      return <StopOutlined />;
+    case 'in-review':
       return <EyeOutlined />;
     case 'testing':
       return <FileProtectOutlined />;
-    case 'archived':
+    case 'closed':
       return <MinusCircleOutlined />;
-    case 'todo':
+    case 'new':
       return <ClockCircleOutlined />;
     default:
       return <MinusCircleOutlined />;

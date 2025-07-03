@@ -391,8 +391,8 @@ export class EnterpriseSync {
       labels.push('priority-high');
     }
 
-    // Add status label if not todo
-    if (entry.status !== 'todo') {
+    // Add status label if not new
+    if (entry.status !== 'new') {
       labels.push(`status-${entry.status}`);
     }
 

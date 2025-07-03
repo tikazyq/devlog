@@ -224,8 +224,26 @@
       "priority": "medium",
       "createdAt": "2025-07-03T14:38:48.269Z",
       "updatedAt": "2025-07-03T14:47:48.908Z"
+    },
+    "29": {
+      "filename": "029-consolidate-overview-stats-components-into-shared-.json",
+      "title": "Consolidate overview stats components into shared OverviewStats component",
+      "status": "todo",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-07-03T15:39:42.303Z",
+      "updatedAt": "2025-07-03T15:39:42.303Z"
+    },
+    "30": {
+      "filename": "030-update-devlog-status-values-to-match-new-requireme.json",
+      "title": "Update devlog status values to match new requirements",
+      "status": "done",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-07-03T16:01:15.989Z",
+      "updatedAt": "2025-07-03T16:13:09.146Z"
     }
   },
-  "lastId": 28,
+  "lastId": 30,
   "version": "1.0.0"
 }

@@ -4,7 +4,7 @@ import React from 'react';
 import { Button, Empty, Popconfirm, Space, Spin, Table, Tag, Typography } from 'antd';
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import { DevlogEntry, DevlogListProps, DevlogPriority, DevlogStatus } from '@devlog/types';
+import { DevlogEntry, DevlogListProps, DevlogPriority, DevlogStatus, DevlogStats, DevlogType } from '@devlog/types';
 import {
   getPriorityColor,
   getPriorityIcon,
@@ -12,11 +12,38 @@ import {
   getStatusIcon,
 } from '@/lib/devlog-ui-utils';
 import { formatTimeAgoWithTooltip } from '@/lib/time-utils';
+import { OverviewStats } from '@/components';
 import styles from './DevlogList.module.css';
 
 const { Title, Text } = Typography;
 
 export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: DevlogListProps) {
+  // Calculate stats from devlogs array
+  const calculateStats = (): DevlogStats => {
+    const byStatus = devlogs.reduce((acc, devlog) => {
+      acc[devlog.status] = (acc[devlog.status] || 0) + 1;
+      return acc;
+    }, {} as Record<DevlogStatus, number>);
+
+    const byType = devlogs.reduce((acc, devlog) => {
+      acc[devlog.type] = (acc[devlog.type] || 0) + 1;
+      return acc;
+    }, {} as Record<DevlogType, number>);
+
+    const byPriority = devlogs.reduce((acc, devlog) => {
+      acc[devlog.priority] = (acc[devlog.priority] || 0) + 1;
+      return acc;
+    }, {} as Record<DevlogPriority, number>);
+
+    return {
+      totalEntries: devlogs.length,
+      byStatus,
+      byType,
+      byPriority,
+    };
+  };
+
+  const stats = calculateStats();
   const columns: ColumnsType<DevlogEntry> = [
     {
       title: 'Title',
@@ -194,16 +221,6 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
     );
   }
 
-  // Calculate stats for the sticky header
-  const totalCount = devlogs.length;
-  const statusCounts = devlogs.reduce(
-    (acc, devlog) => {
-      acc[devlog.status] = (acc[devlog.status] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>,
-  );
-
   return (
     <div className={styles.devlogListContainer}>
       {/* Sticky Header with Summary */}
@@ -213,38 +230,7 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
             <Title level={2} className={styles.devlogListTitle}>
               All Devlogs
             </Title>
-            <div className={styles.devlogStats}>
-              <div className={styles.statCompact}>
-                <span className={styles.statValue}>{totalCount}</span>
-                <span className={styles.statLabel}>Total</span>
-              </div>
-              <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.inProgress}`}>
-                  {statusCounts['in-progress'] || 0}
-                </span>
-                <span className={styles.statLabel}>In Progress</span>
-              </div>
-              <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.completed}`}>
-                  {statusCounts['done'] || 0}
-                </span>
-                <span className={styles.statLabel}>Done</span>
-              </div>
-              <div className={styles.statCompact}>
-                <span className={`${styles.statValue} ${styles.todo}`}>
-                  {statusCounts['todo'] || 0}
-                </span>
-                <span className={styles.statLabel}>Todo</span>
-              </div>
-              {statusCounts['blocked'] && (
-                <div className={styles.statCompact}>
-                  <span className={`${styles.statValue} ${styles.blocked}`}>
-                    {statusCounts['blocked']}
-                  </span>
-                  <span className={styles.statLabel}>Blocked</span>
-                </div>
-              )}
-            </div>
+            <OverviewStats stats={stats} variant="detailed" />
           </div>
         </div>
       </div>

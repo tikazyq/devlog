@@ -255,7 +255,7 @@ export class MCPDevlogAdapter {
     await this.ensureInitialized();
 
     const filter = {
-      status: ['todo', 'in-progress', 'review', 'testing'] as any[],
+      status: ['new', 'in-progress', 'blocked', 'in-review', 'testing'] as any[],
     };
 
     const entries = await this.devlogManager.listDevlogs(filter);
@@ -413,12 +413,13 @@ export class MCPDevlogAdapter {
       .slice(0, 10)
       .map(({ entry, relevance, matchedTerms }) => {
         const statusEmoji: Record<DevlogStatus, string> = {
-          todo: '📋',
+          new: '🆕',
           'in-progress': '🔄',
-          review: '👀',
+          blocked: '🚫',
+          'in-review': '👀',
           testing: '🧪',
           done: '✅',
-          archived: '📦',
+          closed: '📦',
         };
 
         return (

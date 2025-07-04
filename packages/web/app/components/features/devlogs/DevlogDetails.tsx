@@ -1,39 +1,29 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  Alert,
-  Button,
-  Card,
-  Checkbox,
-  Col,
-  Divider,
-  Form,
-  Input,
-  List,
-  Row,
-  Select,
-  Space,
-  Tag,
-  Timeline,
-  Typography,
-} from 'antd';
+import { Alert, Card, Checkbox, Col, List, Row, Space, Tag, Timeline, Typography } from 'antd';
 import {
   BulbOutlined,
   InfoCircleOutlined,
   QuestionCircleOutlined,
   RightOutlined,
-  SaveOutlined,
   ToolOutlined,
 } from '@ant-design/icons';
-import { DevlogDetailsProps } from '@devlog/types';
+import { DevlogEntry } from '@devlog/types';
 import { MarkdownRenderer } from '@/components/ui';
+import { DevlogForm } from '@/components/forms/DevlogForm';
 import { formatTimeAgoWithTooltip } from '@/lib/time-utils';
 import styles from './DevlogDetails.module.css';
 
 const { Title, Text } = Typography;
-const { TextArea } = Input;
-const { Option } = Select;
+
+interface DevlogDetailsProps {
+  devlog: DevlogEntry;
+  onUpdate: (data: any) => void;
+  onDelete: () => void;
+  isEditing?: boolean;
+  onEditToggle?: () => void;
+}
 
 export function DevlogDetails({
   devlog,
@@ -42,13 +32,31 @@ export function DevlogDetails({
   onEditToggle,
 }: DevlogDetailsProps) {
   const [internalIsEditing, setInternalIsEditing] = useState(false);
-  const [form] = Form.useForm();
 
   // Use external editing state if provided, otherwise use internal state
   const isEditing = externalIsEditing !== undefined ? externalIsEditing : internalIsEditing;
 
   const handleSubmit = (values: any) => {
-    onUpdate({ id: devlog.id, ...values });
+    // Transform DevlogForm data to match DevlogDetails expected format
+    const updateData = {
+      id: devlog.id,
+      ...values,
+      context: {
+        ...devlog.context,
+        businessContext: values.businessContext,
+        technicalContext: values.technicalContext,
+      },
+    };
+
+    onUpdate(updateData);
+    if (onEditToggle) {
+      onEditToggle();
+    } else {
+      setInternalIsEditing(false);
+    }
+  };
+
+  const handleCancel = () => {
     if (onEditToggle) {
       onEditToggle();
     } else {
@@ -59,148 +67,20 @@ export function DevlogDetails({
   return (
     <div>
       {isEditing ? (
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
+        <DevlogForm
+          onSubmit={handleSubmit}
+          onCancel={handleCancel}
+          isEditMode={true}
           initialValues={{
             title: devlog.title,
             type: devlog.type,
-            status: devlog.status,
             priority: devlog.priority,
+            status: devlog.status,
             description: devlog.description,
             businessContext: devlog.context?.businessContext || '',
             technicalContext: devlog.context?.technicalContext || '',
-            estimatedHours: devlog.estimatedHours,
-            actualHours: devlog.actualHours,
-            assignee: devlog.assignee || '',
-            tags: devlog.tags || [],
           }}
-        >
-          <Row gutter={[16, 0]}>
-            <Col span={24}>
-              <Form.Item
-                name="title"
-                label="Title"
-                rules={[{ required: true, message: 'Please enter a title' }]}
-              >
-                <Input size="large" />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} md={8}>
-              <Form.Item
-                name="type"
-                label="Type"
-                rules={[{ required: true, message: 'Please select a type' }]}
-              >
-                <Select size="large">
-                  <Option value="feature">Feature</Option>
-                  <Option value="bugfix">Bug Fix</Option>
-                  <Option value="task">Task</Option>
-                  <Option value="refactor">Refactor</Option>
-                  <Option value="docs">Documentation</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} md={8}>
-              <Form.Item
-                name="status"
-                label="Status"
-                rules={[{ required: true, message: 'Please select a status' }]}
-              >
-                <Select size="large">
-                  <Option value="todo">To Do</Option>
-                  <Option value="in-progress">In Progress</Option>
-                  <Option value="blocked">Blocked</Option>
-                  <Option value="review">Review</Option>
-                  <Option value="testing">Testing</Option>
-                  <Option value="done">Done</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} md={8}>
-              <Form.Item
-                name="priority"
-                label="Priority"
-                rules={[{ required: true, message: 'Please select a priority' }]}
-              >
-                <Select size="large">
-                  <Option value="low">Low</Option>
-                  <Option value="medium">Medium</Option>
-                  <Option value="high">High</Option>
-                  <Option value="critical">Critical</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-
-            <Col span={24}>
-              <Form.Item
-                name="description"
-                label="Description"
-                rules={[{ required: true, message: 'Please enter a description' }]}
-              >
-                <TextArea rows={4} showCount maxLength={500} />
-              </Form.Item>
-            </Col>
-
-            <Col span={24}>
-              <Form.Item name="businessContext" label="Business Context">
-                <TextArea rows={3} showCount maxLength={300} />
-              </Form.Item>
-            </Col>
-
-            <Col span={24}>
-              <Form.Item name="technicalContext" label="Technical Context">
-                <TextArea rows={3} showCount maxLength={300} />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} md={8}>
-              <Form.Item name="estimatedHours" label="Estimated Hours">
-                <Input type="number" min={0} step={0.5} placeholder="0" />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} md={8}>
-              <Form.Item name="actualHours" label="Actual Hours">
-                <Input type="number" min={0} step={0.5} placeholder="0" />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} md={8}>
-              <Form.Item name="assignee" label="Assignee">
-                <Input placeholder="Enter assignee name" />
-              </Form.Item>
-            </Col>
-
-            <Col span={24}>
-              <Form.Item name="tags" label="Tags">
-                <Select
-                  mode="tags"
-                  style={{ width: '100%' }}
-                  placeholder="Add tags"
-                  tokenSeparators={[',']}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Divider />
-
-          <Form.Item style={{ marginBottom: 0 }}>
-            <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-              <Button onClick={() => (onEditToggle ? onEditToggle() : setInternalIsEditing(false))}>
-                Cancel
-              </Button>
-              <Button type="primary" htmlType="submit" icon={<SaveOutlined />}>
-                Save Changes
-              </Button>
-            </Space>
-          </Form.Item>
-        </Form>
+        />
       ) : (
         <>
           <div className={styles.devlogDetailsHeader}>
@@ -212,16 +92,10 @@ export function DevlogDetails({
                 <Text type="secondary" style={{ fontSize: '14px' }}>
                   ID: #{devlog.id}
                 </Text>
-                <Text 
-                  type="secondary" 
-                  title={formatTimeAgoWithTooltip(devlog.createdAt).fullDate}
-                >
+                <Text type="secondary" title={formatTimeAgoWithTooltip(devlog.createdAt).fullDate}>
                   Created: {formatTimeAgoWithTooltip(devlog.createdAt).timeAgo}
                 </Text>
-                <Text 
-                  type="secondary"
-                  title={formatTimeAgoWithTooltip(devlog.updatedAt).fullDate}
-                >
+                <Text type="secondary" title={formatTimeAgoWithTooltip(devlog.updatedAt).fullDate}>
                   Updated: {formatTimeAgoWithTooltip(devlog.updatedAt).timeAgo}
                 </Text>
               </Space>
@@ -548,7 +422,9 @@ export function DevlogDetails({
                   <div>
                     <Text type="secondary" style={{ fontSize: '12px' }}>
                       Last AI Update:{' '}
-                      <span title={formatTimeAgoWithTooltip(devlog.aiContext.lastAIUpdate).fullDate}>
+                      <span
+                        title={formatTimeAgoWithTooltip(devlog.aiContext.lastAIUpdate).fullDate}
+                      >
                         {formatTimeAgoWithTooltip(devlog.aiContext.lastAIUpdate).timeAgo}
                       </span>{' '}
                       • Version: {devlog.aiContext.contextVersion}

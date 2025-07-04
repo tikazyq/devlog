@@ -6,7 +6,7 @@ import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import {
   DevlogEntry,
-  DevlogListProps,
+  DevlogId,
   DevlogPriority,
   DevlogStatus,
   DevlogStats,
@@ -23,6 +23,13 @@ import { OverviewStats } from '@/components';
 import styles from './DevlogList.module.css';
 
 const { Title, Text } = Typography;
+
+interface DevlogListProps {
+  devlogs: DevlogEntry[];
+  loading: boolean;
+  onViewDevlog: (devlog: DevlogEntry) => void;
+  onDeleteDevlog: (id: DevlogId) => void;
+}
 
 export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: DevlogListProps) {
   // Calculate stats from devlogs array

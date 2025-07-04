@@ -269,8 +269,17 @@
       "priority": "medium",
       "createdAt": "2025-07-03T16:49:08.727Z",
       "updatedAt": "2025-07-03T16:50:43.183Z"
+    },
+    "34": {
+      "filename": "034-refactor-devlogdetails-to-use-devlogform-component.json",
+      "title": "Refactor DevlogDetails to use DevlogForm component in edit mode",
+      "status": "done",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-07-04T08:29:50.204Z",
+      "updatedAt": "2025-07-04T08:43:17.894Z"
     }
   },
-  "lastId": 33,
+  "lastId": 34,
   "version": "1.0.0"
 }

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Alert, Breadcrumb, Button, Popconfirm, Space, Tag } from 'antd';
-import { ArrowLeftOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, DeleteOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { DevlogDetails, LoadingPage, PageLayout } from '@/components';
 import { useDevlogs } from '@/hooks/useDevlogs';
@@ -25,7 +25,6 @@ export function DevlogDetailsPage({ id }: DevlogDetailsPageProps) {
   const [devlog, setDevlog] = useState<DevlogEntry | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -47,7 +46,6 @@ export function DevlogDetailsPage({ id }: DevlogDetailsPageProps) {
       // Refresh the devlog data
       const updated = devlogs.find((d: DevlogEntry) => d.id === parseInt(id));
       setDevlog(updated || null);
-      setIsEditing(false);
     } catch (error) {
       console.error('Failed to update devlog:', error);
     }
@@ -114,9 +112,6 @@ export function DevlogDetailsPage({ id }: DevlogDetailsPageProps) {
       <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
         Back to List
       </Button>
-      <Button type="default" icon={<EditOutlined />} onClick={() => setIsEditing(!isEditing)}>
-        {isEditing ? 'Cancel' : 'Edit'}
-      </Button>
       <Popconfirm
         title="Delete Devlog"
         description="Are you sure you want to delete this devlog?"
@@ -137,8 +132,6 @@ export function DevlogDetailsPage({ id }: DevlogDetailsPageProps) {
         devlog={devlog}
         onUpdate={handleUpdate}
         onDelete={handleDelete}
-        isEditing={isEditing}
-        onEditToggle={() => setIsEditing(!isEditing)}
       />
     </PageLayout>
   );

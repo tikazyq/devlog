@@ -30,9 +30,249 @@
   margin-top: 24px;
 }
 
+/* Inline editing styles */
+.editableField {
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+  position: relative;
+}
+
+.editableField:hover {
+  background-color: #f5f5f5;
+  border: 1px dashed #d9d9d9;
+  padding: 3px 7px;
+  margin: -4px -8px;
+}
+
+.editableField.editing {
+  background-color: #fff;
+  border: 1px solid #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  padding: 3px 7px;
+  margin: -4px -8px;
+  cursor: default;
+}
+
+.fieldActions {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.inlineForm {
+  width: 100%;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.editIcon {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: #999;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.sectionHeader:hover .editIcon {
+  opacity: 1;
+}
+
+.editIcon:hover {
+  color: #1890ff;
+}
+
+/* Section spacing */
+.descriptionSection {
+  margin-bottom: 24px;
+}
+
+.contextSection {
+  margin-bottom: 24px;
+}
+
+.criteriaSection {
+  margin-bottom: 24px;
+}
+
+.dependencySection {
+  margin-bottom: 24px;
+}
+
+.decisionSection {
+  margin-bottom: 24px;
+}
+
+.riskSection {
+  margin-bottom: 24px;
+}
+
+.fileSection {
+  margin-bottom: 24px;
+}
+
+.relatedSection {
+  margin-bottom: 24px;
+}
+
+.aiContextSection {
+  margin-bottom: 24px;
+}
+
+.externalRefSection {
+  margin-bottom: 24px;
+}
+
+.notesSection {
+  margin-bottom: 24px;
+}
+
+/* Hours display */
+.hoursRow {
+  margin-bottom: 16px;
+}
+
+.tagsSection {
+  margin-bottom: 16px;
+}
+
+/* Decision timeline */
+.decisionItem {
+  margin-bottom: 8px;
+}
+
+.decisionContent {
+  margin-bottom: 8px;
+}
+
+.decisionAlternatives {
+  margin-bottom: 8px;
+}
+
+/* Dependency cards */
+.dependencyCard {
+  width: 100%;
+}
+
+.dependencyHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dependencyInfo {
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+/* Risk cards */
+.riskCard {
+  width: 100%;
+}
+
+.riskHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.riskMitigation {
+  margin-top: 8px;
+}
+
+/* File cards */
+.fileCard {
+  background: #f8f9fa;
+}
+
+/* AI Context sections */
+.aiSection {
+  margin-bottom: 16px;
+}
+
+.aiInsightItem {
+  padding: 4px 0;
+  border: none;
+}
+
+.aiQuestionItem {
+  padding: 4px 0;
+  border: none;
+}
+
+.aiStepItem {
+  padding: 4px 0;
+  border: none;
+}
+
+.aiPatterns {
+  margin-top: 8px;
+}
+
+.aiUpdateInfo {
+  font-size: 12px;
+}
+
+/* External references */
+.externalRefCard {
+  margin-bottom: 8px;
+}
+
+.externalRefHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.externalRefLink {
+  color: #1890ff;
+}
+
+.externalRefStatus {
+  margin-top: 4px;
+}
+
+.externalRefSync {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+/* Notes */
+.noteItem {
+  margin-bottom: 8px;
+}
+
+.noteTimestamp {
+  font-size: 12px;
+}
+
 /* Better spacing for mobile */
 @media (max-width: 576px) {
   .devlogDetailsHeader {
     margin-bottom: 16px;
+  }
+
+  .fieldActions {
+    flex-direction: column;
+  }
+
+  .editableField {
+    margin: -2px -4px;
+    padding: 2px 4px;
+  }
+
+  .editableField:hover,
+  .editableField.editing {
+    margin: -2px -4px;
+    padding: 1px 3px;
   }
 }

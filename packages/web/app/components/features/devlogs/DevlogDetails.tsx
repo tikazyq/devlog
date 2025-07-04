@@ -1,27 +1,25 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  Alert, 
-  Button, 
-  Card, 
-  Checkbox, 
-  Col, 
-  Form, 
-  Input, 
-  List, 
-  Row, 
-  Select, 
-  Space, 
-  Tag, 
-  Timeline, 
-  Typography 
+import {
+  Alert,
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  Input,
+  List,
+  Row,
+  Select,
+  Space,
+  Tag,
+  Timeline,
+  Typography,
 } from 'antd';
 import {
   BulbOutlined,
   CheckOutlined,
   CloseOutlined,
-  EditOutlined,
   InfoCircleOutlined,
   QuestionCircleOutlined,
   RightOutlined,
@@ -53,14 +51,14 @@ interface EditableFieldProps {
   children: React.ReactNode;
 }
 
-function EditableField({ 
-  value, 
-  onSave, 
-  multiline = false, 
+function EditableField({
+  value,
+  onSave,
+  multiline = false,
   type = 'text',
   options = [],
   placeholder,
-  children 
+  children,
 }: EditableFieldProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
@@ -87,62 +85,45 @@ function EditableField({
   if (isEditing) {
     return (
       <div className={`${styles.editableField} ${styles.editing}`}>
-        <div className={styles.inlineForm}>
-          {type === 'select' ? (
-            <Select
-              value={editValue}
-              onChange={setEditValue}
-              style={{ width: '100%' }}
-              autoFocus
-            >
-              {options.map(option => (
-                <Option key={option.value} value={option.value}>
-                  {option.label}
-                </Option>
-              ))}
-            </Select>
-          ) : type === 'textarea' || multiline ? (
-            <TextArea
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onKeyDown={handleKeyPress}
-              rows={3}
-              autoFocus
-              placeholder={placeholder}
-            />
-          ) : (
-            <Input
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onKeyDown={handleKeyPress}
-              autoFocus
-              placeholder={placeholder}
-            />
-          )}
-          <div className={styles.fieldActions}>
-            <Button size="small" onClick={handleCancel} icon={<CloseOutlined />}>
-              Cancel
-            </Button>
-            <Button 
-              size="small" 
-              type="primary" 
-              onClick={handleSave} 
-              icon={<CheckOutlined />}
-            >
-              Save
-            </Button>
-          </div>
+        {type === 'select' ? (
+          <Select value={editValue} onChange={setEditValue} style={{ width: '100%' }} autoFocus>
+            {options.map((option) => (
+              <Option key={option.value} value={option.value}>
+                {option.label}
+              </Option>
+            ))}
+          </Select>
+        ) : type === 'textarea' || multiline ? (
+          <TextArea
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onKeyDown={handleKeyPress}
+            autoFocus
+            placeholder={placeholder}
+          />
+        ) : (
+          <Input
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onKeyDown={handleKeyPress}
+            autoFocus
+            placeholder={placeholder}
+          />
+        )}
+        <div className={styles.fieldActions}>
+          <Button size="small" onClick={handleCancel} icon={<CloseOutlined />}>
+            Cancel
+          </Button>
+          <Button size="small" type="primary" onClick={handleSave} icon={<CheckOutlined />}>
+            Save
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div 
-      className={styles.editableField}
-      onClick={() => setIsEditing(true)}
-      title="Click to edit"
-    >
+    <div className={styles.editableField} onClick={() => setIsEditing(true)} title="Click to edit">
       {children}
     </div>
   );
@@ -202,12 +183,12 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
             onSave={(value) => handleFieldUpdate('title', value)}
             placeholder="Enter title"
           >
-            <Title level={2} style={{ margin: 0, marginBottom: '8px' }}>
+            <Title level={2} className={styles.devlogTitle}>
               {devlog.title}
             </Title>
           </EditableField>
-          <Space split={<Text type="secondary">•</Text>} style={{ marginBottom: '8px' }}>
-            <Text type="secondary" style={{ fontSize: '14px' }}>
+          <Space split={<Text type="secondary">•</Text>} className={styles.metaInfo}>
+            <Text type="secondary" className={styles.metaText}>
               ID: #{devlog.id}
             </Text>
             <Text type="secondary" title={formatTimeAgoWithTooltip(devlog.createdAt).fullDate}>
@@ -217,9 +198,9 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
               Updated: {formatTimeAgoWithTooltip(devlog.updatedAt).timeAgo}
             </Text>
           </Space>
-          
+
           {/* Editable Status, Priority, and Type */}
-          <Space wrap style={{ marginBottom: '16px' }}>
+          <Space wrap className={styles.statusSection}>
             <span>
               <Text type="secondary">Status: </Text>
               <EditableField
@@ -274,7 +255,9 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
                 onSave={(value) => handleFieldUpdate('estimatedHours', parseFloat(value) || 0)}
                 placeholder="0"
               >
-                <Text type="secondary" style={{ fontStyle: 'italic' }}>Click to add...</Text>
+                <Text type="secondary" className={styles.emptyFieldText}>
+                  Click to add...
+                </Text>
               </EditableField>
             )}
           </Col>
@@ -295,22 +278,32 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
                 onSave={(value) => handleFieldUpdate('actualHours', parseFloat(value) || 0)}
                 placeholder="0"
               >
-                <Text type="secondary" style={{ fontStyle: 'italic' }}>Click to add...</Text>
+                <Text type="secondary" className={styles.emptyFieldText}>
+                  Click to add...
+                </Text>
               </EditableField>
             )}
           </Col>
         </Row>
 
-        {devlog.tags && devlog.tags.length > 0 ? (
-          <div className={styles.tagsSection}>
-            <Text type="secondary" style={{ marginRight: '8px' }}>
-              Tags:
-            </Text>
-            <EditableField
-              value={devlog.tags.join(', ')}
-              onSave={(value) => handleFieldUpdate('tags', value.split(',').map(tag => tag.trim()).filter(tag => tag))}
-              placeholder="Enter tags separated by commas"
-            >
+        <div className={styles.tagsSection}>
+          <Text type="secondary" className={styles.tagsLabel}>
+            Tags:
+          </Text>
+          <EditableField
+            value={devlog.tags ? devlog.tags.join(', ') : ''}
+            onSave={(value) =>
+              handleFieldUpdate(
+                'tags',
+                value
+                  .split(',')
+                  .map((tag) => tag.trim())
+                  .filter((tag) => tag),
+              )
+            }
+            placeholder="Enter tags separated by commas"
+          >
+            {devlog.tags && devlog.tags.length > 0 ? (
               <Space wrap>
                 {devlog.tags.map((tag, index) => (
                   <Tag key={index} color="purple">
@@ -318,21 +311,13 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
                   </Tag>
                 ))}
               </Space>
-            </EditableField>
-          </div>
-        ) : (
-          <div className={styles.tagsSection}>
-            <EditableField
-              value=""
-              onSave={(value) => handleFieldUpdate('tags', value.split(',').map(tag => tag.trim()).filter(tag => tag))}
-              placeholder="Enter tags separated by commas"
-            >
-              <Text type="secondary" style={{ fontStyle: 'italic' }}>
+            ) : (
+              <Text type="secondary" className={styles.emptyFieldText}>
                 Click to add tags...
               </Text>
-            </EditableField>
-          </div>
-        )}
+            )}
+          </EditableField>
+        </div>
       </div>
 
       <div className={styles.devlogDetailsContent}>
@@ -351,66 +336,50 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
 
         <div className={styles.contextSection}>
           <Title level={4}>Business Context</Title>
-          {devlog.context?.businessContext ? (
-            <EditableField
-              value={devlog.context.businessContext}
-              onSave={(value) => handleContextUpdate('businessContext', value)}
-              multiline
-              type="textarea"
-              placeholder="Why this work matters and what problem it solves"
-            >
+          <EditableField
+            value={devlog.context?.businessContext || ''}
+            onSave={(value) => handleContextUpdate('businessContext', value)}
+            multiline
+            type="textarea"
+            placeholder="Why this work matters and what problem it solves"
+          >
+            {devlog.context?.businessContext ? (
               <Alert
                 message={<MarkdownRenderer content={devlog.context.businessContext} />}
                 type="info"
                 showIcon
                 icon={<InfoCircleOutlined />}
               />
-            </EditableField>
-          ) : (
-            <EditableField
-              value=""
-              onSave={(value) => handleContextUpdate('businessContext', value)}
-              multiline
-              type="textarea"
-              placeholder="Why this work matters and what problem it solves"
-            >
-              <Text type="secondary" style={{ fontStyle: 'italic' }}>
+            ) : (
+              <Text type="secondary" className={styles.emptyFieldText}>
                 Click to add business context...
               </Text>
-            </EditableField>
-          )}
+            )}
+          </EditableField>
         </div>
 
         <div className={styles.contextSection}>
           <Title level={4}>Technical Context</Title>
-          {devlog.context?.technicalContext ? (
-            <EditableField
-              value={devlog.context.technicalContext}
-              onSave={(value) => handleContextUpdate('technicalContext', value)}
-              multiline
-              type="textarea"
-              placeholder="Architecture decisions, constraints, assumptions"
-            >
+          <EditableField
+            value={devlog.context?.technicalContext || ''}
+            onSave={(value) => handleContextUpdate('technicalContext', value)}
+            multiline
+            type="textarea"
+            placeholder="Architecture decisions, constraints, assumptions"
+          >
+            {devlog.context?.technicalContext ? (
               <Alert
                 message={<MarkdownRenderer content={devlog.context.technicalContext} />}
                 type="warning"
                 showIcon
                 icon={<ToolOutlined />}
               />
-            </EditableField>
-          ) : (
-            <EditableField
-              value=""
-              onSave={(value) => handleContextUpdate('technicalContext', value)}
-              multiline
-              type="textarea"
-              placeholder="Architecture decisions, constraints, assumptions"
-            >
-              <Text type="secondary" style={{ fontStyle: 'italic' }}>
+            ) : (
+              <Text type="secondary" className={styles.emptyFieldText}>
                 Click to add technical context...
               </Text>
-            </EditableField>
-          )}
+            )}
+          </EditableField>
         </div>
 
         {devlog.context?.acceptanceCriteria && devlog.context.acceptanceCriteria.length > 0 && (
@@ -443,9 +412,7 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
                       <Text strong>{dep.description}</Text>
                       {dep.externalId && (
                         <div className={styles.dependencyInfo}>
-                          <Text type="secondary">
-                            External ID: {dep.externalId}
-                          </Text>
+                          <Text type="secondary">External ID: {dep.externalId}</Text>
                         </div>
                       )}
                     </div>
@@ -608,9 +575,7 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
                     renderItem={(question) => (
                       <List.Item className={styles.aiQuestionItem}>
                         <Space align="start">
-                          <QuestionCircleOutlined
-                            style={{ color: '#f5222d', marginTop: '2px' }}
-                          />
+                          <QuestionCircleOutlined style={{ color: '#f5222d', marginTop: '2px' }} />
                           <Text>{question}</Text>
                         </Space>
                       </List.Item>
@@ -639,26 +604,23 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
                   </div>
                 )}
 
-              {devlog.aiContext.relatedPatterns &&
-                devlog.aiContext.relatedPatterns.length > 0 && (
-                  <div className={styles.aiSection}>
-                    <Text strong>Related Patterns:</Text>
-                    <Space wrap className={styles.aiPatterns}>
-                      {devlog.aiContext.relatedPatterns.map((pattern, index) => (
-                        <Tag key={index} color="geekblue">
-                          {pattern}
-                        </Tag>
-                      ))}
-                    </Space>
-                  </div>
-                )}
+              {devlog.aiContext.relatedPatterns && devlog.aiContext.relatedPatterns.length > 0 && (
+                <div className={styles.aiSection}>
+                  <Text strong>Related Patterns:</Text>
+                  <Space wrap className={styles.aiPatterns}>
+                    {devlog.aiContext.relatedPatterns.map((pattern, index) => (
+                      <Tag key={index} color="geekblue">
+                        {pattern}
+                      </Tag>
+                    ))}
+                  </Space>
+                </div>
+              )}
 
               <div>
                 <Text type="secondary" className={styles.aiUpdateInfo}>
                   Last AI Update:{' '}
-                  <span
-                    title={formatTimeAgoWithTooltip(devlog.aiContext.lastAIUpdate).fullDate}
-                  >
+                  <span title={formatTimeAgoWithTooltip(devlog.aiContext.lastAIUpdate).fullDate}>
                     {formatTimeAgoWithTooltip(devlog.aiContext.lastAIUpdate).timeAgo}
                   </span>{' '}
                   • Version: {devlog.aiContext.contextVersion}

@@ -7,6 +7,12 @@
   height: 400px;
 }
 
+.skeletonStats {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
 .devlogListContainer {
   height: 100%;
   display: flex;

@@ -3,7 +3,7 @@
 import React from 'react';
 import { Button, Space } from 'antd';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
-import { DevlogList, LoadingPage, PageLayout } from '@/components';
+import { DevlogList, PageLayout } from '@/components';
 import { useDevlogs } from '@/hooks/useDevlogs';
 import { DevlogEntry, DevlogId } from '@devlog/types';
 import { useRouter } from 'next/navigation';
@@ -31,10 +31,6 @@ export function DevlogListPage() {
   const handleRefresh = () => {
     refetch();
   };
-
-  if (loading) {
-    return <LoadingPage message="Loading devlogs..." />;
-  }
 
   const actions = (
     <Space>

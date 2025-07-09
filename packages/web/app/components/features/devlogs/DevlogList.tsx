@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Empty, Popconfirm, Space, Spin, Table, Tag, Typography } from 'antd';
+import { Button, Empty, Popconfirm, Space, Spin, Table, Tag, Typography, Skeleton } from 'antd';
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -206,8 +206,148 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
 
   if (loading) {
     return (
-      <div className={styles.loadingContainer}>
-        <Spin size="large" tip="Loading devlogs..." />
+      <div className={styles.devlogListContainer}>
+        {/* Sticky Header with Summary Skeleton */}
+        <div className="page-header-sticky">
+          <div className={styles.devlogListHeader}>
+            <div className={styles.devlogTitleRow}>
+              <div>
+                <Title level={2} className={styles.devlogListTitle}>
+                  All Devlogs
+                </Title>
+                <Text type="secondary">List of all development items</Text>
+              </div>
+              {/* OverviewStats skeleton */}
+              <div className={styles.skeletonStats}>
+                <Skeleton.Button style={{ width: '120px', height: '32px' }} active />
+                <Skeleton.Button style={{ width: '120px', height: '32px' }} active />
+                <Skeleton.Button style={{ width: '120px', height: '32px' }} active />
+                <Skeleton.Button style={{ width: '120px', height: '32px' }} active />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.devlogListTable}>
+          {/* Table skeleton */}
+          <Table
+            columns={[
+              {
+                title: 'ID',
+                dataIndex: 'id',
+                key: 'id',
+                fixed: 'left',
+                width: 60,
+                render: () => (
+                  <Skeleton.Button style={{ width: '40px', height: '20px' }} active size="small" />
+                ),
+              },
+              {
+                title: 'Title',
+                dataIndex: 'title',
+                key: 'title',
+                fixed: 'left',
+                width: 400,
+                render: () => (
+                  <Skeleton.Button
+                    style={{ width: '360px', height: '20px', marginBottom: '4px' }}
+                    active
+                    size="small"
+                  />
+                ),
+              },
+              {
+                title: 'Status',
+                dataIndex: 'status',
+                key: 'status',
+                width: 120,
+                render: () => (
+                  <Skeleton.Button style={{ width: '80px', height: '20px' }} active size="small" />
+                ),
+              },
+              {
+                title: 'Priority',
+                dataIndex: 'priority',
+                key: 'priority',
+                width: 120,
+                render: () => (
+                  <Skeleton.Button style={{ width: '80px', height: '20px' }} active size="small" />
+                ),
+              },
+              {
+                title: 'Type',
+                dataIndex: 'type',
+                key: 'type',
+                width: 120,
+                render: () => (
+                  <Skeleton.Button style={{ width: '80px', height: '20px' }} active size="small" />
+                ),
+              },
+              {
+                title: 'Assignee',
+                dataIndex: 'assignee',
+                key: 'assignee',
+                width: 120,
+                render: () => (
+                  <Skeleton.Button style={{ width: '80px', height: '20px' }} active size="small" />
+                ),
+              },
+              {
+                title: 'Created',
+                dataIndex: 'createdAt',
+                key: 'createdAt',
+                width: 100,
+                render: () => (
+                  <Skeleton.Button style={{ width: '80px', height: '20px' }} active size="small" />
+                ),
+              },
+              {
+                title: 'Updated',
+                dataIndex: 'updatedAt',
+                key: 'updatedAt',
+                width: 100,
+                render: () => (
+                  <Skeleton.Button style={{ width: '80px', height: '20px' }} active size="small" />
+                ),
+              },
+              {
+                title: 'Actions',
+                key: 'actions',
+                fixed: 'right',
+                width: 180,
+                render: () => (
+                  <Space size="small">
+                    <Skeleton.Button
+                      style={{ width: '70px', height: '24px' }}
+                      active
+                      size="small"
+                    />
+                    <Skeleton.Button
+                      style={{ width: '70px', height: '24px' }}
+                      active
+                      size="small"
+                    />
+                  </Space>
+                ),
+              },
+            ]}
+            dataSource={Array.from({ length: 10 }, (_, index) => ({ key: index }))}
+            rowKey="key"
+            scroll={{ x: 1200, y: 'calc(100vh - 300px)' }}
+            pagination={false}
+            size="middle"
+            onHeaderRow={() => ({
+              style: {
+                backgroundColor: '#fff',
+              },
+            })}
+            onRow={() => ({
+              style: {
+                height: '72px',
+              },
+            })}
+          />
+        </div>
       </div>
     );
   }

@@ -332,8 +332,17 @@
       "priority": "medium",
       "createdAt": "2025-07-09T15:24:08.089Z",
       "updatedAt": "2025-07-09T15:25:37.875Z"
+    },
+    "41": {
+      "filename": "041-add-skeleton-loading-states-to-devloglist-componen.json",
+      "title": "Add skeleton loading states to DevlogList component",
+      "status": "done",
+      "type": "feature",
+      "priority": "medium",
+      "createdAt": "2025-07-09T15:27:56.041Z",
+      "updatedAt": "2025-07-09T15:32:43.746Z"
     }
   },
-  "lastId": 40,
+  "lastId": 41,
   "version": "1.0.0"
 }

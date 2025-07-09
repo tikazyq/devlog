@@ -1,2 +1,2 @@
 // Common Components
-export * from './OverviewStats/OverviewStats';
+export * from '@/components/common/overview-stats/OverviewStats';

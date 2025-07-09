@@ -47,37 +47,7 @@
   margin-top: 24px;
 }
 
-/* Inline editing styles */
-.editableField {
-  transition: all 0.2s ease;
-  cursor: pointer;
-  border-radius: 4px;
-  padding: 4px 8px;
-  margin: -4px -8px;
-  position: relative;
-  width: 100%;
-  display: block;
-  border: 1px dashed transparent;
-}
-
-.editableField:hover {
-  background-color: #f5f5f5;
-  border-color: #d9d9d9;
-  padding: 4px 8px;
-  margin: -4px -8px;
-}
-
-.editableField.editing {
-  background-color: transparent;
-  border-color: transparent;
-}
-
-.fieldActions {
-  margin-top: 8px;
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
+/* Inline editing styles - remove these as they're now in EditableField.module.css */
 
 .inlineForm {
   width: 100%;
@@ -285,20 +255,5 @@
 @media (max-width: 576px) {
   .devlogDetailsHeader {
     margin-bottom: 16px;
-  }
-
-  .fieldActions {
-    flex-direction: column;
-  }
-
-  .editableField {
-    margin: -2px -4px;
-    padding: 2px 4px;
-  }
-
-  .editableField:hover,
-  .editableField.editing {
-    margin: -2px -4px;
-    padding: 1px 3px;
   }
 }

@@ -287,8 +287,17 @@
       "priority": "medium",
       "createdAt": "2025-07-04T08:46:36.207Z",
       "updatedAt": "2025-07-04T09:04:30.637Z"
+    },
+    "36": {
+      "filename": "036-extract-editablefield-into-reusable-component.json",
+      "title": "Extract EditableField into reusable component",
+      "status": "done",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-07-09T12:50:40.923Z",
+      "updatedAt": "2025-07-09T12:55:14.755Z"
     }
   },
-  "lastId": 35,
+  "lastId": 36,
   "version": "1.0.0"
 }

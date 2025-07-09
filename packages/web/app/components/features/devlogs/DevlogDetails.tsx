@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, Checkbox, List, Space, Tag, Timeline, Typography } from 'antd';
 import {
   BulbOutlined,
@@ -35,27 +35,179 @@ interface DevlogDetailsProps {
   devlog: DevlogEntry;
   onUpdate: (data: any) => void;
   onDelete: () => void;
+  onUnsavedChangesChange?: (
+    hasChanges: boolean,
+    saveHandler: () => Promise<void>,
+    discardHandler: () => void,
+    isSaving: boolean,
+    saveError: string | null,
+  ) => void;
 }
 
-export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
-  const handleFieldUpdate = (field: string, value: any) => {
-    const updateData = {
-      id: devlog.id,
-      [field]: value,
-    };
-    onUpdate(updateData);
+export function DevlogDetails({ devlog, onUpdate, onUnsavedChangesChange }: DevlogDetailsProps) {
+  // Local state for tracking changes
+  const [localChanges, setLocalChanges] = useState<Record<string, any>>({});
+  const [originalDevlog, setOriginalDevlog] = useState<DevlogEntry>(devlog);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  // Reset local changes when devlog prop changes (e.g., after save)
+  useEffect(() => {
+    setLocalChanges({});
+    setOriginalDevlog(devlog);
+    setHasUnsavedChanges(false);
+    setSaveError(null);
+  }, [devlog.id, devlog.updatedAt]);
+
+  // Get the original value for a field from the original devlog data
+  const getOriginalValue = useCallback(
+    (field: string) => {
+      if (field.startsWith('context.')) {
+        const contextField = field.substring(8) as keyof typeof originalDevlog.context;
+        return (originalDevlog.context?.[contextField] as any) || '';
+      }
+      return (originalDevlog as any)[field];
+    },
+    [originalDevlog],
+  );
+
+  // Get the current value for a field (local change if exists, otherwise current devlog value)
+  const getCurrentValue = useCallback(
+    (field: string) => {
+      if (localChanges[field] !== undefined) {
+        return localChanges[field];
+      }
+
+      if (field.startsWith('context.')) {
+        const contextField = field.substring(8) as keyof typeof devlog.context;
+        return (devlog.context?.[contextField] as any) || '';
+      }
+      return (devlog as any)[field];
+    },
+    [localChanges, devlog],
+  );
+
+  // Check if a field has actually changed from its original value
+  const isFieldActuallyChanged = useCallback(
+    (field: string) => {
+      const currentValue = getCurrentValue(field);
+      const originalValue = getOriginalValue(field);
+      return currentValue !== originalValue;
+    },
+    [getCurrentValue, getOriginalValue],
+  );
+
+  // Check if a field has been changed locally (regardless of original value)
+  const isFieldChanged = useCallback(
+    (field: string) => {
+      return localChanges[field] !== undefined;
+    },
+    [localChanges],
+  );
+
+  // Check if there are any actual changes from the original devlog
+  const hasActualChanges = useCallback(() => {
+    // Get all fields that might have been changed
+    const allPossibleFields = [
+      'title',
+      'description',
+      'status',
+      'priority',
+      'type',
+      'context.businessContext',
+      'context.technicalContext',
+    ];
+
+    return allPossibleFields.some((field) => isFieldActuallyChanged(field));
+  }, [isFieldActuallyChanged]);
+
+  const handleFieldChange = (field: string, value: any) => {
+    const originalValue = getOriginalValue(field);
+    const newChanges = { ...localChanges };
+
+    // If the value matches the original, remove it from local changes
+    if (value === originalValue) {
+      delete newChanges[field];
+    } else {
+      // Otherwise, track the change
+      newChanges[field] = value;
+    }
+
+    setLocalChanges(newChanges);
+
+    // Check if there are any actual changes from the original devlog with the new changes
+    const allPossibleFields = [
+      'title',
+      'description',
+      'status',
+      'priority',
+      'type',
+      'context.businessContext',
+      'context.technicalContext',
+    ];
+
+    const actualChanges = allPossibleFields.some((checkField) => {
+      const currentValue =
+        newChanges[checkField] !== undefined
+          ? newChanges[checkField]
+          : getOriginalValue(checkField);
+      const originalFieldValue = getOriginalValue(checkField);
+      return currentValue !== originalFieldValue;
+    });
+
+    setHasUnsavedChanges(actualChanges);
+    setSaveError(null);
   };
 
-  const handleContextUpdate = (contextField: string, value: string) => {
-    const updateData = {
-      id: devlog.id,
-      context: {
-        ...devlog.context,
-        [contextField]: value,
-      },
-    };
-    onUpdate(updateData);
+  const handleContextChange = (contextField: string, value: string) => {
+    handleFieldChange(`context.${contextField}`, value);
   };
+
+  const handleSave = useCallback(async () => {
+    try {
+      setIsSaving(true);
+      setSaveError(null);
+
+      // Build update data from local changes
+      const updateData: any = { id: devlog.id };
+
+      // Handle regular field changes
+      Object.entries(localChanges).forEach(([field, value]) => {
+        if (field.startsWith('context.')) {
+          const contextField = field.substring(8);
+          if (!updateData.context) {
+            updateData.context = { ...devlog.context };
+          }
+          updateData.context[contextField] = value;
+        } else {
+          updateData[field] = value;
+        }
+      });
+
+      // Call the update function
+      onUpdate(updateData);
+
+      // Note: localChanges will be cleared when the devlog prop updates and triggers the useEffect
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'Failed to save changes');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [localChanges, devlog.id, devlog.context, onUpdate]);
+
+  const handleDiscard = useCallback(() => {
+    setLocalChanges({});
+    setHasUnsavedChanges(false);
+    setSaveError(null);
+  }, []);
+
+  // Notify parent about unsaved changes state
+  useEffect(() => {
+    if (onUnsavedChangesChange) {
+      onUnsavedChangesChange(hasUnsavedChanges, handleSave, handleDiscard, isSaving, saveError);
+    }
+  }, [hasUnsavedChanges, isSaving, saveError, onUnsavedChangesChange, handleSave, handleDiscard]);
 
   const statusOptions = [
     { label: 'New', value: 'new' },
@@ -87,91 +239,69 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
       <div className={styles.devlogDetailsHeader}>
         <div className={styles.devlogDetailsTitle}>
           <EditableField
-            value={devlog.title}
-            onSave={(value) => handleFieldUpdate('title', value)}
+            key={`title-${getCurrentValue('title')}`}
+            value={getCurrentValue('title')}
+            onSave={(value) => handleFieldChange('title', value)}
             placeholder="Enter title"
+            className={isFieldChanged('title') ? styles.fieldChanged : ''}
           >
             <Title level={2} className={styles.devlogTitle}>
-              {devlog.title}
+              {getCurrentValue('title')}
             </Title>
           </EditableField>
 
           <Space wrap className={styles.statusSection}>
             <EditableField
-              className={styles.statusItem}
+              key={`status-${getCurrentValue('status')}`}
+              className={`${styles.statusItem} ${isFieldChanged('status') ? styles.fieldChanged : ''}`}
               type="select"
-              value={devlog.status}
+              value={getCurrentValue('status')}
               options={statusOptions}
-              onSave={(value) => handleFieldUpdate('status', value)}
+              onSave={(value) => handleFieldChange('status', value)}
             >
               <Tag
                 className={styles.statusTag}
-                color={getStatusColor(devlog.status)}
-                icon={getStatusIcon(devlog.status)}
+                color={getStatusColor(getCurrentValue('status'))}
+                icon={getStatusIcon(getCurrentValue('status'))}
               >
-                {statusOptions.find(({ value }) => devlog.status === value)?.label || devlog.status}
+                {statusOptions.find(({ value }) => getCurrentValue('status') === value)?.label ||
+                  getCurrentValue('status')}
               </Tag>
             </EditableField>
             <EditableField
-              className={styles.statusItem}
+              key={`priority-${getCurrentValue('priority')}`}
+              className={`${styles.statusItem} ${isFieldChanged('priority') ? styles.fieldChanged : ''}`}
               type="select"
-              value={devlog.priority}
+              value={getCurrentValue('priority')}
               options={priorityOptions}
-              onSave={(value) => handleFieldUpdate('priority', value)}
+              onSave={(value) => handleFieldChange('priority', value)}
             >
               <Tag
                 className={styles.statusTag}
-                color={getPriorityColor(devlog.priority)}
-                icon={getPriorityIcon(devlog.priority)}
+                color={getPriorityColor(getCurrentValue('priority'))}
+                icon={getPriorityIcon(getCurrentValue('priority'))}
               >
-                {priorityOptions.find(({ value }) => devlog.priority === value)?.label ||
-                  devlog.priority}
+                {priorityOptions.find(({ value }) => getCurrentValue('priority') === value)
+                  ?.label || getCurrentValue('priority')}
               </Tag>
             </EditableField>
             <EditableField
-              className={styles.statusItem}
+              key={`type-${getCurrentValue('type')}`}
+              className={`${styles.statusItem} ${isFieldChanged('type') ? styles.fieldChanged : ''}`}
               type="select"
-              value={devlog.type}
-              onSave={(value) => handleFieldUpdate('type', value)}
+              value={getCurrentValue('type')}
+              onSave={(value) => handleFieldChange('type', value)}
               options={typeOptions}
             >
-              <Tag className={styles.statusTag} color="blue" icon={getTypeIcon(devlog.type)}>
-                {typeOptions.find(({ value }) => devlog.type === value)?.label || devlog.type}
+              <Tag
+                className={styles.statusTag}
+                color="blue"
+                icon={getTypeIcon(getCurrentValue('type'))}
+              >
+                {typeOptions.find(({ value }) => getCurrentValue('type') === value)?.label ||
+                  getCurrentValue('type')}
               </Tag>
             </EditableField>
-            {/*<span>*/}
-            {/*  <Text type="secondary">Status: </Text>*/}
-            {/*  <EditableField*/}
-            {/*    value={devlog.status}*/}
-            {/*    onSave={(value) => handleFieldUpdate('status', value)}*/}
-            {/*    type="select"*/}
-            {/*    options={statusOptions}*/}
-            {/*  >*/}
-            {/*    <Tag color="blue">{devlog.status}</Tag>*/}
-            {/*  </EditableField>*/}
-            {/*</span>*/}
-            {/*<span>*/}
-            {/*  <Text type="secondary">Priority: </Text>*/}
-            {/*  <EditableField*/}
-            {/*    value={devlog.priority}*/}
-            {/*    onSave={(value) => handleFieldUpdate('priority', value)}*/}
-            {/*    type="select"*/}
-            {/*    options={priorityOptions}*/}
-            {/*  >*/}
-            {/*    <Tag color="orange">{devlog.priority}</Tag>*/}
-            {/*  </EditableField>*/}
-            {/*</span>*/}
-            {/*<span>*/}
-            {/*  <Text type="secondary">Type: </Text>*/}
-            {/*  <EditableField*/}
-            {/*    value={devlog.type}*/}
-            {/*    onSave={(value) => handleFieldUpdate('type', value)}*/}
-            {/*    type="select"*/}
-            {/*    options={typeOptions}*/}
-            {/*  >*/}
-            {/*    <Tag color="green">{devlog.type}</Tag>*/}
-            {/*  </EditableField>*/}
-            {/*</span>*/}
           </Space>
 
           <Space split={<Text type="secondary">•</Text>} className={styles.metaInfo}>
@@ -195,14 +325,15 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
             Description
           </Title>
           <EditableField
-            value={devlog.description}
-            onSave={(value) => handleFieldUpdate('description', value)}
+            value={getCurrentValue('description')}
+            onSave={(value) => handleFieldChange('description', value)}
             multiline
             type="textarea"
             placeholder="Enter description"
             emptyText="Click to add description..."
+            className={isFieldChanged('description') ? styles.fieldChanged : ''}
           >
-            <MarkdownRenderer content={devlog.description} />
+            <MarkdownRenderer content={getCurrentValue('description')} />
           </EditableField>
         </div>
 
@@ -212,14 +343,15 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
             Business Context
           </Title>
           <EditableField
-            value={devlog.context?.businessContext || ''}
-            onSave={(value) => handleContextUpdate('businessContext', value)}
+            value={getCurrentValue('context.businessContext')}
+            onSave={(value) => handleContextChange('businessContext', value)}
             multiline
             type="textarea"
             placeholder="Why this work matters and what problem it solves"
             emptyText="Click to add business context..."
+            className={isFieldChanged('context.businessContext') ? styles.fieldChanged : ''}
           >
-            <MarkdownRenderer content={devlog.context?.businessContext || ''} />
+            <MarkdownRenderer content={getCurrentValue('context.businessContext')} />
           </EditableField>
         </div>
 
@@ -229,14 +361,15 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
             Technical Context
           </Title>
           <EditableField
-            value={devlog.context?.technicalContext || ''}
-            onSave={(value) => handleContextUpdate('technicalContext', value)}
+            value={getCurrentValue('context.technicalContext')}
+            onSave={(value) => handleContextChange('technicalContext', value)}
             multiline
             type="textarea"
             placeholder="Architecture decisions, constraints, assumptions"
             emptyText="Click to add technical context..."
+            className={isFieldChanged('context.technicalContext') ? styles.fieldChanged : ''}
           >
-            <MarkdownRenderer content={devlog.context?.technicalContext || ''} />
+            <MarkdownRenderer content={getCurrentValue('context.technicalContext')} />
           </EditableField>
         </div>
 

@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Alert, Breadcrumb, Button, Popconfirm, Space, Tag } from 'antd';
-import { ArrowLeftOutlined, DeleteOutlined } from '@ant-design/icons';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { Alert, Breadcrumb, Button, Popconfirm, Space, Tag, message } from 'antd';
+import { ArrowLeftOutlined, DeleteOutlined, SaveOutlined, UndoOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { DevlogDetails, LoadingPage, PageLayout } from '@/components';
 import { useDevlogs } from '@/hooks/useDevlogs';
@@ -25,7 +25,14 @@ export function DevlogDetailsPage({ id }: DevlogDetailsPageProps) {
   const [devlog, setDevlog] = useState<DevlogEntry | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const router = useRouter();
+
+  // Use refs to store function references to avoid recreation on every render
+  const saveHandlerRef = useRef<(() => Promise<void>) | null>(null);
+  const discardHandlerRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const foundDevlog = devlogs.find((d: DevlogEntry) => d.id === parseInt(id));
@@ -43,13 +50,36 @@ export function DevlogDetailsPage({ id }: DevlogDetailsPageProps) {
   const handleUpdate = async (data: any) => {
     try {
       await updateDevlog(data);
-      // Refresh the devlog data
-      const updated = devlogs.find((d: DevlogEntry) => d.id === parseInt(id));
-      setDevlog(updated || null);
+      // The devlogs array will be updated automatically by fetchDevlogs() in updateDevlog
+      // The useEffect will update the local devlog state when devlogs changes
+      message.success('Changes saved successfully');
     } catch (error) {
       console.error('Failed to update devlog:', error);
+      throw error; // Re-throw so the component can handle the error
     }
   };
+
+  const handleUnsavedChangesChange = useCallback(
+    (
+      hasChanges: boolean,
+      save: () => Promise<void>,
+      discard: () => void,
+      saving: boolean,
+      error: string | null,
+    ) => {
+      setHasUnsavedChanges(hasChanges);
+      saveHandlerRef.current = save;
+      discardHandlerRef.current = discard;
+      setIsSaving(saving);
+      setSaveError(error);
+
+      // Show error message if save failed
+      if (error) {
+        message.error(`Failed to save changes: ${error}`);
+      }
+    },
+    [],
+  );
 
   const handleDelete = async () => {
     try {
@@ -84,31 +114,27 @@ export function DevlogDetailsPage({ id }: DevlogDetailsPageProps) {
     );
   }
 
-  const customBreadcrumb = (
-    <div className="breadcrumb-with-tags">
-      <Breadcrumb
-        items={[
-          { title: <Link href="/">Dashboard</Link> },
-          { title: <Link href="/devlogs">Devlogs</Link> },
-          { title: <span>#{id}</span> },
-        ]}
-      />
-      <Space>
-        <Tag color={getStatusColor(devlog.status)} icon={getStatusIcon(devlog.status)}>
-          {devlog.status}
-        </Tag>
-        <Tag color={getPriorityColor(devlog.priority)} icon={getPriorityIcon(devlog.priority)}>
-          {devlog.priority}
-        </Tag>
-        <Tag color="blue" icon={getTypeIcon(devlog.type)}>
-          {devlog.type}
-        </Tag>
-      </Space>
-    </div>
-  );
-
   const actions = (
     <Space>
+      {hasUnsavedChanges && (
+        <>
+          <Button
+            onClick={() => discardHandlerRef.current?.()}
+            icon={<UndoOutlined />}
+            disabled={isSaving}
+          >
+            Discard Changes
+          </Button>
+          <Button
+            type="primary"
+            onClick={() => saveHandlerRef.current?.()}
+            loading={isSaving}
+            icon={<SaveOutlined />}
+          >
+            Save Changes
+          </Button>
+        </>
+      )}
       <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>
         Back to List
       </Button>
@@ -128,7 +154,12 @@ export function DevlogDetailsPage({ id }: DevlogDetailsPageProps) {
 
   return (
     <PageLayout actions={actions}>
-      <DevlogDetails devlog={devlog} onUpdate={handleUpdate} onDelete={handleDelete} />
+      <DevlogDetails
+        devlog={devlog}
+        onUpdate={handleUpdate}
+        onDelete={handleDelete}
+        onUnsavedChangesChange={handleUnsavedChangesChange}
+      />
     </PageLayout>
   );
 }

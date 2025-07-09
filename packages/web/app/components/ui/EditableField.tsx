@@ -19,6 +19,7 @@ interface EditableFieldProps {
   emptyText?: string;
   className?: string;
   size?: 'small' | 'middle' | 'large';
+  draftMode?: boolean; // When true, doesn't auto-save on blur
   children: React.ReactNode;
 }
 
@@ -32,6 +33,7 @@ export function EditableField({
   emptyText,
   className,
   size = 'small',
+  draftMode = true,
   children,
 }: EditableFieldProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -71,13 +73,28 @@ export function EditableField({
   };
 
   const handleBlur = () => {
-    // Save changes when losing focus
-    handleSave();
+    if (draftMode) {
+      // In draft mode, just save the local value and exit edit mode
+      // The parent component will handle when to actually save
+      if (editValue !== value) {
+        onSave(editValue);
+      }
+      setIsEditing(false);
+    } else {
+      // Original behavior: save changes when losing focus
+      handleSave();
+    }
   };
 
   const handleEnterEdit = () => {
     setIsEditing(true);
   };
+
+  useEffect(() => {
+    if (type === 'select') {
+      handleBlur();
+    }
+  }, [editValue]);
 
   const renderInput = () => {
     const inputProps = {
@@ -96,7 +113,6 @@ export function EditableField({
           size={size}
           open={isEditing}
           onChange={setEditValue}
-          onBlur={handleBlur}
           style={{ width: '100%' }}
           variant="borderless"
         >

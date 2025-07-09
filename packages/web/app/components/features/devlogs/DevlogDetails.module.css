@@ -32,6 +32,7 @@
 }
 
 .statusSection {
+  gap: 16px;
   margin-right: 16px;
 }
 
@@ -44,6 +45,23 @@
   font-size: 12px;
   text-align: center;
   padding: 4px 8px;
+}
+
+/* Changed Field Indicator */
+.fieldChanged {
+  position: relative;
+}
+
+.fieldChanged::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: #faad14;
+  border-radius: 2px;
+  z-index: 1;
 }
 
 .devlogDetailsActions {

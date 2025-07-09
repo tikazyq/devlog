@@ -304,9 +304,18 @@
       "type": "refactor",
       "priority": "medium",
       "createdAt": "2025-07-09T13:09:17.875Z",
-      "updatedAt": "2025-07-09T14:16:12.754Z"
+      "updatedAt": "2025-07-09T14:20:42.561Z"
+    },
+    "38": {
+      "filename": "038-implement-save-button-with-changed-flag-system-for.json",
+      "title": "Implement save button with changed flag system for DevlogDetails",
+      "status": "blocked",
+      "type": "feature",
+      "priority": "medium",
+      "createdAt": "2025-07-09T14:21:38.798Z",
+      "updatedAt": "2025-07-09T15:03:47.082Z"
     }
   },
-  "lastId": 37,
+  "lastId": 38,
   "version": "1.0.0"
 }

@@ -210,7 +210,7 @@ const tools: Tool[] = [
       properties: {
         status: {
           type: 'string',
-          enum: ['todo', 'in-progress', 'blocked', 'review', 'testing', 'done'],
+          enum: ['new', 'in-progress', 'blocked', 'in-review', 'testing', 'done', 'closed'],
           description: 'Filter by status',
         },
         type: {
@@ -285,7 +285,7 @@ const tools: Tool[] = [
         },
         status: {
           type: 'string',
-          enum: ['todo', 'in-progress', 'review', 'testing', 'done', 'archived'],
+          enum: ['new', 'in-progress', 'in-review', 'blocked', 'testing', 'done', 'closed'],
           description: 'New status for the devlog entry',
         },
         progress: {

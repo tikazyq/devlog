@@ -95,7 +95,16 @@ export function DevlogDetailsPage({ id }: DevlogDetailsPageProps) {
   };
 
   if (loading) {
-    return <LoadingPage message="Loading devlog..." />;
+    return (
+      <PageLayout>
+        <DevlogDetails
+          loading={true}
+          onUpdate={handleUpdate}
+          onDelete={handleDelete}
+          onUnsavedChangesChange={handleUnsavedChangesChange}
+        />
+      </PageLayout>
+    );
   }
 
   if (error) {

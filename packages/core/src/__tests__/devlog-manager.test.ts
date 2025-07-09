@@ -28,7 +28,7 @@ describe('DevlogManager', () => {
       expect(result.type).toBe('feature');
       expect(result.description).toBe('A test feature');
       expect(result.priority).toBe('high');
-      expect(result.status).toBe('todo');
+      expect(result.status).toBe('new');
       expect(result.context.businessContext).toBe('Important business requirement');
       expect(result.context.technicalContext).toBe('Uses TypeScript');
     });
@@ -95,7 +95,7 @@ describe('DevlogManager', () => {
       expect(result).not.toBeNull();
       expect(result!.title).toBe('Get Test');
       expect(result!.type).toBe('task');
-      expect(result!.status).toBe('todo');
+      expect(result!.status).toBe('new');
     });
 
     it('should return null for non-existent devlog', async () => {
@@ -143,7 +143,7 @@ describe('DevlogManager', () => {
         status: 'done',
       });
 
-      const todoItems = await manager.listDevlogs({ status: ['todo'] });
+      const todoItems = await manager.listDevlogs({ status: ['new'] });
       const doneItems = await manager.listDevlogs({ status: ['done'] });
 
       expect(todoItems).toHaveLength(1);
@@ -304,7 +304,7 @@ describe('DevlogManager', () => {
       expect(stats.totalEntries).toBe(2);
       expect(stats.byType.feature).toBe(1);
       expect(stats.byType.bugfix).toBe(1);
-      expect(stats.byStatus.todo).toBe(1);
+      expect(stats.byStatus.new).toBe(1);
       expect(stats.byStatus.done).toBe(1);
       expect(stats.byPriority.high).toBe(1);
       expect(stats.byPriority.medium).toBe(1);

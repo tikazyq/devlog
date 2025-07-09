@@ -83,7 +83,7 @@ export class DevlogManager {
       title: request.title,
       type: request.type,
       description: request.description,
-      status: 'todo' as DevlogStatus,
+      status: 'new',
       priority: request.priority || 'medium',
       createdAt: now,
       updatedAt: now,
@@ -149,11 +149,16 @@ export class DevlogManager {
     if (request.files !== undefined) updated.files = request.files;
 
     // Update enhanced context fields
-    if (request.businessContext !== undefined) updated.context.businessContext = request.businessContext;
-    if (request.technicalContext !== undefined) updated.context.technicalContext = request.technicalContext;
-    if (request.acceptanceCriteria !== undefined) updated.context.acceptanceCriteria = request.acceptanceCriteria;
-    if (request.initialInsights !== undefined) updated.aiContext.keyInsights = request.initialInsights;
-    if (request.relatedPatterns !== undefined) updated.aiContext.relatedPatterns = request.relatedPatterns;
+    if (request.businessContext !== undefined)
+      updated.context.businessContext = request.businessContext;
+    if (request.technicalContext !== undefined)
+      updated.context.technicalContext = request.technicalContext;
+    if (request.acceptanceCriteria !== undefined)
+      updated.context.acceptanceCriteria = request.acceptanceCriteria;
+    if (request.initialInsights !== undefined)
+      updated.aiContext.keyInsights = request.initialInsights;
+    if (request.relatedPatterns !== undefined)
+      updated.aiContext.relatedPatterns = request.relatedPatterns;
 
     // Update AI context fields (embedded from updateAIContext functionality)
     let aiContextUpdated = false;
@@ -194,7 +199,7 @@ export class DevlogManager {
     options?: {
       files?: string[];
       codeChanges?: string;
-    }
+    },
   ): Promise<DevlogEntry> {
     await this.ensureInitialized();
 
@@ -233,21 +238,16 @@ export class DevlogManager {
       category?: NoteCategory;
       files?: string[];
       codeChanges?: string;
-    }
+    },
   ): Promise<DevlogEntry> {
     // First update the devlog
     const updated = await this.updateDevlog({ ...updates, id });
-    
+
     // Then add the progress note
-    return await this.addNote(
-      id, 
-      progressNote, 
-      options?.category || 'progress',
-      {
-        files: options?.files,
-        codeChanges: options?.codeChanges,
-      }
-    );
+    return await this.addNote(id, progressNote, options?.category || 'progress', {
+      files: options?.files,
+      codeChanges: options?.codeChanges,
+    });
   }
 
   /**
@@ -283,7 +283,9 @@ export class DevlogManager {
     // Set defaults
     const days = request.days || 30;
     const endDate = request.to ? new Date(request.to) : new Date();
-    const startDate = request.from ? new Date(request.from) : new Date(endDate.getTime() - days * 24 * 60 * 60 * 1000);
+    const startDate = request.from
+      ? new Date(request.from)
+      : new Date(endDate.getTime() - days * 24 * 60 * 60 * 1000);
 
     // Get all devlogs to analyze
     const allDevlogs = await this.storageProvider.list();
@@ -313,13 +315,16 @@ export class DevlogManager {
       // Count current status distribution at end of this date
       // For simplicity, we'll use current status distribution
       // In a real implementation, you'd track status changes over time
-      const statusCounts = allDevlogs.reduce((acc: Record<DevlogStatus, number>, devlog: DevlogEntry) => {
-        const createdDate = new Date(devlog.createdAt);
-        if (createdDate <= currentDate) {
-          acc[devlog.status] = (acc[devlog.status] || 0) + 1;
-        }
-        return acc;
-      }, {} as Record<DevlogStatus, number>);
+      const statusCounts = allDevlogs.reduce(
+        (acc: Record<DevlogStatus, number>, devlog: DevlogEntry) => {
+          const createdDate = new Date(devlog.createdAt);
+          if (createdDate <= currentDate) {
+            acc[devlog.status] = (acc[devlog.status] || 0) + 1;
+          }
+          return acc;
+        },
+        {} as Record<DevlogStatus, number>,
+      );
 
       dataPoints.push({
         date: dateStr,
@@ -391,7 +396,7 @@ export class DevlogManager {
     await this.ensureInitialized();
 
     const filter = {
-      status: ['todo', 'in-progress', 'review', 'testing'] as any[],
+      status: ['new', 'in-progress', 'in-review', 'blocked', 'testing'] as any[],
     };
 
     const entries = await this.storageProvider.list(filter);

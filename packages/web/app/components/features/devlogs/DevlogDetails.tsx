@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, Checkbox, List, Space, Tag, Timeline, Typography } from 'antd';
+import { Card, Checkbox, List, Space, Tag, Timeline, Typography, Skeleton } from 'antd';
 import {
   BulbOutlined,
   CheckCircleOutlined,
@@ -34,7 +34,8 @@ import { DevlogStatusTag, DevlogPriorityTag, DevlogTypeTag } from '@/components'
 const { Title, Text } = Typography;
 
 interface DevlogDetailsProps {
-  devlog: DevlogEntry;
+  devlog?: DevlogEntry;
+  loading?: boolean;
   onUpdate: (data: any) => void;
   onDelete: () => void;
   onUnsavedChangesChange?: (
@@ -46,7 +47,85 @@ interface DevlogDetailsProps {
   ) => void;
 }
 
-export function DevlogDetails({ devlog, onUpdate, onUnsavedChangesChange }: DevlogDetailsProps) {
+export function DevlogDetails({ devlog, loading = false, onUpdate, onUnsavedChangesChange }: DevlogDetailsProps) {
+  // If loading, show skeleton
+  if (loading || !devlog) {
+    return (
+      <div>
+        <div className={styles.devlogDetailsHeader}>
+          <div className={styles.devlogDetailsTitle}>
+            <Skeleton.Input 
+              style={{ width: '60%', height: '32px', marginBottom: '16px' }} 
+              active 
+              size="large" 
+            />
+
+            <Space wrap className={styles.statusSection}>
+              <Skeleton.Button style={{ width: '80px' }} active size="small" />
+              <Skeleton.Button style={{ width: '80px' }} active size="small" />
+              <Skeleton.Button style={{ width: '80px' }} active size="small" />
+            </Space>
+
+            <div className={styles.metaInfo}>
+              <Skeleton.Input style={{ width: '200px' }} active size="small" />
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.devlogDetailsContent}>
+          <div className={styles.descriptionSection}>
+            <Title level={4}>
+              <FileTextOutlined className={styles.sectionIcon} />
+              Description
+            </Title>
+            <Skeleton active paragraph={{ rows: 4 }} />
+          </div>
+
+          <div className={styles.contextSection}>
+            <Title level={4}>
+              <InfoCircleOutlined className={styles.sectionIcon} />
+              Business Context
+            </Title>
+            <Skeleton active paragraph={{ rows: 3 }} />
+          </div>
+
+          <div className={styles.contextSection}>
+            <Title level={4}>
+              <ToolOutlined className={styles.sectionIcon} />
+              Technical Context
+            </Title>
+            <Skeleton active paragraph={{ rows: 3 }} />
+          </div>
+
+          <div className={styles.criteriaSection}>
+            <Title level={4}>
+              <CheckCircleOutlined className={styles.sectionIcon} />
+              Acceptance Criteria
+            </Title>
+            <Card size="small">
+              <Skeleton active paragraph={{ rows: 2 }} />
+            </Card>
+          </div>
+
+          <div className={styles.notesSection}>
+            <Title level={4}>
+              <CommentOutlined className={styles.sectionIcon} />
+              Notes
+            </Title>
+            <Timeline>
+              <Timeline.Item>
+                <Skeleton active paragraph={{ rows: 2 }} />
+              </Timeline.Item>
+              <Timeline.Item>
+                <Skeleton active paragraph={{ rows: 1 }} />
+              </Timeline.Item>
+            </Timeline>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Local state for tracking changes
   const [localChanges, setLocalChanges] = useState<Record<string, any>>({});
   const [originalDevlog, setOriginalDevlog] = useState<DevlogEntry>(devlog);

@@ -41,7 +41,7 @@ export class PostgreSQLStorageProvider implements StorageProvider {
         title TEXT NOT NULL,
         type TEXT NOT NULL,
         description TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'todo',
+        status TEXT NOT NULL DEFAULT 'new',
         priority TEXT NOT NULL DEFAULT 'medium',
         created_at TIMESTAMPTZ NOT NULL,
         updated_at TIMESTAMPTZ NOT NULL,
@@ -239,7 +239,7 @@ export class PostgreSQLStorageProvider implements StorageProvider {
 
   async getNextId(): Promise<DevlogId> {
     const result = await this.client.query(
-      'SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM devlog_entries'
+      'SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM devlog_entries',
     );
     return result.rows[0].next_id;
   }

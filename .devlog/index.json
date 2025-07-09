@@ -323,8 +323,17 @@
       "priority": "medium",
       "createdAt": "2025-07-09T15:07:12.362Z",
       "updatedAt": "2025-07-09T15:20:10.495Z"
+    },
+    "40": {
+      "filename": "040-add-skeleton-loading-states-to-devlogdetails-compo.json",
+      "title": "Add skeleton loading states to DevlogDetails component",
+      "status": "done",
+      "type": "feature",
+      "priority": "medium",
+      "createdAt": "2025-07-09T15:24:08.089Z",
+      "updatedAt": "2025-07-09T15:25:37.875Z"
     }
   },
-  "lastId": 39,
+  "lastId": 40,
   "version": "1.0.0"
 }

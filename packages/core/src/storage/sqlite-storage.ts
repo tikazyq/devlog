@@ -91,7 +91,7 @@ export class SQLiteStorageProvider implements StorageProvider {
           title TEXT NOT NULL,
           type TEXT NOT NULL,
           description TEXT NOT NULL,
-          status TEXT NOT NULL DEFAULT 'todo',
+          status TEXT NOT NULL DEFAULT 'new',
           priority TEXT NOT NULL DEFAULT 'medium',
           created_at TEXT NOT NULL,
           updated_at TEXT NOT NULL,

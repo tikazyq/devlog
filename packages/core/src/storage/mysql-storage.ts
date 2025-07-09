@@ -36,7 +36,7 @@ export class MySQLStorageProvider implements StorageProvider {
         title TEXT NOT NULL,
         type VARCHAR(50) NOT NULL,
         description TEXT NOT NULL,
-        status VARCHAR(50) NOT NULL DEFAULT 'todo',
+        status VARCHAR(50) NOT NULL DEFAULT 'new',
         priority VARCHAR(50) NOT NULL DEFAULT 'medium',
         created_at DATETIME NOT NULL,
         updated_at DATETIME NOT NULL,
@@ -230,7 +230,7 @@ export class MySQLStorageProvider implements StorageProvider {
 
   async getNextId(): Promise<DevlogId> {
     const [rows] = await this.connection.execute(
-      'SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM devlog_entries'
+      'SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM devlog_entries',
     );
     return (rows as any[])[0].next_id;
   }

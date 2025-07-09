@@ -1,5 +1,10 @@
 /* DevlogDetails Component Styles */
 
+.sectionIcon {
+  margin-right: 8px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
 .devlogDetailsHeader {
   padding: 12px 24px;
   position: sticky;
@@ -27,7 +32,7 @@
 }
 
 .statusSection {
-  margin-bottom: 16px;
+  margin-left: 16px;
 }
 
 .devlogDetailsActions {

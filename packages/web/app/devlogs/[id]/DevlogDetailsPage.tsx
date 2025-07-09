@@ -127,12 +127,8 @@ export function DevlogDetailsPage({ id }: DevlogDetailsPageProps) {
   );
 
   return (
-    <PageLayout breadcrumb={customBreadcrumb} actions={actions}>
-      <DevlogDetails
-        devlog={devlog}
-        onUpdate={handleUpdate}
-        onDelete={handleDelete}
-      />
+    <PageLayout actions={actions}>
+      <DevlogDetails devlog={devlog} onUpdate={handleUpdate} onDelete={handleDelete} />
     </PageLayout>
   );
 }

@@ -296,8 +296,17 @@
       "priority": "medium",
       "createdAt": "2025-07-09T12:50:40.923Z",
       "updatedAt": "2025-07-09T12:55:14.755Z"
+    },
+    "37": {
+      "filename": "037-refactor-editablefield-for-seamless-read-edit-ux-l.json",
+      "title": "Refactor EditableField for seamless read/edit UX like Azure DevOps",
+      "status": "done",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-07-09T13:09:17.875Z",
+      "updatedAt": "2025-07-09T13:50:27.648Z"
     }
   },
-  "lastId": 36,
+  "lastId": 37,
   "version": "1.0.0"
 }

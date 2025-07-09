@@ -4,6 +4,11 @@
   line-height: 1.5;
 }
 
+.markdownRenderer p:last-child {
+  margin-bottom: 0;
+}
+
+
 .markdownRenderer h1,
 .markdownRenderer h2,
 .markdownRenderer h3,

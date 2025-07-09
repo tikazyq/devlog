@@ -1,27 +1,33 @@
 'use client';
 
-import React, { useState } from 'react';
-import {
-  Alert,
-  Card,
-  Checkbox,
-  List,
-  Space,
-  Tag,
-  Timeline,
-  Typography,
-} from 'antd';
+import React from 'react';
+import { Card, Checkbox, List, Space, Tag, Timeline, Typography } from 'antd';
 import {
   BulbOutlined,
+  CheckCircleOutlined,
+  CommentOutlined,
+  FileTextOutlined,
   InfoCircleOutlined,
+  LinkOutlined,
+  NodeIndexOutlined,
   QuestionCircleOutlined,
   RightOutlined,
+  RobotOutlined,
+  SettingOutlined,
   ToolOutlined,
+  WarningOutlined,
 } from '@ant-design/icons';
 import { DevlogEntry } from '@devlog/types';
-import { MarkdownRenderer, EditableField } from '@/components/ui';
+import { EditableField, MarkdownRenderer } from '@/components/ui';
 import { formatTimeAgoWithTooltip } from '@/lib/time-utils';
 import styles from './DevlogDetails.module.css';
+import {
+  getPriorityColor,
+  getPriorityIcon,
+  getStatusColor,
+  getStatusIcon,
+  getTypeIcon,
+} from '@/lib/devlog-ui-utils';
 
 const { Title, Text } = Typography;
 
@@ -89,6 +95,7 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
               {devlog.title}
             </Title>
           </EditableField>
+
           <Space split={<Text type="secondary">•</Text>} className={styles.metaInfo}>
             <Text type="secondary" className={styles.metaText}>
               ID: #{devlog.id}
@@ -103,108 +110,117 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
 
           {/* Editable Status, Priority, and Type */}
           <Space wrap className={styles.statusSection}>
-            <span>
-              <Text type="secondary">Status: </Text>
-              <EditableField
-                value={devlog.status}
-                onSave={(value) => handleFieldUpdate('status', value)}
-                type="select"
-                options={statusOptions}
-              >
-                <Tag color="blue">{devlog.status}</Tag>
-              </EditableField>
-            </span>
-            <span>
-              <Text type="secondary">Priority: </Text>
-              <EditableField
-                value={devlog.priority}
-                onSave={(value) => handleFieldUpdate('priority', value)}
-                type="select"
-                options={priorityOptions}
-              >
-                <Tag color="orange">{devlog.priority}</Tag>
-              </EditableField>
-            </span>
-            <span>
-              <Text type="secondary">Type: </Text>
-              <EditableField
-                value={devlog.type}
-                onSave={(value) => handleFieldUpdate('type', value)}
-                type="select"
-                options={typeOptions}
-              >
-                <Tag color="green">{devlog.type}</Tag>
-              </EditableField>
-            </span>
+            <EditableField
+              type="select"
+              value={devlog.status}
+              options={statusOptions}
+              onSave={(value) => handleFieldUpdate('status', value)}
+            >
+              <Tag color={getStatusColor(devlog.status)} icon={getStatusIcon(devlog.status)}>
+                {devlog.status}
+              </Tag>
+            </EditableField>
+            <Tag color={getPriorityColor(devlog.priority)} icon={getPriorityIcon(devlog.priority)}>
+              {devlog.priority}
+            </Tag>
+            <Tag color="blue" icon={getTypeIcon(devlog.type)}>
+              {devlog.type}
+            </Tag>
+            {/*<span>*/}
+            {/*  <Text type="secondary">Status: </Text>*/}
+            {/*  <EditableField*/}
+            {/*    value={devlog.status}*/}
+            {/*    onSave={(value) => handleFieldUpdate('status', value)}*/}
+            {/*    type="select"*/}
+            {/*    options={statusOptions}*/}
+            {/*  >*/}
+            {/*    <Tag color="blue">{devlog.status}</Tag>*/}
+            {/*  </EditableField>*/}
+            {/*</span>*/}
+            {/*<span>*/}
+            {/*  <Text type="secondary">Priority: </Text>*/}
+            {/*  <EditableField*/}
+            {/*    value={devlog.priority}*/}
+            {/*    onSave={(value) => handleFieldUpdate('priority', value)}*/}
+            {/*    type="select"*/}
+            {/*    options={priorityOptions}*/}
+            {/*  >*/}
+            {/*    <Tag color="orange">{devlog.priority}</Tag>*/}
+            {/*  </EditableField>*/}
+            {/*</span>*/}
+            {/*<span>*/}
+            {/*  <Text type="secondary">Type: </Text>*/}
+            {/*  <EditableField*/}
+            {/*    value={devlog.type}*/}
+            {/*    onSave={(value) => handleFieldUpdate('type', value)}*/}
+            {/*    type="select"*/}
+            {/*    options={typeOptions}*/}
+            {/*  >*/}
+            {/*    <Tag color="green">{devlog.type}</Tag>*/}
+            {/*  </EditableField>*/}
+            {/*</span>*/}
           </Space>
         </div>
       </div>
 
       <div className={styles.devlogDetailsContent}>
         <div className={styles.descriptionSection}>
-          <Title level={4}>Description</Title>
+          <Title level={4}>
+            <FileTextOutlined className={styles.sectionIcon} />
+            Description
+          </Title>
           <EditableField
             value={devlog.description}
             onSave={(value) => handleFieldUpdate('description', value)}
             multiline
             type="textarea"
             placeholder="Enter description"
+            emptyText="Click to add description..."
           >
             <MarkdownRenderer content={devlog.description} />
           </EditableField>
         </div>
 
         <div className={styles.contextSection}>
-          <Title level={4}>Business Context</Title>
+          <Title level={4}>
+            <InfoCircleOutlined className={styles.sectionIcon} />
+            Business Context
+          </Title>
           <EditableField
             value={devlog.context?.businessContext || ''}
             onSave={(value) => handleContextUpdate('businessContext', value)}
             multiline
             type="textarea"
             placeholder="Why this work matters and what problem it solves"
+            emptyText="Click to add business context..."
           >
-            {devlog.context?.businessContext ? (
-              <Alert
-                message={<MarkdownRenderer content={devlog.context.businessContext} />}
-                type="info"
-                showIcon
-                icon={<InfoCircleOutlined />}
-              />
-            ) : (
-              <Text type="secondary" className={styles.emptyFieldText}>
-                Click to add business context...
-              </Text>
-            )}
+            <MarkdownRenderer content={devlog.context?.businessContext || ''} />
           </EditableField>
         </div>
 
         <div className={styles.contextSection}>
-          <Title level={4}>Technical Context</Title>
+          <Title level={4}>
+            <ToolOutlined className={styles.sectionIcon} />
+            Technical Context
+          </Title>
           <EditableField
             value={devlog.context?.technicalContext || ''}
             onSave={(value) => handleContextUpdate('technicalContext', value)}
             multiline
             type="textarea"
             placeholder="Architecture decisions, constraints, assumptions"
+            emptyText="Click to add technical context..."
           >
-            {devlog.context?.technicalContext ? (
-              <Alert
-                message={<MarkdownRenderer content={devlog.context.technicalContext} />}
-                type="warning"
-                showIcon
-                icon={<ToolOutlined />}
-              />
-            ) : (
-              <Text type="secondary" className={styles.emptyFieldText}>
-                Click to add technical context...
-              </Text>
-            )}
+            <MarkdownRenderer content={devlog.context?.technicalContext || ''} />
           </EditableField>
         </div>
 
         {devlog.context?.acceptanceCriteria && devlog.context.acceptanceCriteria.length > 0 && (
           <div className={styles.criteriaSection}>
-            <Title level={4}>Acceptance Criteria</Title>
+            <Title level={4}>
+              <CheckCircleOutlined className={styles.sectionIcon} />
+              Acceptance Criteria
+            </Title>
             <Card size="small">
               <List
                 dataSource={devlog.context.acceptanceCriteria}
@@ -223,7 +239,10 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
 
         {devlog.context?.dependencies && devlog.context.dependencies.length > 0 && (
           <div className={styles.dependencySection}>
-            <Title level={4}>Dependencies</Title>
+            <Title level={4}>
+              <NodeIndexOutlined className={styles.sectionIcon} />
+              Dependencies
+            </Title>
             <Space direction="vertical" style={{ width: '100%' }}>
               {devlog.context.dependencies.map((dep, index) => (
                 <Card key={index} size="small" className={styles.dependencyCard}>
@@ -256,7 +275,10 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
 
         {devlog.context?.decisions && devlog.context.decisions.length > 0 && (
           <div className={styles.decisionSection}>
-            <Title level={4}>Decisions</Title>
+            <Title level={4}>
+              <SettingOutlined style={{ marginRight: 8, color: '#13c2c2' }} />
+              Decisions
+            </Title>
             <Timeline>
               {devlog.context.decisions.map((decision) => (
                 <Timeline.Item key={decision.id}>
@@ -286,7 +308,10 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
 
         {devlog.context?.risks && devlog.context.risks.length > 0 && (
           <div className={styles.riskSection}>
-            <Title level={4}>Risks</Title>
+            <Title level={4}>
+              <WarningOutlined className={styles.sectionIcon} />
+              Risks
+            </Title>
             <Space direction="vertical" style={{ width: '100%' }}>
               {devlog.context.risks.map((risk, index) => (
                 <Card key={index} size="small" className={styles.riskCard}>
@@ -331,7 +356,10 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
 
         {devlog.files && devlog.files.length > 0 && (
           <div className={styles.fileSection}>
-            <Title level={4}>Related Files</Title>
+            <Title level={4}>
+              <FileTextOutlined className={styles.sectionIcon} />
+              Related Files
+            </Title>
             <Space direction="vertical" style={{ width: '100%' }}>
               {devlog.files.map((file, index) => (
                 <Card key={index} size="small" className={styles.fileCard}>
@@ -344,7 +372,10 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
 
         {devlog.relatedDevlogs && devlog.relatedDevlogs.length > 0 && (
           <div className={styles.relatedSection}>
-            <Title level={4}>Related Devlogs</Title>
+            <Title level={4}>
+              <LinkOutlined className={styles.sectionIcon} />
+              Related Devlogs
+            </Title>
             <Space wrap>
               {devlog.relatedDevlogs.map((relatedId, index) => (
                 <Tag key={index} color="cyan">
@@ -357,7 +388,10 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
 
         {devlog.aiContext && (
           <div className={styles.aiContextSection}>
-            <Title level={4}>AI Context</Title>
+            <Title level={4}>
+              <RobotOutlined className={styles.sectionIcon} />
+              AI Context
+            </Title>
             <Card>
               {devlog.aiContext.currentSummary && (
                 <div className={styles.aiSection}>
@@ -452,7 +486,10 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
 
         {devlog.externalReferences && devlog.externalReferences.length > 0 && (
           <div className={styles.externalRefSection}>
-            <Title level={4}>External References</Title>
+            <Title level={4}>
+              <LinkOutlined className={styles.sectionIcon} />
+              External References
+            </Title>
             <Space direction="vertical" style={{ width: '100%' }}>
               {devlog.externalReferences.map((ref, index) => (
                 <Card key={index} size="small" className={styles.externalRefCard}>
@@ -492,7 +529,10 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
 
         {devlog.notes && devlog.notes.length > 0 && (
           <div className={styles.notesSection}>
-            <Title level={4}>Notes</Title>
+            <Title level={4}>
+              <CommentOutlined className={styles.sectionIcon} />
+              Notes
+            </Title>
             <Timeline>
               {[...devlog.notes].reverse().map((note) => (
                 <Timeline.Item key={note.id}>

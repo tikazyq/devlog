@@ -34,10 +34,7 @@ export interface DevlogEntry {
   priority: DevlogPriority;
   createdAt: string;
   updatedAt: string;
-  estimatedHours?: number;
-  actualHours?: number;
   assignee?: string;
-  tags: string[];
   notes: DevlogNote[];
   files: string[];
   relatedDevlogs: string[];
@@ -110,7 +107,6 @@ export interface DevlogFilter {
   type?: DevlogType[];
   priority?: DevlogPriority[];
   assignee?: string;
-  tags?: string[];
   fromDate?: string;
   toDate?: string;
 }

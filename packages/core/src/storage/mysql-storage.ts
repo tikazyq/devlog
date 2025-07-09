@@ -40,10 +40,7 @@ export class MySQLStorageProvider implements StorageProvider {
         priority VARCHAR(50) NOT NULL DEFAULT 'medium',
         created_at DATETIME NOT NULL,
         updated_at DATETIME NOT NULL,
-        estimated_hours INT,
-        actual_hours INT,
         assignee VARCHAR(255),
-        tags JSON,
         files JSON,
         related_devlogs JSON,
         context JSON,
@@ -82,9 +79,9 @@ export class MySQLStorageProvider implements StorageProvider {
       `
       INSERT INTO devlog_entries (
         id, key_field, title, type, description, status, priority, created_at, updated_at,
-        estimated_hours, actual_hours, assignee, tags, files, related_devlogs,
+        assignee, files, related_devlogs,
         context, ai_context, external_references, notes
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON DUPLICATE KEY UPDATE
         key_field = VALUES(key_field),
         title = VALUES(title),
@@ -93,10 +90,7 @@ export class MySQLStorageProvider implements StorageProvider {
         status = VALUES(status),
         priority = VALUES(priority),
         updated_at = VALUES(updated_at),
-        estimated_hours = VALUES(estimated_hours),
-        actual_hours = VALUES(actual_hours),
         assignee = VALUES(assignee),
-        tags = VALUES(tags),
         files = VALUES(files),
         related_devlogs = VALUES(related_devlogs),
         context = VALUES(context),
@@ -114,10 +108,7 @@ export class MySQLStorageProvider implements StorageProvider {
         entry.priority,
         entry.createdAt,
         entry.updatedAt,
-        entry.estimatedHours,
-        entry.actualHours,
         entry.assignee,
-        JSON.stringify(entry.tags),
         JSON.stringify(entry.files),
         JSON.stringify(entry.relatedDevlogs),
         JSON.stringify(entry.context),
@@ -166,14 +157,6 @@ export class MySQLStorageProvider implements StorageProvider {
       if (filter.toDate) {
         conditions.push('created_at <= ?');
         params.push(filter.toDate);
-      }
-
-      if (filter.tags && filter.tags.length > 0) {
-        // Use JSON_OVERLAPS for MySQL 8.0+, fallback to JSON_CONTAINS for older versions
-        for (const tag of filter.tags) {
-          conditions.push('JSON_CONTAINS(tags, ?)');
-          params.push(JSON.stringify(tag));
-        }
       }
     }
 
@@ -271,10 +254,7 @@ export class MySQLStorageProvider implements StorageProvider {
       priority: row.priority,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
-      estimatedHours: row.estimated_hours,
-      actualHours: row.actual_hours,
       assignee: row.assignee,
-      tags: row.tags ? JSON.parse(row.tags) : [],
       files: row.files ? JSON.parse(row.files) : [],
       relatedDevlogs: row.related_devlogs ? JSON.parse(row.related_devlogs) : [],
       context: row.context ? JSON.parse(row.context) : {},

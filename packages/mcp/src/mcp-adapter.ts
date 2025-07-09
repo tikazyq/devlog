@@ -223,7 +223,7 @@ export class MCPDevlogAdapter {
     const updated = await this.devlogManager.updateDevlog({
       id: args.id,
       // Use a field that exists in UpdateDevlogRequest to trigger save
-      tags: entry.tags,
+      description: entry.description,
     });
 
     return {

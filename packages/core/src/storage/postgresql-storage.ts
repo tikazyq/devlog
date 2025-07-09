@@ -45,10 +45,7 @@ export class PostgreSQLStorageProvider implements StorageProvider {
         priority TEXT NOT NULL DEFAULT 'medium',
         created_at TIMESTAMPTZ NOT NULL,
         updated_at TIMESTAMPTZ NOT NULL,
-        estimated_hours INTEGER,
-        actual_hours INTEGER,
         assignee TEXT,
-        tags JSONB,
         files JSONB,
         related_devlogs JSONB,
         context JSONB,
@@ -64,7 +61,6 @@ export class PostgreSQLStorageProvider implements StorageProvider {
       CREATE INDEX IF NOT EXISTS idx_devlog_assignee ON devlog_entries(assignee);
       CREATE INDEX IF NOT EXISTS idx_devlog_created_at ON devlog_entries(created_at);
       CREATE INDEX IF NOT EXISTS idx_devlog_updated_at ON devlog_entries(updated_at);
-      CREATE INDEX IF NOT EXISTS idx_devlog_tags ON devlog_entries USING GIN(tags);
       CREATE INDEX IF NOT EXISTS idx_devlog_full_text ON devlog_entries USING GIN(to_tsvector('english', title || ' ' || description));
     `);
   }
@@ -87,9 +83,9 @@ export class PostgreSQLStorageProvider implements StorageProvider {
       `
       INSERT INTO devlog_entries (
         id, key_field, title, type, description, status, priority, created_at, updated_at,
-        estimated_hours, actual_hours, assignee, tags, files, related_devlogs,
+        assignee, files, related_devlogs,
         context, ai_context, external_references, notes
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
       ON CONFLICT (id) DO UPDATE SET
         key_field = EXCLUDED.key_field,
         title = EXCLUDED.title,
@@ -98,10 +94,7 @@ export class PostgreSQLStorageProvider implements StorageProvider {
         status = EXCLUDED.status,
         priority = EXCLUDED.priority,
         updated_at = EXCLUDED.updated_at,
-        estimated_hours = EXCLUDED.estimated_hours,
-        actual_hours = EXCLUDED.actual_hours,
         assignee = EXCLUDED.assignee,
-        tags = EXCLUDED.tags,
         files = EXCLUDED.files,
         related_devlogs = EXCLUDED.related_devlogs,
         context = EXCLUDED.context,
@@ -119,10 +112,7 @@ export class PostgreSQLStorageProvider implements StorageProvider {
         entry.priority,
         entry.createdAt,
         entry.updatedAt,
-        entry.estimatedHours,
-        entry.actualHours,
         entry.assignee,
-        JSON.stringify(entry.tags),
         JSON.stringify(entry.files),
         JSON.stringify(entry.relatedDevlogs),
         JSON.stringify(entry.context),
@@ -178,12 +168,6 @@ export class PostgreSQLStorageProvider implements StorageProvider {
         paramCount++;
         conditions.push(`created_at <= $${paramCount}`);
         params.push(filter.toDate);
-      }
-
-      if (filter.tags && filter.tags.length > 0) {
-        paramCount++;
-        conditions.push(`tags ?| $${paramCount}`);
-        params.push(filter.tags);
       }
     }
 
@@ -279,10 +263,7 @@ export class PostgreSQLStorageProvider implements StorageProvider {
       priority: row.priority,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
-      estimatedHours: row.estimated_hours,
-      actualHours: row.actual_hours,
       assignee: row.assignee,
-      tags: row.tags || [],
       files: row.files || [],
       relatedDevlogs: row.related_devlogs || [],
       context: row.context || {},

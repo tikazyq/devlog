@@ -95,10 +95,7 @@ export class SQLiteStorageProvider implements StorageProvider {
           priority TEXT NOT NULL DEFAULT 'medium',
           created_at TEXT NOT NULL,
           updated_at TEXT NOT NULL,
-          estimated_hours INTEGER,
-          actual_hours INTEGER,
           assignee TEXT,
-          tags TEXT, -- JSON array
           files TEXT, -- JSON array
           related_devlogs TEXT, -- JSON array
           context TEXT, -- JSON object
@@ -200,9 +197,9 @@ export class SQLiteStorageProvider implements StorageProvider {
       const stmt = this.db.prepare(`
         INSERT OR REPLACE INTO devlog_entries (
           id, key_field, title, type, description, status, priority, created_at, updated_at,
-          estimated_hours, actual_hours, assignee, tags, files, related_devlogs,
+          assignee, files, related_devlogs,
           context, ai_context, external_references, notes
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
       stmt.run(
@@ -215,10 +212,7 @@ export class SQLiteStorageProvider implements StorageProvider {
         entry.priority,
         entry.createdAt,
         entry.updatedAt,
-        entry.estimatedHours,
-        entry.actualHours,
         entry.assignee,
-        JSON.stringify(entry.tags),
         JSON.stringify(entry.files),
         JSON.stringify(entry.relatedDevlogs),
         JSON.stringify(entry.context),
@@ -277,14 +271,6 @@ export class SQLiteStorageProvider implements StorageProvider {
       if (filter.toDate) {
         conditions.push('created_at <= ?');
         params.push(filter.toDate);
-      }
-
-      if (filter.tags && filter.tags.length > 0) {
-        // Use JSON operations to search tags
-        for (const tag of filter.tags) {
-          conditions.push("json_extract(tags, '$') LIKE ?");
-          params.push(`%"${tag}"%`);
-        }
       }
     }
 
@@ -395,10 +381,7 @@ export class SQLiteStorageProvider implements StorageProvider {
       priority: row.priority,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
-      estimatedHours: row.estimated_hours,
-      actualHours: row.actual_hours,
       assignee: row.assignee,
-      tags: JSON.parse(row.tags || '[]'),
       files: JSON.parse(row.files || '[]'),
       relatedDevlogs: JSON.parse(row.related_devlogs || '[]'),
       context: JSON.parse(row.context || '{}'),

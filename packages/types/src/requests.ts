@@ -9,9 +9,7 @@ export interface CreateDevlogRequest {
   type: DevlogType;
   description: string;
   priority?: DevlogPriority;
-  estimatedHours?: number;
   assignee?: string;
-  tags?: string[];
 
   // Enhanced context for AI agents
   businessContext?: string;
@@ -27,10 +25,7 @@ export interface UpdateDevlogRequest {
   description?: string;
   status?: DevlogStatus;
   priority?: DevlogPriority;
-  estimatedHours?: number;
-  actualHours?: number;
   assignee?: string;
-  tags?: string[];
   blockers?: string;
   nextSteps?: string;
   files?: string[];

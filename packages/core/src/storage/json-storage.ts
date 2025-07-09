@@ -156,7 +156,6 @@ export class JsonStorageProvider implements StorageProvider {
         // Apply additional filtering
         if (filter) {
           if (filter.assignee && entry.assignee !== filter.assignee) continue;
-          if (filter.tags && !filter.tags.some((tag) => entry.tags.includes(tag))) continue;
         }
 
         entries.push(entry);
@@ -177,7 +176,6 @@ export class JsonStorageProvider implements StorageProvider {
       return (
         entry.title.toLowerCase().includes(lowerQuery) ||
         entry.description.toLowerCase().includes(lowerQuery) ||
-        entry.tags.some((tag) => tag.toLowerCase().includes(lowerQuery)) ||
         entry.notes.some((note) => note.content.toLowerCase().includes(lowerQuery))
       );
     });

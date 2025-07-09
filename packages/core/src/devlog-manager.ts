@@ -87,9 +87,7 @@ export class DevlogManager {
       priority: request.priority || 'medium',
       createdAt: now,
       updatedAt: now,
-      estimatedHours: request.estimatedHours,
       assignee: request.assignee,
-      tags: request.tags || [],
       notes: [],
       files: [],
       relatedDevlogs: [],
@@ -147,10 +145,7 @@ export class DevlogManager {
     if (request.description !== undefined) updated.description = request.description;
     if (request.status !== undefined) updated.status = request.status;
     if (request.priority !== undefined) updated.priority = request.priority;
-    if (request.estimatedHours !== undefined) updated.estimatedHours = request.estimatedHours;
-    if (request.actualHours !== undefined) updated.actualHours = request.actualHours;
     if (request.assignee !== undefined) updated.assignee = request.assignee;
-    if (request.tags !== undefined) updated.tags = request.tags;
     if (request.files !== undefined) updated.files = request.files;
 
     // Update enhanced context fields

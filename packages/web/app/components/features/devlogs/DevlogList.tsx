@@ -153,43 +153,6 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
         ),
     },
     {
-      title: 'Tags',
-      dataIndex: 'tags',
-      key: 'tags',
-      width: 140,
-      render: (tags: string[]) => (
-        <div>
-          {tags?.slice(0, 2).map((tag) => (
-            <Tag key={tag} color="purple" className={styles.devlogTagSmall}>
-              {tag}
-            </Tag>
-          ))}
-          {tags?.length > 2 && (
-            <Tag color="default" className={styles.devlogTagSmall}>
-              +{tags.length - 2}
-            </Tag>
-          )}
-        </div>
-      ),
-    },
-    {
-      title: 'Hours',
-      key: 'hours',
-      width: 100,
-      render: (_, record: DevlogEntry) => (
-        <div className={styles.devlogHours}>
-          {record.estimatedHours || record.actualHours ? (
-            <>
-              <div>{record.estimatedHours ? `Est: ${record.estimatedHours}h` : '—'}</div>
-              <div>{record.actualHours ? `Act: ${record.actualHours}h` : '—'}</div>
-            </>
-          ) : (
-            <Text type="secondary">—</Text>
-          )}
-        </div>
-      ),
-    },
-    {
       title: 'Created',
       dataIndex: 'createdAt',
       key: 'createdAt',

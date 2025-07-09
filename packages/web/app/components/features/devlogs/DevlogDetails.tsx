@@ -509,7 +509,12 @@ export function DevlogDetails({ devlog, onUpdate, onUnsavedChangesChange }: Devl
           </div>
         )}
 
-        {devlog.aiContext && (
+        {devlog.aiContext && 
+         (devlog.aiContext.currentSummary ||
+          (devlog.aiContext.keyInsights && devlog.aiContext.keyInsights.length > 0) ||
+          (devlog.aiContext.openQuestions && devlog.aiContext.openQuestions.length > 0) ||
+          (devlog.aiContext.suggestedNextSteps && devlog.aiContext.suggestedNextSteps.length > 0) ||
+          (devlog.aiContext.relatedPatterns && devlog.aiContext.relatedPatterns.length > 0)) && (
           <div className={styles.aiContextSection}>
             <Title level={4}>
               <RobotOutlined className={styles.sectionIcon} />

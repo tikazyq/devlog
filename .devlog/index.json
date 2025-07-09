@@ -309,11 +309,11 @@
     "38": {
       "filename": "038-implement-save-button-with-changed-flag-system-for.json",
       "title": "Implement save button with changed flag system for DevlogDetails",
-      "status": "blocked",
+      "status": "done",
       "type": "feature",
       "priority": "medium",
       "createdAt": "2025-07-09T14:21:38.798Z",
-      "updatedAt": "2025-07-09T15:03:47.082Z"
+      "updatedAt": "2025-07-09T15:47:11.675Z"
     },
     "39": {
       "filename": "039-create-reusable-devlogtag-components-for-status-pr.json",

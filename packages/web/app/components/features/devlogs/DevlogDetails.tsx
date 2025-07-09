@@ -96,36 +96,49 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
             </Title>
           </EditableField>
 
-          <Space split={<Text type="secondary">•</Text>} className={styles.metaInfo}>
-            <Text type="secondary" className={styles.metaText}>
-              ID: #{devlog.id}
-            </Text>
-            <Text type="secondary" title={formatTimeAgoWithTooltip(devlog.createdAt).fullDate}>
-              Created: {formatTimeAgoWithTooltip(devlog.createdAt).timeAgo}
-            </Text>
-            <Text type="secondary" title={formatTimeAgoWithTooltip(devlog.updatedAt).fullDate}>
-              Updated: {formatTimeAgoWithTooltip(devlog.updatedAt).timeAgo}
-            </Text>
-          </Space>
-
-          {/* Editable Status, Priority, and Type */}
           <Space wrap className={styles.statusSection}>
             <EditableField
+              className={styles.statusItem}
               type="select"
               value={devlog.status}
               options={statusOptions}
               onSave={(value) => handleFieldUpdate('status', value)}
             >
-              <Tag color={getStatusColor(devlog.status)} icon={getStatusIcon(devlog.status)}>
-                {devlog.status}
+              <Tag
+                className={styles.statusTag}
+                color={getStatusColor(devlog.status)}
+                icon={getStatusIcon(devlog.status)}
+              >
+                {statusOptions.find(({ value }) => devlog.status === value)?.label || devlog.status}
               </Tag>
             </EditableField>
-            <Tag color={getPriorityColor(devlog.priority)} icon={getPriorityIcon(devlog.priority)}>
-              {devlog.priority}
-            </Tag>
-            <Tag color="blue" icon={getTypeIcon(devlog.type)}>
-              {devlog.type}
-            </Tag>
+            <EditableField
+              className={styles.statusItem}
+              type="select"
+              value={devlog.priority}
+              options={priorityOptions}
+              onSave={(value) => handleFieldUpdate('priority', value)}
+            >
+              <Tag
+                className={styles.statusTag}
+                color={getPriorityColor(devlog.priority)}
+                icon={getPriorityIcon(devlog.priority)}
+              >
+                {priorityOptions.find(({ value }) => devlog.priority === value)?.label ||
+                  devlog.priority}
+              </Tag>
+            </EditableField>
+            <EditableField
+              className={styles.statusItem}
+              type="select"
+              value={devlog.type}
+              onSave={(value) => handleFieldUpdate('type', value)}
+              options={typeOptions}
+            >
+              <Tag className={styles.statusTag} color="blue" icon={getTypeIcon(devlog.type)}>
+                {typeOptions.find(({ value }) => devlog.type === value)?.label || devlog.type}
+              </Tag>
+            </EditableField>
             {/*<span>*/}
             {/*  <Text type="secondary">Status: </Text>*/}
             {/*  <EditableField*/}
@@ -159,6 +172,18 @@ export function DevlogDetails({ devlog, onUpdate }: DevlogDetailsProps) {
             {/*    <Tag color="green">{devlog.type}</Tag>*/}
             {/*  </EditableField>*/}
             {/*</span>*/}
+          </Space>
+
+          <Space split={<Text type="secondary">•</Text>} className={styles.metaInfo}>
+            <Text type="secondary" className={styles.metaText}>
+              ID: #{devlog.id}
+            </Text>
+            <Text type="secondary" title={formatTimeAgoWithTooltip(devlog.createdAt).fullDate}>
+              Created: {formatTimeAgoWithTooltip(devlog.createdAt).timeAgo}
+            </Text>
+            <Text type="secondary" title={formatTimeAgoWithTooltip(devlog.updatedAt).fullDate}>
+              Updated: {formatTimeAgoWithTooltip(devlog.updatedAt).timeAgo}
+            </Text>
           </Space>
         </div>
       </div>

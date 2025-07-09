@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Input, Select, Typography } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 import styles from './EditableField.module.css';
@@ -17,6 +17,8 @@ interface EditableFieldProps {
   options?: { label: string; value: string }[];
   placeholder?: string;
   emptyText?: string;
+  className?: string;
+  size?: 'small' | 'middle' | 'large';
   children: React.ReactNode;
 }
 
@@ -28,6 +30,8 @@ export function EditableField({
   options = [],
   placeholder,
   emptyText,
+  className,
+  size = 'small',
   children,
 }: EditableFieldProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -87,8 +91,10 @@ export function EditableField({
 
     if (type === 'select') {
       return (
-        <Select 
-          {...inputProps} 
+        <Select
+          {...inputProps}
+          size={size}
+          open={isEditing}
           onChange={setEditValue}
           onBlur={handleBlur}
           style={{ width: '100%' }}
@@ -102,26 +108,15 @@ export function EditableField({
         </Select>
       );
     } else if (type === 'textarea' || multiline) {
-      return (
-        <TextArea
-          {...inputProps}
-          autoSize={{ minRows: 1 }}
-          variant="borderless"
-        />
-      );
+      return <TextArea {...inputProps} autoSize={{ minRows: 1 }} variant="borderless" />;
     } else {
-      return (
-        <Input
-          {...inputProps}
-          variant="borderless"
-        />
-      );
+      return <Input {...inputProps} variant="borderless" />;
     }
   };
 
   if (isEditing) {
     return (
-      <div className={`${styles.editableField} ${styles.editing}`}>
+      <div className={`${styles.editableField} ${styles.editing} ${className}`}>
         {renderInput()}
       </div>
     );
@@ -131,8 +126,8 @@ export function EditableField({
   const showEmptyText = (!value || value.trim() === '') && emptyText;
 
   return (
-    <div 
-      className={`${styles.editableField} ${isHovered ? styles.hovered : ''}`}
+    <div
+      className={`${styles.editableField} ${isHovered ? styles.hovered : ''} ${className}`}
       onClick={handleEnterEdit}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

@@ -32,7 +32,18 @@
 }
 
 .statusSection {
-  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.statusItem {
+  min-width: 120px;
+}
+
+.statusTag {
+  width: 100%;
+  font-size: 12px;
+  text-align: center;
+  padding: 4px 8px;
 }
 
 .devlogDetailsActions {

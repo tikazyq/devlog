@@ -3,6 +3,7 @@
 import React from 'react';
 import { Button, Col, Form, Input, Row, Select, Space, Typography } from 'antd';
 import { CloseOutlined, SaveOutlined } from '@ant-design/icons';
+import { statusOptions, priorityOptions, typeOptions } from '@/lib/devlog-options';
 import styles from './DevlogForm.module.css';
 
 const { Title, Text } = Typography;
@@ -69,11 +70,9 @@ export function DevlogForm({ onSubmit, onCancel, initialValues, isEditMode = fal
               rules={[{ required: true, message: 'Please select a type' }]}
             >
               <Select size="large" placeholder="Select type">
-                <Option value="feature">Feature</Option>
-                <Option value="bugfix">Bug Fix</Option>
-                <Option value="task">Task</Option>
-                <Option value="refactor">Refactor</Option>
-                <Option value="docs">Documentation</Option>
+                {typeOptions.map(option => (
+                  <Option key={option.value} value={option.value}>{option.label}</Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>
@@ -85,10 +84,9 @@ export function DevlogForm({ onSubmit, onCancel, initialValues, isEditMode = fal
               rules={[{ required: true, message: 'Please select a priority' }]}
             >
               <Select size="large" placeholder="Select priority">
-                <Option value="low">Low</Option>
-                <Option value="medium">Medium</Option>
-                <Option value="high">High</Option>
-                <Option value="critical">Critical</Option>
+                {priorityOptions.map(option => (
+                  <Option key={option.value} value={option.value}>{option.label}</Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>
@@ -101,13 +99,9 @@ export function DevlogForm({ onSubmit, onCancel, initialValues, isEditMode = fal
                 rules={[{ required: true, message: 'Please select a status' }]}
               >
                 <Select size="large" placeholder="Select status">
-                  <Option value="new">New</Option>
-                  <Option value="in-progress">In Progress</Option>
-                  <Option value="blocked">Blocked</Option>
-                  <Option value="in-preview">In Review</Option>
-                  <Option value="testing">Testing</Option>
-                  <Option value="done">Done</Option>
-                  <Option value="closed">Closed</Option>
+                  {statusOptions.map(option => (
+                    <Option key={option.value} value={option.value}>{option.label}</Option>
+                  ))}
                 </Select>
               </Form.Item>
             </Col>

@@ -314,8 +314,17 @@
       "priority": "medium",
       "createdAt": "2025-07-09T14:21:38.798Z",
       "updatedAt": "2025-07-09T15:03:47.082Z"
+    },
+    "39": {
+      "filename": "039-create-reusable-devlogtag-components-for-status-pr.json",
+      "title": "Create reusable DevlogTag components for status, priority, and type",
+      "status": "done",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-07-09T15:07:12.362Z",
+      "updatedAt": "2025-07-09T15:20:10.495Z"
     }
   },
-  "lastId": 38,
+  "lastId": 39,
   "version": "1.0.0"
 }

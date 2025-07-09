@@ -125,7 +125,7 @@ const tools: Tool[] = [
         },
         status: {
           type: 'string',
-          enum: ['todo', 'in-progress', 'blocked', 'review', 'testing', 'done'],
+          enum: ['new', 'in-progress', 'blocked', 'in-review', 'testing', 'done', 'closed'],
           description: 'Current status of the task',
         },
         blockers: {
@@ -389,7 +389,8 @@ const tools: Tool[] = [
   },
   {
     name: 'update_ai_context',
-    description: '[DEPRECATED] Update AI context for a devlog entry. Use update_devlog with AI context fields instead. This tool will be removed in v2.0.0.',
+    description:
+      '[DEPRECATED] Update AI context for a devlog entry. Use update_devlog with AI context fields instead. This tool will be removed in v2.0.0.',
     inputSchema: {
       type: 'object',
       properties: {

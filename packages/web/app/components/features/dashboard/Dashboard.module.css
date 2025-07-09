@@ -101,6 +101,13 @@
   margin-bottom: 8px;
 }
 
+.devlogId {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1890ff;
+  font-family: monospace;
+}
+
 .devlogDate {
   font-size: 14px;
 }

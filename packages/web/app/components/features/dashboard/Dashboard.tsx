@@ -19,11 +19,10 @@ import {
 import { DevlogEntry, DevlogStats, TimeSeriesStats } from '@devlog/types';
 import { useRouter } from 'next/navigation';
 import {
-  getPriorityColor,
-  getPriorityIcon,
   getStatusColor,
   getStatusIcon,
 } from '@/lib/devlog-ui-utils';
+import { DevlogStatusTag, DevlogPriorityTag, DevlogTypeTag } from '@/components';
 import { formatTimeAgoWithTooltip } from '@/lib/time-utils';
 import { OverviewStats } from '@/components';
 import styles from './Dashboard.module.css';
@@ -264,20 +263,23 @@ export function Dashboard({
                     <List.Item.Meta
                       className={styles.devlogListItemMeta}
                       avatar={
-                        <Avatar
-                          size={40}
-                          icon={getStatusIcon(devlog.status)}
-                          style={{
-                            backgroundColor:
-                              getStatusColor(devlog.status) === 'success'
-                                ? '#52c41a'
-                                : getStatusColor(devlog.status) === 'processing'
-                                  ? '#1890ff'
-                                  : getStatusColor(devlog.status) === 'error'
-                                    ? '#ff4d4f'
-                                    : '#d9d9d9',
-                          }}
-                        />
+                        <Text strong className={styles.devlogId}>
+                          {devlog.id}
+                        </Text>
+                        // <Avatar
+                        //   size={40}
+                        //   icon={getStatusIcon(devlog.status)}
+                        //   style={{
+                        //     backgroundColor:
+                        //       getStatusColor(devlog.status) === 'success'
+                        //         ? '#52c41a'
+                        //         : getStatusColor(devlog.status) === 'processing'
+                        //           ? '#1890ff'
+                        //           : getStatusColor(devlog.status) === 'error'
+                        //             ? '#ff4d4f'
+                        //             : '#d9d9d9',
+                        //   }}
+                        // />
                       }
                       title={
                         <div className={styles.devlogTitleSection}>
@@ -285,20 +287,18 @@ export function Dashboard({
                             {devlog.title}
                           </Text>
                           <div className={styles.recentDevlogsMeta}>
-                            <Tag
-                              color={getStatusColor(devlog.status)}
-                              icon={getStatusIcon(devlog.status)}
+                            <DevlogStatusTag
+                              status={devlog.status}
                               className={styles.devlogTag}
-                            >
-                              {devlog.status}
-                            </Tag>
-                            <Tag
-                              color={getPriorityColor(devlog.priority)}
-                              icon={getPriorityIcon(devlog.priority)}
+                            />
+                            <DevlogPriorityTag
+                              priority={devlog.priority}
                               className={styles.devlogTag}
-                            >
-                              {devlog.priority}
-                            </Tag>
+                            />
+                            <DevlogTypeTag
+                              type={devlog.type}
+                              className={styles.devlogTag}
+                            />
                           </div>
                         </div>
                       }

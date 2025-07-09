@@ -12,12 +12,7 @@ import {
   DevlogStats,
   DevlogType,
 } from '@devlog/types';
-import {
-  getPriorityColor,
-  getPriorityIcon,
-  getStatusColor,
-  getStatusIcon,
-} from '@/lib/devlog-ui-utils';
+import { DevlogStatusTag, DevlogPriorityTag, DevlogTypeTag } from '@/components';
 import { formatTimeAgoWithTooltip } from '@/lib/time-utils';
 import { OverviewStats } from '@/components';
 import styles from './DevlogList.module.css';
@@ -102,7 +97,6 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
             >
               {title}
             </Text>
-            <Tag color="blue">{record.type}</Tag>
           </div>
           <Text
             type="secondary"
@@ -119,22 +113,21 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       dataIndex: 'status',
       key: 'status',
       width: 120,
-      render: (status: DevlogStatus) => (
-        <Tag color={getStatusColor(status)} icon={getStatusIcon(status)}>
-          {status}
-        </Tag>
-      ),
+      render: (status: DevlogStatus) => <DevlogStatusTag status={status} />,
     },
     {
       title: 'Priority',
       dataIndex: 'priority',
       key: 'priority',
       width: 120,
-      render: (priority: DevlogPriority) => (
-        <Tag color={getPriorityColor(priority)} icon={getPriorityIcon(priority)}>
-          {priority}
-        </Tag>
-      ),
+      render: (priority: DevlogPriority) => <DevlogPriorityTag priority={priority} />,
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+      width: 120,
+      render: (type: DevlogType) => <DevlogTypeTag type={type} />,
     },
     {
       title: 'Assignee',

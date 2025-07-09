@@ -32,11 +32,11 @@
 ## Quick Reference Links
 
 📋 **Detailed Guidelines:**
-- [Devlog Workflow Guide](guides/devlog-workflow.md) - Detailed MCP operations and workflows
-- [Development Guidelines](guides/development-guidelines.md) - Development philosophy and practices
-- [Testing Guidelines](guides/testing-guidelines.md) - Testing best practices and file management
-- [Error Checking](guides/error-checking.md) - Error checking workflows and tools
-- [Git Workflow](guides/git-workflow.md) - Git operations using MCP tools
+- `guides/devlog-workflow.md` - Detailed MCP operations and workflows
+- `guides/development-guidelines.md` - Development philosophy and practices
+- `guides/testing-guidelines.md` - Testing best practices and file management
+- `guides/error-checking.md` - Error checking workflows and tools
+- `guides/git-workflow.md` - Git operations using MCP tools
 
 ## Essential SOPs
 

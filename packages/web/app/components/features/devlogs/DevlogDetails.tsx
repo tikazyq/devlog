@@ -22,12 +22,14 @@ import { EditableField, MarkdownRenderer } from '@/components/ui';
 import { formatTimeAgoWithTooltip } from '@/lib/time-utils';
 import styles from './DevlogDetails.module.css';
 import {
-  getPriorityColor,
-  getPriorityIcon,
-  getStatusColor,
-  getStatusIcon,
   getTypeIcon,
 } from '@/lib/devlog-ui-utils';
+import {
+  statusOptions,
+  priorityOptions,
+  typeOptions,
+} from '@/lib/devlog-options';
+import { DevlogStatusTag, DevlogPriorityTag, DevlogTypeTag } from '@/components';
 
 const { Title, Text } = Typography;
 
@@ -209,31 +211,6 @@ export function DevlogDetails({ devlog, onUpdate, onUnsavedChangesChange }: Devl
     }
   }, [hasUnsavedChanges, isSaving, saveError, onUnsavedChangesChange, handleSave, handleDiscard]);
 
-  const statusOptions = [
-    { label: 'New', value: 'new' },
-    { label: 'In Progress', value: 'in-progress' },
-    { label: 'Blocked', value: 'blocked' },
-    { label: 'In Review', value: 'in-preview' },
-    { label: 'Testing', value: 'testing' },
-    { label: 'Done', value: 'done' },
-    { label: 'Closed', value: 'closed' },
-  ];
-
-  const priorityOptions = [
-    { label: 'Low', value: 'low' },
-    { label: 'Medium', value: 'medium' },
-    { label: 'High', value: 'high' },
-    { label: 'Critical', value: 'critical' },
-  ];
-
-  const typeOptions = [
-    { label: 'Feature', value: 'feature' },
-    { label: 'Bug Fix', value: 'bugfix' },
-    { label: 'Task', value: 'task' },
-    { label: 'Refactor', value: 'refactor' },
-    { label: 'Documentation', value: 'docs' },
-  ];
-
   return (
     <div>
       <div className={styles.devlogDetailsHeader}>
@@ -259,14 +236,10 @@ export function DevlogDetails({ devlog, onUpdate, onUnsavedChangesChange }: Devl
               options={statusOptions}
               onSave={(value) => handleFieldChange('status', value)}
             >
-              <Tag
+              <DevlogStatusTag
+                status={getCurrentValue('status')}
                 className={styles.statusTag}
-                color={getStatusColor(getCurrentValue('status'))}
-                icon={getStatusIcon(getCurrentValue('status'))}
-              >
-                {statusOptions.find(({ value }) => getCurrentValue('status') === value)?.label ||
-                  getCurrentValue('status')}
-              </Tag>
+              />
             </EditableField>
             <EditableField
               key={`priority-${getCurrentValue('priority')}`}
@@ -276,14 +249,10 @@ export function DevlogDetails({ devlog, onUpdate, onUnsavedChangesChange }: Devl
               options={priorityOptions}
               onSave={(value) => handleFieldChange('priority', value)}
             >
-              <Tag
+              <DevlogPriorityTag
+                priority={getCurrentValue('priority')}
                 className={styles.statusTag}
-                color={getPriorityColor(getCurrentValue('priority'))}
-                icon={getPriorityIcon(getCurrentValue('priority'))}
-              >
-                {priorityOptions.find(({ value }) => getCurrentValue('priority') === value)
-                  ?.label || getCurrentValue('priority')}
-              </Tag>
+              />
             </EditableField>
             <EditableField
               key={`type-${getCurrentValue('type')}`}
@@ -293,14 +262,10 @@ export function DevlogDetails({ devlog, onUpdate, onUnsavedChangesChange }: Devl
               onSave={(value) => handleFieldChange('type', value)}
               options={typeOptions}
             >
-              <Tag
+              <DevlogTypeTag
+                type={getCurrentValue('type')}
                 className={styles.statusTag}
-                color="blue"
-                icon={getTypeIcon(getCurrentValue('type'))}
-              >
-                {typeOptions.find(({ value }) => getCurrentValue('type') === value)?.label ||
-                  getCurrentValue('type')}
-              </Tag>
+              />
             </EditableField>
           </Space>
 

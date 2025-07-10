@@ -83,7 +83,16 @@ class AIContextManager {
 
 ## Success Metrics
 
+### AI Agent Autonomy (Primary Goal)
+- **Human intervention rate** < 10% of total working time
+- **Autonomous task completion** > 90% success rate without human guidance
+- **Zero-touch operation time** - Measure continuous AI work periods without human attendance
+
+### AI Performance Indicators
 - Context rebuilding < 30% of session time
 - Problem resolution > 80% success rate
 - Knowledge reuse > 70% across sessions
 - Session estimates within ±1 actual sessions
+
+### Objective
+The ideal objective is that the AI agent can work and deliver as expected with no human interaction at all - the AI agent is working autonomously. Human interventions should be measured and minimized as the primary success indicator.

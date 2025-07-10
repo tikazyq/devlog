@@ -21,7 +21,7 @@ interface DevlogEntry {
   // AI-specific fields
   complexityEstimate?: 'trivial' | 'simple' | 'moderate' | 'complex' | 'research';
   contextRequirement?: 'local' | 'cross-file' | 'system-wide';
-  sessionEstimate?: number;           // Expected AI sessions (not hours)
+  expectedSessions?: number;          // Expected AI sessions (not hours)
   knowledgePrerequisites?: string[];  // What AI needs to know
   toolRequirements?: string[];        // Required AI tools
   uncertaintyLevel?: 'known' | 'exploratory' | 'research';
@@ -72,12 +72,21 @@ const context = await buildSessionContext(epicId);
 // }
 ```
 
-## 🎯 Key AI Success Metrics
+## 🎯 AI Success Metrics
 
+### AI Agent Autonomy (Primary Goal)
+- **Human intervention rate** < 10% of total working time
+- **Autonomous task completion** > 90% success rate without human guidance
+- **Zero-touch operation time** - Measure continuous AI work periods without human attendance
+
+### AI Performance Indicators
 - **Context Efficiency**: <30% of session time rebuilding context
 - **Resolution Rate**: >80% success on first attempt  
 - **Knowledge Reuse**: >70% context persistence between sessions
 - **Session Accuracy**: ±1 session from estimate
+
+### Objective
+The ideal objective is that the AI agent can work and deliver as expected with no human interaction at all - the AI agent is working autonomously. Human interventions should be measured and minimized as the primary success indicator.
 
 ## 🔧 Implementation Priority
 

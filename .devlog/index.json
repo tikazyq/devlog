@@ -341,8 +341,17 @@
       "priority": "medium",
       "createdAt": "2025-07-09T15:27:56.041Z",
       "updatedAt": "2025-07-09T15:32:43.746Z"
+    },
+    "42": {
+      "filename": "042-refactor-mcp-server-index-ts-by-extracting-tool-de.json",
+      "title": "Refactor MCP server index.ts by extracting tool definitions into separate modules",
+      "status": "done",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-07-10T01:41:48.741Z",
+      "updatedAt": "2025-07-10T01:49:12.450Z"
     }
   },
-  "lastId": 41,
+  "lastId": 42,
   "version": "1.0.0"
 }

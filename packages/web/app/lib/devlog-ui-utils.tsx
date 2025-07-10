@@ -7,7 +7,10 @@ import {
   ExclamationCircleOutlined,
   EyeOutlined,
   FileProtectOutlined,
+  InfoCircleOutlined,
   MinusCircleOutlined,
+  PlusOutlined,
+  StarOutlined,
   StopOutlined,
   SyncOutlined,
   ToolOutlined,
@@ -91,7 +94,7 @@ export const getPriorityIcon = (priority: string): React.ReactNode => {
     case 'high':
       return <WarningOutlined />;
     case 'medium':
-      return <MinusCircleOutlined />;
+      return <InfoCircleOutlined />;
     case 'low':
       return <CheckCircleOutlined />;
     default:
@@ -102,16 +105,16 @@ export const getPriorityIcon = (priority: string): React.ReactNode => {
 export const getTypeIcon = (type: DevlogType): React.ReactNode => {
   switch (type) {
     case 'feature':
-      return '✨';
+      return <StarOutlined />;
     case 'bugfix':
       return <BugOutlined />;
     case 'task':
-      return '📋';
+      return <CheckCircleOutlined />;
     case 'refactor':
       return <ToolOutlined />;
     case 'docs':
       return <BookOutlined />;
     default:
-      return '📝';
+      return <MinusCircleOutlined />;
   }
 };

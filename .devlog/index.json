@@ -300,11 +300,11 @@
     "37": {
       "filename": "037-refactor-editablefield-for-seamless-read-edit-ux-l.json",
       "title": "Refactor EditableField for seamless read/edit UX like Azure DevOps",
-      "status": "new",
+      "status": "done",
       "type": "refactor",
       "priority": "medium",
       "createdAt": "2025-07-09T13:09:17.875Z",
-      "updatedAt": "2025-07-09T14:20:42.561Z"
+      "updatedAt": "2025-07-10T13:18:24.829Z"
     },
     "38": {
       "filename": "038-implement-save-button-with-changed-flag-system-for.json",

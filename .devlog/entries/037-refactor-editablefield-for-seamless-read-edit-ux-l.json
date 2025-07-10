@@ -3,10 +3,10 @@
   "title": "Refactor EditableField for seamless read/edit UX like Azure DevOps",
   "type": "refactor",
   "description": "Improve the EditableField component UX to provide a seamless transition between read and edit modes, similar to Azure DevOps. Instead of completely swapping rendered content between states, implement a solution where the field can be focused and input like a native input while maintaining visual alignment with the read mode content. This will eliminate the jarring UX of content swapping and provide a more intuitive editing experience.",
-  "status": "new",
+  "status": "done",
   "priority": "medium",
   "createdAt": "2025-07-09T13:09:17.875Z",
-  "updatedAt": "2025-07-09T14:20:42.561Z",
+  "updatedAt": "2025-07-10T13:18:24.829Z",
   "notes": [
     {
       "id": "17ae39ca-4c1c-4dc9-8234-e6ebbf31129d",

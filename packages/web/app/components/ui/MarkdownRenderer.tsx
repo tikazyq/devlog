@@ -4,7 +4,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
-import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
+import { defaultSchema } from 'rehype-sanitize';
 import { Typography } from 'antd';
 import styles from './MarkdownRenderer.module.css';
 import { StickyHeadings } from './StickyHeadings';
@@ -23,8 +23,8 @@ const sanitizeSchema = {
   },
   tagNames: [
     ...(defaultSchema.tagNames || []),
-    'span' // Ensure span is allowed for syntax highlighting
-  ]
+    'span', // Ensure span is allowed for syntax highlighting
+  ],
 };
 
 /**
@@ -54,7 +54,7 @@ interface MarkdownRendererProps {
   content: string;
   className?: string;
   preserveLineBreaks?: boolean; // If true, handles escaped newlines and converts single line breaks to paragraphs
-  maxHeight?: number; // Optional max height for the content
+  maxHeight?: number | boolean; // Optional max height for the content
   enableStickyHeadings?: boolean; // Enable sticky headings feature
   stickyHeadingsTopOffset?: number; // Top offset for sticky headings
 }
@@ -74,14 +74,16 @@ export function MarkdownRenderer({
   // Preprocess content to handle single line breaks
   const processedContent = preserveLineBreaks ? preprocessContent(content) : content;
   const combinedClassName = `${styles.markdownRenderer} ${className || ''}`.trim();
-  const wrapperClassName = maxHeight ? `${combinedClassName} ${styles.markdownRendererScrollable} thin-scrollbar-vertical` : combinedClassName;
+  const wrapperClassName = maxHeight
+    ? `${combinedClassName} ${styles.markdownRendererScrollable} thin-scrollbar-vertical`
+    : combinedClassName;
 
   const markdownContent = (
     <div className={wrapperClassName}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[
-          rehypeHighlight
+          rehypeHighlight,
           // Temporarily removing sanitization to test
           // [rehypeSanitize, sanitizeSchema]
         ]}
@@ -100,12 +102,16 @@ export function MarkdownRenderer({
               return <Text code>{children}</Text>;
             }
             // For code blocks, let ReactMarkdown handle the structure with rehypeHighlight
-            return <code className={codeClassName} {...props}>{children}</code>;
+            return (
+              <code className={codeClassName} {...props}>
+                {children}
+              </code>
+            );
           },
           pre: ({ children, className, ...props }) => {
             // Check if the pre element itself has language information
             let language = '';
-            
+
             // First, check if pre has className
             if (className) {
               const match = className.match(/language-(\w+)/);
@@ -113,7 +119,7 @@ export function MarkdownRenderer({
                 language = match[1];
               }
             }
-            
+
             // If not found on pre, check children
             if (!language) {
               React.Children.forEach(children, (child) => {
@@ -132,13 +138,19 @@ export function MarkdownRenderer({
                   <div className={styles.codeBlockHeader}>
                     <span className={styles.codeBlockLanguage}>{language}</span>
                   </div>
-                  <pre className={className} {...props}>{children}</pre>
+                  <pre className={className} {...props}>
+                    {children}
+                  </pre>
                 </div>
               );
             }
 
             // Fallback to regular pre if no language detected
-            return <pre className={className} {...props}>{children}</pre>;
+            return (
+              <pre className={className} {...props}>
+                {children}
+              </pre>
+            );
           },
           blockquote: ({ children }) => <blockquote>{children}</blockquote>,
           ul: ({ children }) => <ul>{children}</ul>,

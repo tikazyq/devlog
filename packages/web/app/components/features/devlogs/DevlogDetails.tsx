@@ -753,7 +753,7 @@ export function DevlogDetails({
               {[...devlog.notes].reverse().map((note) => (
                 <Timeline.Item key={note.id} dot={getCategoryIcon(note.category)}>
                   <div className={styles.noteItem}>
-                    <MarkdownRenderer content={note.content} />
+                    <MarkdownRenderer content={note.content} maxHeight={false} />
                   </div>
                   <Text type="secondary" className={styles.noteTimestamp}>
                     <span title={formatTimeAgoWithTooltip(note.timestamp).fullDate}>

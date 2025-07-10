@@ -3,10 +3,10 @@
   "title": "Fix WebSocket implementation for real-time data synchronization in @devlog/web",
   "type": "bugfix",
   "description": "The current WebSocket implementation is not functional - the WS endpoint returns 501 error and doesn't work with Next.js App Router. Need to implement proper real-time data synchronization between frontend and backend so that when devlog data is updated (create/update/delete operations), all connected clients automatically receive the latest data without manual refresh.",
-  "status": "testing",
-  "priority": "high",
+  "status": "done",
+  "priority": "medium",
   "createdAt": "2025-07-10T09:34:57.346Z",
-  "updatedAt": "2025-07-10T09:48:33.748Z",
+  "updatedAt": "2025-07-10T10:01:07.526Z",
   "notes": [
     {
       "id": "d4726f71-ed70-4775-91cf-e64745c10aaf",

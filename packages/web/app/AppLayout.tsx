@@ -17,7 +17,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
   
-  const { devlogs, error, connected, refetch } = useDevlogs();
+  const { devlogs, error, connected } = useDevlogs();
 
   // Handle client-side hydration
   useEffect(() => {
@@ -56,7 +56,6 @@ export function AppLayout({ children }: AppLayoutProps) {
         <Layout>
           <Header
             connected={connected}
-            onRefresh={refetch}
             sidebarCollapsed={sidebarCollapsed}
             onSidebarToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
           />

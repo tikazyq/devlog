@@ -372,13 +372,22 @@
     "45": {
       "filename": "045-fix-websocket-implementation-for-real-time-data-sy.json",
       "title": "Fix WebSocket implementation for real-time data synchronization in @devlog/web",
-      "status": "testing",
+      "status": "done",
       "type": "bugfix",
-      "priority": "high",
+      "priority": "medium",
       "createdAt": "2025-07-10T09:34:57.346Z",
-      "updatedAt": "2025-07-10T09:48:33.748Z"
+      "updatedAt": "2025-07-10T10:01:07.526Z"
+    },
+    "46": {
+      "filename": "046-remove-manual-refresh-button-from-header-redundant.json",
+      "title": "Remove manual Refresh button from header - redundant with SSE real-time updates",
+      "status": "done",
+      "type": "refactor",
+      "priority": "low",
+      "createdAt": "2025-07-10T09:53:21.609Z",
+      "updatedAt": "2025-07-10T09:55:56.860Z"
     }
   },
-  "lastId": 45,
+  "lastId": 46,
   "version": "1.0.0"
 }

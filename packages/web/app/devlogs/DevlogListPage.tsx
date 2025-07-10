@@ -2,14 +2,14 @@
 
 import React from 'react';
 import { Button, Space } from 'antd';
-import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { DevlogList, PageLayout } from '@/components';
 import { useDevlogs } from '@/hooks/useDevlogs';
 import { DevlogEntry, DevlogId } from '@devlog/types';
 import { useRouter } from 'next/navigation';
 
 export function DevlogListPage() {
-  const { devlogs, loading, deleteDevlog, refetch } = useDevlogs();
+  const { devlogs, loading, deleteDevlog } = useDevlogs();
   const router = useRouter();
 
   const handleViewDevlog = (devlog: DevlogEntry) => {
@@ -28,19 +28,8 @@ export function DevlogListPage() {
     router.push('/devlogs/create');
   };
 
-  const handleRefresh = () => {
-    refetch();
-  };
-
   const actions = (
     <Space>
-      <Button 
-        icon={<ReloadOutlined />} 
-        onClick={handleRefresh}
-        disabled={loading}
-      >
-        Refresh
-      </Button>
       <Button 
         type="primary" 
         icon={<PlusOutlined />} 

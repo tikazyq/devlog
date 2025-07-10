@@ -84,7 +84,6 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
       title: 'Title',
       dataIndex: 'title',
       key: 'title',
-      fixed: 'left',
       width: 400,
       render: (title: string, record: DevlogEntry) => (
         <>

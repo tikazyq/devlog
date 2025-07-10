@@ -93,15 +93,17 @@ export function DevlogList({ devlogs, loading, onViewDevlog, onDeleteDevlog }: D
               strong
               className={styles.devlogTitle}
               onClick={() => onViewDevlog(record)}
-              ellipsis={{ tooltip: title }}
+              ellipsis={true}
+              title={record.title}
             >
               {title}
             </Text>
           </div>
           <Text
             type="secondary"
-            ellipsis={{ tooltip: record.description }}
             className={styles.devlogDescription}
+            ellipsis={true}
+            title={record.description}
           >
             {record.description}
           </Text>

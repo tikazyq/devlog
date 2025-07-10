@@ -141,7 +141,7 @@ export function EditableField({
           onChange={(newValue) => {
             setEditValue(newValue);
           }}
-          style={{ width: '100%' }}
+          style={{ width: '100%', borderRadius: '4px', height: '32px' }}
           variant="borderless"
         >
           {options.map((option) => (
@@ -172,7 +172,9 @@ export function EditableField({
 
   if (isEditing) {
     return (
-      <div className={`${styles.editableField} ${styles.editing} ${className}`}>
+      <div
+        className={`${styles.editableField} ${styles.editing} ${className} ${type === 'select' ? styles.isSelect : ''}`}
+      >
         {renderInput()}
       </div>
     );

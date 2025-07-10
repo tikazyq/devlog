@@ -350,8 +350,26 @@
       "priority": "medium",
       "createdAt": "2025-07-10T01:41:48.741Z",
       "updatedAt": "2025-07-10T01:49:12.450Z"
+    },
+    "43": {
+      "filename": "043-use-timeline-icons-for-note-categories-in-devlogde.json",
+      "title": "Use timeline icons for note categories in DevlogDetails",
+      "status": "done",
+      "type": "feature",
+      "priority": "medium",
+      "createdAt": "2025-07-10T09:02:55.150Z",
+      "updatedAt": "2025-07-10T09:11:59.763Z"
+    },
+    "44": {
+      "filename": "044-add-tooltips-to-timeline-icons-for-note-categories.json",
+      "title": "Add tooltips to timeline icons for note categories",
+      "status": "done",
+      "type": "feature",
+      "priority": "medium",
+      "createdAt": "2025-07-10T09:13:16.394Z",
+      "updatedAt": "2025-07-10T09:15:14.302Z"
     }
   },
-  "lastId": 42,
+  "lastId": 44,
   "version": "1.0.0"
 }

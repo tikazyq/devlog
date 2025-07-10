@@ -173,7 +173,7 @@ export function MarkdownEditor({
 
             // Update the container height directly to avoid re-renders
             if (editorRef.current) {
-              editorRef.current.style.height = height + 12 + 'px';
+              editorRef.current.style.height = height + 18 + 'px';
             }
             editor.layout();
           }

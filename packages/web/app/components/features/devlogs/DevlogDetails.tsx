@@ -23,6 +23,7 @@ import { EditableField, MarkdownRenderer } from '@/components/ui';
 import { formatTimeAgoWithTooltip } from '@/lib/time-utils';
 import styles from './DevlogDetails.module.css';
 import { getTypeIcon } from '@/lib/devlog-ui-utils';
+import { getCategoryIcon } from '@/lib/note-utils';
 import { statusOptions, priorityOptions, typeOptions } from '@/lib/devlog-options';
 import { DevlogStatusTag, DevlogPriorityTag, DevlogTypeTag } from '@/components';
 
@@ -744,12 +745,11 @@ export function DevlogDetails({
             </Title>
             <Timeline>
               {[...devlog.notes].reverse().map((note) => (
-                <Timeline.Item key={note.id}>
+                <Timeline.Item key={note.id} dot={getCategoryIcon(note.category)}>
                   <div className={styles.noteItem}>
                     <MarkdownRenderer content={note.content} />
                   </div>
                   <Text type="secondary" className={styles.noteTimestamp}>
-                    {note.category} •{' '}
                     <span title={formatTimeAgoWithTooltip(note.timestamp).fullDate}>
                       {formatTimeAgoWithTooltip(note.timestamp).timeAgo}
                     </span>

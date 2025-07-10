@@ -23,7 +23,17 @@
   border-color: #1677ff;
   cursor: text;
   background-color: transparent;
+}
+
+.editableField.editing {
   padding: 4px;
+}
+
+.editableField.isSelect {
+  padding: 0 !important;
+  height: 32px;
+  display: flex;
+  align-items: center;
 }
 
 .editableField.editing:hover {

@@ -431,8 +431,17 @@
       "priority": "critical",
       "createdAt": "2025-07-10T14:03:27.126Z",
       "updatedAt": "2025-07-10T14:05:22.947Z"
+    },
+    "52": {
+      "filename": "052-design-project-epic-management-feature-for-large-c.json",
+      "title": "Design Project/Epic Management Feature for Large Complex Projects",
+      "status": "in-progress",
+      "type": "feature",
+      "priority": "high",
+      "createdAt": "2025-07-10T15:36:29.869Z",
+      "updatedAt": "2025-07-10T16:25:13.150Z"
     }
   },
-  "lastId": 51,
+  "lastId": 52,
   "version": "1.0.0"
 }

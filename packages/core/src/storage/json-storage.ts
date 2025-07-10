@@ -217,7 +217,6 @@ export class JsonStorageProvider implements StorageProvider {
 
   private async loadIndex(): Promise<DevlogIndex> {
     try {
-      console.debug('Loading devlog index from', this.indexPath);
       const content = await fs.readFile(this.indexPath, 'utf-8');
       return JSON.parse(content);
     } catch {

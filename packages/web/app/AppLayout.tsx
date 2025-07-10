@@ -24,7 +24,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     setMounted(true);
   }, []);
 
-  // Fetch stats
+  // Fetch stats on mount and when devlogs count changes significantly
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -39,7 +39,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     };
 
     fetchStats();
-  }, [devlogs]);
+  }, [devlogs.length]); // Only refetch when count changes, not when individual items change
 
   // Prevent hydration mismatch by not rendering until mounted
   if (!mounted) {

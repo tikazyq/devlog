@@ -12,26 +12,6 @@
 .markdownRendererScrollable {
   max-height: 480px;
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #d9d9d9 transparent;
-}
-
-.markdownRendererScrollable::-webkit-scrollbar {
-  width: 6px;
-}
-
-.markdownRendererScrollable::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.markdownRendererScrollable::-webkit-scrollbar-thumb {
-  background-color: #d9d9d9;
-  border-radius: 3px;
-  transition: background-color 0.2s ease;
-}
-
-.markdownRendererScrollable::-webkit-scrollbar-thumb:hover {
-  background-color: #bfbfbf;
 }
 
 

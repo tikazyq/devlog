@@ -54,7 +54,7 @@ export function DevlogDetails({
     return (
       <div>
         <div className={styles.devlogDetailsHeader}>
-          <div className={styles.devlogTitleWrapper}>
+          <div className={`${styles.devlogTitleWrapper} thin-scrollbar-horizontal`}>
             <Skeleton.Input
               style={{ width: '60%', height: '32px', marginBottom: '16px' }}
               active
@@ -281,7 +281,7 @@ export function DevlogDetails({
           value={getCurrentValue('title')}
           onSave={(value) => handleFieldChange('title', value)}
           placeholder="Enter title"
-          className={`${isFieldChanged('title') ? styles.fieldChanged : ''} ${styles.devlogTitleWrapper}`}
+          className={`${isFieldChanged('title') ? styles.fieldChanged : ''} ${styles.devlogTitleWrapper} thin-scrollbar-horizontal`}
         >
           <Title level={2} className={styles.devlogTitle}>
             {getCurrentValue('title')}

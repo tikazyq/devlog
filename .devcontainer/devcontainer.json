@@ -7,19 +7,14 @@
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
 		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
-		"ghcr.io/devcontainers/features/common-utils:2": {
-			"installZsh": true,
-			"installOhMyZsh": true,
-			"upgradePackages": true
-		}
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [3000, 3001, 5000, 5173, 8080],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "npm install -g pnpm@10.12.1 && pnpm install && pnpm build:types && apt-get update && apt-get install -y vim",
+	"postCreateCommand": "npm install -g pnpm@10.12.1 && pnpm install && pnpm build:types",
 
 	// Configure tool-specific properties.
 	"customizations": {
@@ -35,7 +30,8 @@
 				"github.copilot",
 				"github.copilot-chat",
 				"ms-vscode.test-adapter-converter",
-				"vscodevim.vim"
+				"vscodevim.vim",
+				"k--kato.intellij-idea-keybindings"
 			],
 			"settings": {
 				"typescript.updateImportsOnFileMove.enabled": "always",

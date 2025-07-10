@@ -33,12 +33,52 @@
 .markdownRenderer pre {
   background: #f6f8fa;
   padding: 16px;
-  border-radius: 6px;
+  border-radius: 0 0 6px 6px;
   overflow: auto;
   font-size: 14px;
   line-height: 1.45;
   border: 1px solid #e1e4e8;
+  border-top: none;
   margin-bottom: 12px;
+}
+
+.codeBlockWrapper {
+  margin-bottom: 12px;
+}
+
+.codeBlockWrapper pre {
+  margin-bottom: 0;
+}
+
+.codeBlockHeader {
+  background: #f1f3f4;
+  border: 1px solid #e1e4e8;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.codeBlockLanguage {
+  color: #586069;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Consolas', monospace;
+}
+
+/* Fallback for code blocks without language header */
+.markdownRenderer pre:not(.codeBlockWrapper pre) {
+  border-radius: 6px;
+  border: 1px solid #e1e4e8;
+}
+
+.markdownRenderer pre code {
+  background: transparent;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  font-size: 14px;
 }
 
 .markdownRenderer code {

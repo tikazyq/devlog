@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, Checkbox, List, Space, Tag, Timeline, Typography, Skeleton } from 'antd';
 import {
+  ApartmentOutlined,
   BulbOutlined,
   CheckCircleOutlined,
   CommentOutlined,
@@ -668,13 +669,19 @@ export function DevlogDetails({ devlog, loading = false, onUpdate, onUnsavedChan
               {devlog.aiContext.relatedPatterns && devlog.aiContext.relatedPatterns.length > 0 && (
                 <div className={styles.aiSection}>
                   <Text strong>Related Patterns:</Text>
-                  <Space wrap className={styles.aiPatterns}>
-                    {devlog.aiContext.relatedPatterns.map((pattern, index) => (
-                      <Tag key={index} color="geekblue">
-                        {pattern}
-                      </Tag>
-                    ))}
-                  </Space>
+                  <List
+                    size="small"
+                    style={{ marginTop: '8px' }}
+                    dataSource={devlog.aiContext.relatedPatterns}
+                    renderItem={(pattern) => (
+                      <List.Item className={styles.aiPatternItem}>
+                        <Space align="start">
+                          <ApartmentOutlined style={{ color: '#722ed1', marginTop: '2px' }} />
+                          <Text>{pattern}</Text>
+                        </Space>
+                      </List.Item>
+                    )}
+                  />
                 </div>
               )}
 

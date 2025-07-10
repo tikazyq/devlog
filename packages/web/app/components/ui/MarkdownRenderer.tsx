@@ -4,20 +4,38 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
-import rehypeSanitize from 'rehype-sanitize';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import { Typography } from 'antd';
 import styles from './MarkdownRenderer.module.css';
 
 const { Text } = Typography;
 
+// Custom sanitize schema that allows syntax highlighting attributes
+const sanitizeSchema = {
+  ...defaultSchema,
+  attributes: {
+    ...defaultSchema.attributes,
+    code: [...(defaultSchema.attributes?.code || []), 'className'],
+    span: [...(defaultSchema.attributes?.span || []), 'className', 'style'],
+    div: [...(defaultSchema.attributes?.div || []), 'className'],
+    pre: [...(defaultSchema.attributes?.pre || []), 'className'],
+  },
+  tagNames: [
+    ...(defaultSchema.tagNames || []),
+    'span' // Ensure span is allowed for syntax highlighting
+  ]
+};
+
 /**
  * Preprocesses markdown content to handle single line breaks from LLMs
- * Converts single line breaks to double line breaks for proper markdown rendering
+ * and escaped newlines from JSON storage
  */
 function preprocessContent(content: string): string {
   return (
     content
-      // First, protect code blocks from processing
+      // First, handle escaped newlines from JSON storage
+      .replace(/\\n/g, '\n')
+      // Then protect code blocks from processing
       .replace(/(```[\s\S]*?```)/g, (match) => {
         // Replace newlines in code blocks with a placeholder
         return match.replace(/\n/g, '__CODE_NEWLINE__');
@@ -34,7 +52,7 @@ function preprocessContent(content: string): string {
 interface MarkdownRendererProps {
   content: string;
   className?: string;
-  preserveLineBreaks?: boolean;
+  preserveLineBreaks?: boolean; // If true, handles escaped newlines and converts single line breaks to paragraphs
 }
 
 export function MarkdownRenderer({
@@ -54,7 +72,11 @@ export function MarkdownRenderer({
     <div className={combinedClassName}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeHighlight, rehypeSanitize]}
+        rehypePlugins={[
+          rehypeHighlight
+          // Temporarily removing sanitization to test
+          // [rehypeSanitize, sanitizeSchema]
+        ]}
         components={{
           // Use simple div and let CSS handle styling
           p: ({ children }) => <p>{children}</p>,
@@ -69,13 +91,46 @@ export function MarkdownRenderer({
             if (isInline) {
               return <Text code>{children}</Text>;
             }
-            return (
-              <pre>
-                <code className={codeClassName} {...props}>
-                  {children}
-                </code>
-              </pre>
-            );
+            // For code blocks, let ReactMarkdown handle the structure with rehypeHighlight
+            return <code className={codeClassName} {...props}>{children}</code>;
+          },
+          pre: ({ children, className, ...props }) => {
+            // Check if the pre element itself has language information
+            let language = '';
+            
+            // First, check if pre has className
+            if (className) {
+              const match = className.match(/language-(\w+)/);
+              if (match) {
+                language = match[1];
+              }
+            }
+            
+            // If not found on pre, check children
+            if (!language) {
+              React.Children.forEach(children, (child) => {
+                if (React.isValidElement(child) && child.props?.className) {
+                  const match = child.props.className.match(/language-(\w+)/);
+                  if (match) {
+                    language = match[1];
+                  }
+                }
+              });
+            }
+
+            if (language) {
+              return (
+                <div className={styles.codeBlockWrapper}>
+                  <div className={styles.codeBlockHeader}>
+                    <span className={styles.codeBlockLanguage}>{language}</span>
+                  </div>
+                  <pre className={className} {...props}>{children}</pre>
+                </div>
+              );
+            }
+
+            // Fallback to regular pre if no language detected
+            return <pre className={className} {...props}>{children}</pre>;
           },
           blockquote: ({ children }) => <blockquote>{children}</blockquote>,
           ul: ({ children }) => <ul>{children}</ul>,

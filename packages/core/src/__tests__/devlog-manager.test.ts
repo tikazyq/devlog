@@ -8,8 +8,12 @@ import * as os from 'os';
 describe('DevlogManager', () => {
   let manager: DevlogManager;
   let testTmpDir: string;
+  let originalCwd: string;
 
   beforeEach(async () => {
+    // Store original working directory
+    originalCwd = process.cwd();
+    
     // Create a unique temporary directory for each test
     testTmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'devlog-test-'));
     
@@ -32,14 +36,18 @@ describe('DevlogManager', () => {
       JSON.stringify(testConfig, null, 2)
     );
     
-    // Change to the test directory so DevlogManager finds our test config
-    const originalCwd = process.cwd();
+    // Change to the test directory BEFORE creating DevlogManager
+    // This ensures getWorkspaceRoot() finds our test directory
     process.chdir(testTmpDir);
     
-    // Create isolated DevlogManager instance
+    // Create isolated DevlogManager instance - this will now find our test config
     manager = new DevlogManager();
     
-    // Restore original working directory after manager is created
+    // IMPORTANT: Initialize the manager while still in test directory
+    // This ensures ConfigurationManager.initialize() captures the correct workspace root
+    await manager.initialize();
+    
+    // Now we can safely restore the original working directory
     process.chdir(originalCwd);
     
     // DO NOT DELETE ENTRIES - The temp directory should start clean
@@ -47,6 +55,9 @@ describe('DevlogManager', () => {
   });
 
   afterEach(async () => {
+    // Ensure we're back in original directory
+    process.chdir(originalCwd);
+    
     // Clean up the temporary directory after each test
     if (testTmpDir) {
       await fs.rm(testTmpDir, { recursive: true, force: true });

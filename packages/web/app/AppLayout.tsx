@@ -5,7 +5,6 @@ import { Alert, Layout } from 'antd';
 import { DevlogStats } from '@devlog/types';
 import { NavigationSidebar, Header, ErrorBoundary, AppLayoutSkeleton } from '@/components';
 import { useDevlogs } from '@/hooks/useDevlogs';
-import { useWebSocket } from '@/hooks/useWebSocket';
 
 const { Content } = Layout;
 
@@ -18,8 +17,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
   
-  const { devlogs, error, refetch } = useDevlogs();
-  const { connected } = useWebSocket();
+  const { devlogs, error, connected, refetch } = useDevlogs();
 
   // Handle client-side hydration
   useEffect(() => {

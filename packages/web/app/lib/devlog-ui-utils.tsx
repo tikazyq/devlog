@@ -23,20 +23,20 @@ import { DevlogPriority, DevlogStatus, DevlogType } from '@devlog/types';
  */
 export const getStatusColor = (status: DevlogStatus): string => {
   switch (status) {
-    case 'done':
-      return 'success';
+    case 'new':
+      return 'geekblue';
     case 'in-progress':
       return 'processing';
     case 'blocked':
       return 'error';
     case 'in-review':
-      return 'warning';
+      return 'orange';
     case 'testing':
       return 'cyan';
+    case 'done':
+      return 'success';
     case 'closed':
       return 'default';
-    case 'new':
-      return 'purple';
     default:
       return 'default';
   }

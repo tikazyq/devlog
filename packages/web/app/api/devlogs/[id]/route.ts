@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDevlogManager } from '../../../lib/devlog-manager';
+import { broadcastUpdate } from '@/lib/sse-manager';
+
+// Mark this route as dynamic to prevent static generation
+export const dynamic = 'force-dynamic';
 
 function parseDevlogId(idParam: string): number {
   const id = parseInt(idParam, 10);
@@ -42,6 +46,10 @@ export async function PUT(
     const id = parseDevlogId(params.id);
     const data = await request.json();
     const devlog = await devlogManager.updateDevlog({ ...data, id });
+    
+    // Broadcast the updated devlog to all connected clients
+    broadcastUpdate('devlog-updated', devlog);
+    
     return NextResponse.json(devlog);
   } catch (error) {
     console.error('Error updating devlog:', error);
@@ -59,6 +67,10 @@ export async function DELETE(
 
     const id = parseDevlogId(params.id);
     await devlogManager.deleteDevlog(id);
+    
+    // Broadcast the deletion to all connected clients
+    broadcastUpdate('devlog-deleted', { id });
+    
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting devlog:', error);

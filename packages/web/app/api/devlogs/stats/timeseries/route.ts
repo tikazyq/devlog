@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDevlogManager } from '../../../../lib/devlog-manager';
 
+// Mark this route as dynamic to prevent static generation
+export const dynamic = 'force-dynamic';
+
 // GET /api/devlogs/stats/timeseries - Get time series statistics for dashboard charts
 export async function GET(request: NextRequest) {
   try {

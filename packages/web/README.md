@@ -6,7 +6,7 @@ Web interface for devlog management - A modern dashboard for tracking developmen
 
 - 📊 **Dashboard** - Overview of development progress with statistics
 - 📝 **Devlog Management** - Create, edit, and delete development logs
-- 🔄 **Real-time Updates** - WebSocket connection for live updates
+- 🔄 **Real-time Updates** - Server-Sent Events (SSE) connection for live updates
 - 🎨 **Modern UI** - Built with React and Tailwind CSS
 - 📱 **Responsive Design** - Works on desktop and mobile devices
 
@@ -67,11 +67,34 @@ The web package consists of two main parts:
 - `GET /api/devlogs/stats/overview` - Get overview statistics
 - `POST /api/devlogs/:id/notes` - Add note to devlog
 
-## WebSocket Events
+## Server-Sent Events (SSE)
 
-- `subscribe` - Subscribe to updates for a channel
-- `unsubscribe` - Unsubscribe from a channel
-- `update` - Broadcast when devlogs are updated
+Real-time updates are implemented using Server-Sent Events instead of WebSockets for better compatibility with Next.js App Router.
+
+### Events
+
+- `connected` - Client successfully connected to SSE stream
+- `devlog-created` - New devlog entry was created
+- `devlog-updated` - Existing devlog entry was updated  
+- `devlog-deleted` - Devlog entry was deleted
+
+### Usage
+
+```typescript
+import { useServerSentEvents } from '@/hooks/useServerSentEvents';
+
+function MyComponent() {
+  const { connected, subscribe } = useServerSentEvents();
+  
+  useEffect(() => {
+    subscribe('devlog-updated', (devlog) => {
+      console.log('Devlog updated:', devlog);
+    });
+  }, [subscribe]);
+  
+  return <div>Connected: {connected}</div>;
+}
+```
 
 ## Environment Variables
 

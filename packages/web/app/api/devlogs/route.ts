@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDevlogManager } from '@/lib/devlog-manager';
+import { broadcastUpdate } from '@/lib/sse-manager';
+
+// Mark this route as dynamic to prevent static generation
+export const dynamic = 'force-dynamic';
 
 // GET /api/devlogs - List all devlogs
 export async function GET(request: NextRequest) {
@@ -29,6 +33,10 @@ export async function POST(request: NextRequest) {
 
     const data = await request.json();
     const devlog = await devlogManager.createDevlog(data);
+    
+    // Broadcast the new devlog to all connected clients
+    broadcastUpdate('devlog-created', devlog);
+    
     return NextResponse.json(devlog, { status: 201 });
   } catch (error) {
     console.error('Error creating devlog:', error);

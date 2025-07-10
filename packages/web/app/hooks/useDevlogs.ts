@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { DevlogEntry, DevlogId } from '@devlog/types';
+import { useServerSentEvents } from './useServerSentEvents';
 
 export function useDevlogs() {
   const [devlogs, setDevlogs] = useState<DevlogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { connected, subscribe, unsubscribe } = useServerSentEvents();
 
   const fetchDevlogs = async () => {
     try {
@@ -23,6 +25,38 @@ export function useDevlogs() {
     }
   };
 
+  // Set up real-time event listeners
+  useEffect(() => {
+    const handleDevlogCreated = (newDevlog: DevlogEntry) => {
+      setDevlogs(current => [newDevlog, ...current]);
+    };
+
+    const handleDevlogUpdated = (updatedDevlog: DevlogEntry) => {
+      setDevlogs(current => 
+        current.map(devlog => 
+          devlog.id === updatedDevlog.id ? updatedDevlog : devlog
+        )
+      );
+    };
+
+    const handleDevlogDeleted = (deletedData: { id: DevlogId }) => {
+      setDevlogs(current => 
+        current.filter(devlog => devlog.id !== deletedData.id)
+      );
+    };
+
+    // Subscribe to real-time events
+    subscribe('devlog-created', handleDevlogCreated);
+    subscribe('devlog-updated', handleDevlogUpdated);
+    subscribe('devlog-deleted', handleDevlogDeleted);
+
+    return () => {
+      unsubscribe('devlog-created');
+      unsubscribe('devlog-updated');
+      unsubscribe('devlog-deleted');
+    };
+  }, [subscribe, unsubscribe]);
+
   const createDevlog = async (data: Partial<DevlogEntry>) => {
     const response = await fetch('/api/devlogs', {
       method: 'POST',
@@ -36,7 +70,8 @@ export function useDevlogs() {
       throw new Error('Failed to create devlog');
     }
 
-    await fetchDevlogs();
+    // No need to refetch - the SSE will handle the update
+    return await response.json();
   };
 
   const updateDevlog = async (data: Partial<DevlogEntry> & { id: DevlogId }) => {
@@ -52,7 +87,8 @@ export function useDevlogs() {
       throw new Error('Failed to update devlog');
     }
 
-    await fetchDevlogs();
+    // No need to refetch - the SSE will handle the update
+    return await response.json();
   };
 
   const deleteDevlog = async (id: DevlogId) => {
@@ -64,7 +100,7 @@ export function useDevlogs() {
       throw new Error('Failed to delete devlog');
     }
 
-    await fetchDevlogs();
+    // No need to refetch - the SSE will handle the update
   };
 
   useEffect(() => {
@@ -75,6 +111,7 @@ export function useDevlogs() {
     devlogs,
     loading,
     error,
+    connected,
     refetch: fetchDevlogs,
     createDevlog,
     updateDevlog,

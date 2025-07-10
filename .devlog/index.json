@@ -368,8 +368,17 @@
       "priority": "medium",
       "createdAt": "2025-07-10T09:13:16.394Z",
       "updatedAt": "2025-07-10T09:15:14.302Z"
+    },
+    "45": {
+      "filename": "045-fix-websocket-implementation-for-real-time-data-sy.json",
+      "title": "Fix WebSocket implementation for real-time data synchronization in @devlog/web",
+      "status": "testing",
+      "type": "bugfix",
+      "priority": "high",
+      "createdAt": "2025-07-10T09:34:57.346Z",
+      "updatedAt": "2025-07-10T09:48:33.748Z"
     }
   },
-  "lastId": 44,
+  "lastId": 45,
   "version": "1.0.0"
 }

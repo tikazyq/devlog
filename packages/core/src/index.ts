@@ -10,6 +10,7 @@ export { SQLiteStorageProvider } from './storage/sqlite-storage.js';
 export { JsonStorageProvider } from './storage/json-storage.js';
 export { PostgreSQLStorageProvider } from './storage/postgresql-storage.js';
 export { MySQLStorageProvider } from './storage/mysql-storage.js';
+export { GitHubStorageProvider } from './storage/github-storage.js';
 export { EnterpriseSync } from './integrations/enterprise-sync.js';
 
 // Re-export types for convenience
@@ -35,6 +36,9 @@ export type {
   AdoConfig,
   GitHubConfig,
   SlackConfig,
+  GitHubStorageConfig,
+  StorageConfig,
+  StorageType,
 } from '@devlog/types';
 
 // Utilities

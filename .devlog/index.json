@@ -408,11 +408,11 @@
     "49": {
       "filename": "049-implement-github-issues-storage-provider.json",
       "title": "Implement GitHub Issues Storage Provider",
-      "status": "in-progress",
+      "status": "done",
       "type": "feature",
       "priority": "high",
       "createdAt": "2025-07-10T13:32:52.345Z",
-      "updatedAt": "2025-07-10T13:36:14.127Z"
+      "updatedAt": "2025-07-10T14:53:59.431Z"
     },
     "50": {
       "filename": "050-fix-devlogdetails-sticky-headings-hierarchy-struct.json",

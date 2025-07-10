@@ -408,11 +408,11 @@
     "49": {
       "filename": "049-implement-github-issues-storage-provider.json",
       "title": "Implement GitHub Issues Storage Provider",
-      "status": "in-progress",
+      "status": "done",
       "type": "feature",
       "priority": "high",
       "createdAt": "2025-07-10T13:32:52.345Z",
-      "updatedAt": "2025-07-10T13:36:14.127Z"
+      "updatedAt": "2025-07-10T14:53:59.431Z"
     },
     "50": {
       "filename": "050-fix-devlogdetails-sticky-headings-hierarchy-struct.json",
@@ -440,8 +440,17 @@
       "priority": "high",
       "createdAt": "2025-07-10T15:36:29.869Z",
       "updatedAt": "2025-07-10T16:25:13.150Z"
+    },
+    "79": {
+      "filename": "079-complete-test-isolation-fix-prevent-test-contamina.json",
+      "title": "Complete test isolation fix - prevent test contamination of real devlog data",
+      "status": "done",
+      "type": "bugfix",
+      "priority": "high",
+      "createdAt": "2025-07-10T15:11:15.344Z",
+      "updatedAt": "2025-07-10T15:17:15.866Z"
     }
   },
-  "lastId": 52,
+  "lastId": 79,
   "version": "1.0.0"
 }

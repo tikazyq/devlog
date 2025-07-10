@@ -1,16 +1,67 @@
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, afterEach, describe, expect, it } from 'vitest';
 import { DevlogManager } from '../devlog-manager.js';
+import { ConfigurationManager } from '../configuration-manager.js';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import * as os from 'os';
 
 describe('DevlogManager', () => {
   let manager: DevlogManager;
-
-  beforeAll(async () => {
-    process.env['UNIT_TEST'] = 'true';
-  });
+  let testTmpDir: string;
+  let originalCwd: string;
 
   beforeEach(async () => {
-    // Create isolated storage config for each test using local JSON
+    // Store original working directory
+    originalCwd = process.cwd();
+    
+    // Create a unique temporary directory for each test
+    testTmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'devlog-test-'));
+    
+    // Create a test configuration file in the temp directory
+    const testConfig = {
+      storage: {
+        type: 'json' as const,
+        json: {
+          directory: '.devlog-test', // Use different directory name to avoid confusion
+          filePattern: '{id:auto}-{slug}.json',
+          minPadding: 3,
+          global: false, // Use local directory, not global
+        },
+      },
+    };
+    
+    // Write the test config to the temp directory
+    await fs.writeFile(
+      path.join(testTmpDir, 'devlog.config.json'),
+      JSON.stringify(testConfig, null, 2)
+    );
+    
+    // Change to the test directory BEFORE creating DevlogManager
+    // This ensures getWorkspaceRoot() finds our test directory
+    process.chdir(testTmpDir);
+    
+    // Create isolated DevlogManager instance - this will now find our test config
     manager = new DevlogManager();
+    
+    // IMPORTANT: Initialize the manager while still in test directory
+    // This ensures ConfigurationManager.initialize() captures the correct workspace root
+    await manager.initialize();
+    
+    // Now we can safely restore the original working directory
+    process.chdir(originalCwd);
+    
+    // DO NOT DELETE ENTRIES - The temp directory should start clean
+    // and the DevlogManager should be isolated to that directory
+  });
+
+  afterEach(async () => {
+    // Ensure we're back in original directory
+    process.chdir(originalCwd);
+    
+    // Clean up the temporary directory after each test
+    if (testTmpDir) {
+      await fs.rm(testTmpDir, { recursive: true, force: true });
+    }
   });
 
   describe('createDevlog', () => {

@@ -218,7 +218,7 @@ export function Dashboard({
           <Title level={3} className={styles.recentDevlogsTitle}>
             Recent Devlogs
           </Title>
-          <div className="flex-1 overflow-x-hidden overflow-y-auto">
+          <div className="flex-1 overflow-x-hidden overflow-y-auto thin-scrollbar-vertical">
             {isLoadingDevlogs ? (
               <List
                 itemLayout="horizontal"

@@ -21,22 +21,17 @@
   overflow-x: auto;
   overflow-y: hidden;
   scroll-behavior: smooth;
-  scrollbar-width: thin;
-  scrollbar-color: #d9d9d9 transparent;
   display: flex;
   align-items: center;
 
   .devlogTitle {
     margin: 0 !important;
-    text-wrap: nowrap;
+    white-space: nowrap;
   }
 }
 
 .devlogInfo {
   height: 32px;
-
-  .metaInfo {
-  }
 
   .metaText {
     font-size: 14px;

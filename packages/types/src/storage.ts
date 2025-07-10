@@ -5,7 +5,7 @@
 import { DevlogEntry, DevlogFilter, DevlogId, DevlogStats, DevlogStatus, DevlogType, DevlogPriority } from './core.js';
 
 // Storage Configuration Types
-export type StorageType = 'json' | 'sqlite' | 'mysql' | 'postgres';
+export type StorageType = 'json' | 'sqlite' | 'mysql' | 'postgres' | 'github';
 
 export type ConflictResolution = 'local-wins' | 'remote-wins' | 'timestamp-wins' | 'interactive';
 
@@ -38,11 +38,32 @@ export interface JsonConfig {
   global?: boolean; // default: true (if true, uses a global directory, i.e. "~/.devlog", otherwise uses project root)
 }
 
+export interface GitHubStorageConfig {
+  owner: string;           // Repository owner (user/org)
+  repo: string;            // Repository name  
+  token: string;           // GitHub Personal Access Token
+  apiUrl?: string;         // For GitHub Enterprise (default: api.github.com)
+  branch?: string;         // For repository-specific operations
+  labelsPrefix?: string;   // Prefix for devlog labels (default: 'devlog')
+  rateLimit?: {
+    requestsPerHour?: number;  // Default: 5000 (GitHub's limit)
+    retryDelay?: number;       // Default: 1000ms
+    maxRetries?: number;       // Default: 3
+  };
+  cache?: {
+    enabled?: boolean;       // Default: true
+    ttl?: number;           // Cache TTL in ms (default: 300000 = 5min)
+  };
+}
+
 export interface StorageConfig {
   type: StorageType;
 
   // JSON storage config
   json?: JsonConfig;
+
+  // GitHub storage config
+  github?: GitHubStorageConfig;
 
   // Database connection config
   connectionString?: string;

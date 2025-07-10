@@ -74,7 +74,7 @@ export function MarkdownRenderer({
   // Preprocess content to handle single line breaks
   const processedContent = preserveLineBreaks ? preprocessContent(content) : content;
   const combinedClassName = `${styles.markdownRenderer} ${className || ''}`.trim();
-  const wrapperClassName = maxHeight ? `${combinedClassName} ${styles.markdownRendererScrollable}` : combinedClassName;
+  const wrapperClassName = maxHeight ? `${combinedClassName} ${styles.markdownRendererScrollable} thin-scrollbar-vertical` : combinedClassName;
 
   const markdownContent = (
     <div className={wrapperClassName}>
@@ -150,7 +150,7 @@ export function MarkdownRenderer({
             </a>
           ),
           table: ({ children }) => (
-            <div className={styles.tableWrapper}>
+            <div className={`${styles.tableWrapper} thin-scrollbar-horizontal`}>
               <table>{children}</table>
             </div>
           ),

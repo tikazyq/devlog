@@ -11,6 +11,13 @@ export class StorageProviderFactory {
   static async create(config: StorageConfig): Promise<StorageProvider> {
     // Handle new storage strategies
     switch (config.type) {
+      case 'github':
+        if (!config.github) {
+          throw new Error('GitHub configuration is required for github storage type');
+        }
+        const { GitHubStorageProvider } = await import('./github-storage.js');
+        return new GitHubStorageProvider(config.github);
+
       case 'sqlite':
         const { SQLiteStorageProvider } = await import('./sqlite-storage.js');
         return new SQLiteStorageProvider(config.connectionString || ':memory:', config.options);

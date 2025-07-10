@@ -142,6 +142,7 @@ export class DevlogManager {
 
     // Update basic fields
     if (request.title !== undefined) updated.title = request.title;
+    if (request.type !== undefined) updated.type = request.type;
     if (request.description !== undefined) updated.description = request.description;
     if (request.status !== undefined) updated.status = request.status;
     if (request.priority !== undefined) updated.priority = request.priority;

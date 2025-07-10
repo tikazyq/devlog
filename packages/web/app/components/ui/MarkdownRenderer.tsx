@@ -53,12 +53,14 @@ interface MarkdownRendererProps {
   content: string;
   className?: string;
   preserveLineBreaks?: boolean; // If true, handles escaped newlines and converts single line breaks to paragraphs
+  maxHeight?: number; // Optional max height for the content
 }
 
 export function MarkdownRenderer({
   content,
   className,
   preserveLineBreaks = true,
+  maxHeight = 480, // Default max height
 }: MarkdownRendererProps) {
   if (!content || content.trim() === '') {
     return null;
@@ -67,9 +69,10 @@ export function MarkdownRenderer({
   // Preprocess content to handle single line breaks
   const processedContent = preserveLineBreaks ? preprocessContent(content) : content;
   const combinedClassName = `${styles.markdownRenderer} ${className || ''}`.trim();
+  const style: React.CSSProperties = maxHeight ? { maxHeight: `${maxHeight}px`, overflowY: 'auto', scrollbarWidth: 'thin', scrollbarColor: '#d9d9d9 transparent' } : {};
 
   return (
-    <div className={combinedClassName}>
+    <div className={combinedClassName} style={style}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[

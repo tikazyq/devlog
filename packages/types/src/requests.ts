@@ -2,7 +2,14 @@
  * API request and response types
  */
 
-import { DevlogType, DevlogPriority, DevlogId, DevlogStatus, NoteCategory, DevlogEntry } from './core.js';
+import {
+  DevlogType,
+  DevlogPriority,
+  DevlogId,
+  DevlogStatus,
+  NoteCategory,
+  DevlogEntry,
+} from './core.js';
 
 export interface CreateDevlogRequest {
   title: string;
@@ -23,6 +30,7 @@ export interface UpdateDevlogRequest {
   id: DevlogId;
   title?: string;
   description?: string;
+  type?: DevlogType;
   status?: DevlogStatus;
   priority?: DevlogPriority;
   assignee?: string;

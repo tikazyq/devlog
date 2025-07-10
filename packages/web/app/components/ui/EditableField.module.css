@@ -7,29 +7,25 @@
   border-radius: 6px;
   border: 1px solid transparent;
   padding: 4px;
-  margin: -4px;
 }
 
 .editableField:hover:not(.editing) {
   background-color: rgba(0, 0, 0, 0.02);
   border-color: rgba(0, 0, 0, 0.06);
+  border-style: dashed;
 }
 
 .editableField.editing {
-  cursor: text;
   border-color: #1677ff;
+  cursor: text;
   background-color: transparent;
-  /* Ensure no layout shifts when entering edit mode */
   padding: 4px;
-  margin: -4px;
 }
 
 .editableField.editing:hover {
-  border-color: #1677ff;
   background-color: transparent;
   /* Maintain consistent padding/margin on hover */
   padding: 4px;
-  margin: -4px;
 }
 
 .hoverOverlay {
@@ -128,7 +124,6 @@
   font-size: 16px;
   line-height: 1.5;
 }
-
 
 /* Better spacing for mobile */
 @media (max-width: 576px) {

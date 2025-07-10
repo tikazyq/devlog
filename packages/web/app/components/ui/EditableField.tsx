@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Input, Select, Typography } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
+import { MarkdownEditor } from './MarkdownEditor';
 import styles from './EditableField.module.css';
 
 const { TextArea } = Input;
@@ -13,7 +14,7 @@ interface EditableFieldProps {
   value: string;
   onSave: (value: string) => void;
   multiline?: boolean;
-  type?: 'text' | 'select' | 'textarea';
+  type?: 'text' | 'select' | 'textarea' | 'markdown';
   options?: { label: string; value: string }[];
   placeholder?: string;
   emptyText?: string;
@@ -40,6 +41,7 @@ export function EditableField({
   const [editValue, setEditValue] = useState(value);
   const [isHovered, setIsHovered] = useState(false);
   const inputRef = useRef<any>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   // Update editValue when value prop changes
   useEffect(() => {
@@ -73,11 +75,15 @@ export function EditableField({
   };
 
   const handleBlur = () => {
+    handleBlurWithValue(editValue);
+  };
+
+  const handleBlurWithValue = (currentValue: string) => {
     if (draftMode) {
       // In draft mode, just save the local value and exit edit mode
       // The parent component will handle when to actually save
-      if (editValue !== value) {
-        onSave(editValue);
+      if (currentValue !== value) {
+        onSave(currentValue);
       }
       setIsEditing(false);
     } else {
@@ -97,10 +103,28 @@ export function EditableField({
   }, [editValue]);
 
   const renderInput = () => {
+    if (type === 'markdown') {
+      return (
+        <MarkdownEditor
+          value={editValue}
+          onChange={(value) => {
+            setEditValue(value);
+          }}
+          onBlur={handleBlurWithValue}
+          onCancel={handleCancel}
+          placeholder={placeholder}
+          autoFocus={true}
+        />
+      );
+    }
+
     const inputProps = {
       ref: inputRef,
       value: editValue,
-      onChange: (e: any) => setEditValue(e.target.value),
+      onChange: (e: any) => {
+        const newValue = e.target.value;
+        setEditValue(newValue);
+      },
       onKeyDown: handleKeyPress,
       onBlur: handleBlur,
       placeholder,
@@ -112,7 +136,9 @@ export function EditableField({
           {...inputProps}
           size={size}
           open={isEditing}
-          onChange={setEditValue}
+          onChange={(newValue) => {
+            setEditValue(newValue);
+          }}
           style={{ width: '100%' }}
           variant="borderless"
         >
@@ -130,6 +156,18 @@ export function EditableField({
     }
   };
 
+  const renderContent = () => {
+    if (showEmptyText && (!value || value.trim() === '')) {
+      return (
+        <Text type="secondary" className={styles.emptyFieldText}>
+          {emptyText}
+        </Text>
+      );
+    }
+
+    return children;
+  };
+
   if (isEditing) {
     return (
       <div className={`${styles.editableField} ${styles.editing} ${className}`}>
@@ -143,19 +181,14 @@ export function EditableField({
 
   return (
     <div
+      ref={contentRef}
       className={`${styles.editableField} ${isHovered ? styles.hovered : ''} ${className}`}
       onClick={handleEnterEdit}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       title="Click to edit"
     >
-      {showEmptyText ? (
-        <Text type="secondary" className={styles.emptyFieldText}>
-          {emptyText}
-        </Text>
-      ) : (
-        children
-      )}
+      {renderContent()}
       <div className={styles.hoverOverlay}>
         <EditOutlined className={styles.editIcon} />
       </div>

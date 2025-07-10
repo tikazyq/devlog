@@ -22,14 +22,8 @@ import { DevlogEntry } from '@devlog/types';
 import { EditableField, MarkdownRenderer } from '@/components/ui';
 import { formatTimeAgoWithTooltip } from '@/lib/time-utils';
 import styles from './DevlogDetails.module.css';
-import {
-  getTypeIcon,
-} from '@/lib/devlog-ui-utils';
-import {
-  statusOptions,
-  priorityOptions,
-  typeOptions,
-} from '@/lib/devlog-options';
+import { getTypeIcon } from '@/lib/devlog-ui-utils';
+import { statusOptions, priorityOptions, typeOptions } from '@/lib/devlog-options';
 import { DevlogStatusTag, DevlogPriorityTag, DevlogTypeTag } from '@/components';
 
 const { Title, Text } = Typography;
@@ -48,17 +42,22 @@ interface DevlogDetailsProps {
   ) => void;
 }
 
-export function DevlogDetails({ devlog, loading = false, onUpdate, onUnsavedChangesChange }: DevlogDetailsProps) {
+export function DevlogDetails({
+  devlog,
+  loading = false,
+  onUpdate,
+  onUnsavedChangesChange,
+}: DevlogDetailsProps) {
   // If loading, show skeleton
   if (loading || !devlog) {
     return (
       <div>
         <div className={styles.devlogDetailsHeader}>
-          <div className={styles.devlogDetailsTitle}>
-            <Skeleton.Input 
-              style={{ width: '60%', height: '32px', marginBottom: '16px' }} 
-              active 
-              size="large" 
+          <div className={styles.devlogTitleWrapper}>
+            <Skeleton.Input
+              style={{ width: '60%', height: '32px', marginBottom: '16px' }}
+              active
+              size="large"
             />
 
             <Space wrap className={styles.statusSection}>
@@ -294,73 +293,65 @@ export function DevlogDetails({ devlog, loading = false, onUpdate, onUnsavedChan
   return (
     <div>
       <div className={styles.devlogDetailsHeader}>
-        <div className={styles.devlogDetailsTitle}>
+        <EditableField
+          key={`title-${getCurrentValue('title')}`}
+          value={getCurrentValue('title')}
+          onSave={(value) => handleFieldChange('title', value)}
+          placeholder="Enter title"
+          className={`${isFieldChanged('title') ? styles.fieldChanged : ''} ${styles.devlogTitleWrapper}`}
+        >
+          <Title level={2} className={styles.devlogTitle}>
+            {getCurrentValue('title')}
+          </Title>
+        </EditableField>
+
+        <Space wrap className={styles.statusSection}>
           <EditableField
-            key={`title-${getCurrentValue('title')}`}
-            value={getCurrentValue('title')}
-            onSave={(value) => handleFieldChange('title', value)}
-            placeholder="Enter title"
-            className={isFieldChanged('title') ? styles.fieldChanged : ''}
+            key={`status-${getCurrentValue('status')}`}
+            className={`${styles.statusItem} ${isFieldChanged('status') ? styles.fieldChanged : ''}`}
+            type="select"
+            value={getCurrentValue('status')}
+            options={statusOptions}
+            onSave={(value) => handleFieldChange('status', value)}
           >
-            <Title level={2} className={styles.devlogTitle}>
-              {getCurrentValue('title')}
-            </Title>
+            <DevlogStatusTag status={getCurrentValue('status')} className={styles.statusTag} />
           </EditableField>
+          <EditableField
+            key={`priority-${getCurrentValue('priority')}`}
+            className={`${styles.statusItem} ${isFieldChanged('priority') ? styles.fieldChanged : ''}`}
+            type="select"
+            value={getCurrentValue('priority')}
+            options={priorityOptions}
+            onSave={(value) => handleFieldChange('priority', value)}
+          >
+            <DevlogPriorityTag
+              priority={getCurrentValue('priority')}
+              className={styles.statusTag}
+            />
+          </EditableField>
+          <EditableField
+            key={`type-${getCurrentValue('type')}`}
+            className={`${styles.statusItem} ${isFieldChanged('type') ? styles.fieldChanged : ''}`}
+            type="select"
+            value={getCurrentValue('type')}
+            onSave={(value) => handleFieldChange('type', value)}
+            options={typeOptions}
+          >
+            <DevlogTypeTag type={getCurrentValue('type')} className={styles.statusTag} />
+          </EditableField>
+        </Space>
 
-          <Space wrap className={styles.statusSection}>
-            <EditableField
-              key={`status-${getCurrentValue('status')}`}
-              className={`${styles.statusItem} ${isFieldChanged('status') ? styles.fieldChanged : ''}`}
-              type="select"
-              value={getCurrentValue('status')}
-              options={statusOptions}
-              onSave={(value) => handleFieldChange('status', value)}
-            >
-              <DevlogStatusTag
-                status={getCurrentValue('status')}
-                className={styles.statusTag}
-              />
-            </EditableField>
-            <EditableField
-              key={`priority-${getCurrentValue('priority')}`}
-              className={`${styles.statusItem} ${isFieldChanged('priority') ? styles.fieldChanged : ''}`}
-              type="select"
-              value={getCurrentValue('priority')}
-              options={priorityOptions}
-              onSave={(value) => handleFieldChange('priority', value)}
-            >
-              <DevlogPriorityTag
-                priority={getCurrentValue('priority')}
-                className={styles.statusTag}
-              />
-            </EditableField>
-            <EditableField
-              key={`type-${getCurrentValue('type')}`}
-              className={`${styles.statusItem} ${isFieldChanged('type') ? styles.fieldChanged : ''}`}
-              type="select"
-              value={getCurrentValue('type')}
-              onSave={(value) => handleFieldChange('type', value)}
-              options={typeOptions}
-            >
-              <DevlogTypeTag
-                type={getCurrentValue('type')}
-                className={styles.statusTag}
-              />
-            </EditableField>
-          </Space>
-
-          <Space split={<Text type="secondary">•</Text>} className={styles.metaInfo}>
-            <Text type="secondary" className={styles.metaText}>
-              ID: #{devlog.id}
-            </Text>
-            <Text type="secondary" title={formatTimeAgoWithTooltip(devlog.createdAt).fullDate}>
-              Created: {formatTimeAgoWithTooltip(devlog.createdAt).timeAgo}
-            </Text>
-            <Text type="secondary" title={formatTimeAgoWithTooltip(devlog.updatedAt).fullDate}>
-              Updated: {formatTimeAgoWithTooltip(devlog.updatedAt).timeAgo}
-            </Text>
-          </Space>
-        </div>
+        <Space split={<Text type="secondary">•</Text>} className={styles.metaInfo}>
+          <Text type="secondary" className={styles.metaText}>
+            ID: #{devlog.id}
+          </Text>
+          <Text type="secondary" title={formatTimeAgoWithTooltip(devlog.createdAt).fullDate}>
+            Created: {formatTimeAgoWithTooltip(devlog.createdAt).timeAgo}
+          </Text>
+          <Text type="secondary" title={formatTimeAgoWithTooltip(devlog.updatedAt).fullDate}>
+            Updated: {formatTimeAgoWithTooltip(devlog.updatedAt).timeAgo}
+          </Text>
+        </Space>
       </div>
 
       <div className={styles.devlogDetailsContent}>
@@ -372,8 +363,7 @@ export function DevlogDetails({ devlog, loading = false, onUpdate, onUnsavedChan
           <EditableField
             value={getCurrentValue('description')}
             onSave={(value) => handleFieldChange('description', value)}
-            multiline
-            type="textarea"
+            type="markdown"
             placeholder="Enter description"
             emptyText="Click to add description..."
             className={isFieldChanged('description') ? styles.fieldChanged : ''}
@@ -390,8 +380,7 @@ export function DevlogDetails({ devlog, loading = false, onUpdate, onUnsavedChan
           <EditableField
             value={getCurrentValue('context.businessContext')}
             onSave={(value) => handleContextChange('businessContext', value)}
-            multiline
-            type="textarea"
+            type="markdown"
             placeholder="Why this work matters and what problem it solves"
             emptyText="Click to add business context..."
             className={isFieldChanged('context.businessContext') ? styles.fieldChanged : ''}
@@ -408,8 +397,7 @@ export function DevlogDetails({ devlog, loading = false, onUpdate, onUnsavedChan
           <EditableField
             value={getCurrentValue('context.technicalContext')}
             onSave={(value) => handleContextChange('technicalContext', value)}
-            multiline
-            type="textarea"
+            type="markdown"
             placeholder="Architecture decisions, constraints, assumptions"
             emptyText="Click to add technical context..."
             className={isFieldChanged('context.technicalContext') ? styles.fieldChanged : ''}
@@ -589,76 +577,38 @@ export function DevlogDetails({ devlog, loading = false, onUpdate, onUnsavedChan
           </div>
         )}
 
-        {devlog.aiContext && 
-         (devlog.aiContext.currentSummary ||
-          (devlog.aiContext.keyInsights && devlog.aiContext.keyInsights.length > 0) ||
-          (devlog.aiContext.openQuestions && devlog.aiContext.openQuestions.length > 0) ||
-          (devlog.aiContext.suggestedNextSteps && devlog.aiContext.suggestedNextSteps.length > 0) ||
-          (devlog.aiContext.relatedPatterns && devlog.aiContext.relatedPatterns.length > 0)) && (
-          <div className={styles.aiContextSection}>
-            <Title level={4}>
-              <RobotOutlined className={styles.sectionIcon} />
-              AI Context
-            </Title>
-            <Card>
-              {devlog.aiContext.currentSummary && (
-                <div className={styles.aiSection}>
-                  <Text strong>Summary:</Text>
-                  <MarkdownRenderer content={devlog.aiContext.currentSummary} />
-                </div>
-              )}
-
-              {devlog.aiContext.keyInsights && devlog.aiContext.keyInsights.length > 0 && (
-                <div className={styles.aiSection}>
-                  <Text strong>Key Insights:</Text>
-                  <List
-                    size="small"
-                    style={{ marginTop: '8px' }}
-                    dataSource={devlog.aiContext.keyInsights}
-                    renderItem={(insight) => (
-                      <List.Item className={styles.aiInsightItem}>
-                        <Space align="start">
-                          <BulbOutlined style={{ color: '#faad14', marginTop: '2px' }} />
-                          <Text>{insight}</Text>
-                        </Space>
-                      </List.Item>
-                    )}
-                  />
-                </div>
-              )}
-
-              {devlog.aiContext.openQuestions && devlog.aiContext.openQuestions.length > 0 && (
-                <div className={styles.aiSection}>
-                  <Text strong>Open Questions:</Text>
-                  <List
-                    size="small"
-                    style={{ marginTop: '8px' }}
-                    dataSource={devlog.aiContext.openQuestions}
-                    renderItem={(question) => (
-                      <List.Item className={styles.aiQuestionItem}>
-                        <Space align="start">
-                          <QuestionCircleOutlined style={{ color: '#f5222d', marginTop: '2px' }} />
-                          <Text>{question}</Text>
-                        </Space>
-                      </List.Item>
-                    )}
-                  />
-                </div>
-              )}
-
-              {devlog.aiContext.suggestedNextSteps &&
-                devlog.aiContext.suggestedNextSteps.length > 0 && (
+        {devlog.aiContext &&
+          (devlog.aiContext.currentSummary ||
+            (devlog.aiContext.keyInsights && devlog.aiContext.keyInsights.length > 0) ||
+            (devlog.aiContext.openQuestions && devlog.aiContext.openQuestions.length > 0) ||
+            (devlog.aiContext.suggestedNextSteps &&
+              devlog.aiContext.suggestedNextSteps.length > 0) ||
+            (devlog.aiContext.relatedPatterns && devlog.aiContext.relatedPatterns.length > 0)) && (
+            <div className={styles.aiContextSection}>
+              <Title level={4}>
+                <RobotOutlined className={styles.sectionIcon} />
+                AI Context
+              </Title>
+              <Card>
+                {devlog.aiContext.currentSummary && (
                   <div className={styles.aiSection}>
-                    <Text strong>Suggested Next Steps:</Text>
+                    <Text strong>Summary:</Text>
+                    <MarkdownRenderer content={devlog.aiContext.currentSummary} />
+                  </div>
+                )}
+
+                {devlog.aiContext.keyInsights && devlog.aiContext.keyInsights.length > 0 && (
+                  <div className={styles.aiSection}>
+                    <Text strong>Key Insights:</Text>
                     <List
                       size="small"
                       style={{ marginTop: '8px' }}
-                      dataSource={devlog.aiContext.suggestedNextSteps}
-                      renderItem={(step) => (
-                        <List.Item className={styles.aiStepItem}>
+                      dataSource={devlog.aiContext.keyInsights}
+                      renderItem={(insight) => (
+                        <List.Item className={styles.aiInsightItem}>
                           <Space align="start">
-                            <RightOutlined style={{ color: '#52c41a', marginTop: '2px' }} />
-                            <Text>{step}</Text>
+                            <BulbOutlined style={{ color: '#faad14', marginTop: '2px' }} />
+                            <Text>{insight}</Text>
                           </Space>
                         </List.Item>
                       )}
@@ -666,37 +616,79 @@ export function DevlogDetails({ devlog, loading = false, onUpdate, onUnsavedChan
                   </div>
                 )}
 
-              {devlog.aiContext.relatedPatterns && devlog.aiContext.relatedPatterns.length > 0 && (
-                <div className={styles.aiSection}>
-                  <Text strong>Related Patterns:</Text>
-                  <List
-                    size="small"
-                    style={{ marginTop: '8px' }}
-                    dataSource={devlog.aiContext.relatedPatterns}
-                    renderItem={(pattern) => (
-                      <List.Item className={styles.aiPatternItem}>
-                        <Space align="start">
-                          <ApartmentOutlined style={{ color: '#722ed1', marginTop: '2px' }} />
-                          <Text>{pattern}</Text>
-                        </Space>
-                      </List.Item>
-                    )}
-                  />
-                </div>
-              )}
+                {devlog.aiContext.openQuestions && devlog.aiContext.openQuestions.length > 0 && (
+                  <div className={styles.aiSection}>
+                    <Text strong>Open Questions:</Text>
+                    <List
+                      size="small"
+                      style={{ marginTop: '8px' }}
+                      dataSource={devlog.aiContext.openQuestions}
+                      renderItem={(question) => (
+                        <List.Item className={styles.aiQuestionItem}>
+                          <Space align="start">
+                            <QuestionCircleOutlined
+                              style={{ color: '#f5222d', marginTop: '2px' }}
+                            />
+                            <Text>{question}</Text>
+                          </Space>
+                        </List.Item>
+                      )}
+                    />
+                  </div>
+                )}
 
-              <div>
-                <Text type="secondary" className={styles.aiUpdateInfo}>
-                  Last AI Update:{' '}
-                  <span title={formatTimeAgoWithTooltip(devlog.aiContext.lastAIUpdate).fullDate}>
-                    {formatTimeAgoWithTooltip(devlog.aiContext.lastAIUpdate).timeAgo}
-                  </span>{' '}
-                  • Version: {devlog.aiContext.contextVersion}
-                </Text>
-              </div>
-            </Card>
-          </div>
-        )}
+                {devlog.aiContext.suggestedNextSteps &&
+                  devlog.aiContext.suggestedNextSteps.length > 0 && (
+                    <div className={styles.aiSection}>
+                      <Text strong>Suggested Next Steps:</Text>
+                      <List
+                        size="small"
+                        style={{ marginTop: '8px' }}
+                        dataSource={devlog.aiContext.suggestedNextSteps}
+                        renderItem={(step) => (
+                          <List.Item className={styles.aiStepItem}>
+                            <Space align="start">
+                              <RightOutlined style={{ color: '#52c41a', marginTop: '2px' }} />
+                              <Text>{step}</Text>
+                            </Space>
+                          </List.Item>
+                        )}
+                      />
+                    </div>
+                  )}
+
+                {devlog.aiContext.relatedPatterns &&
+                  devlog.aiContext.relatedPatterns.length > 0 && (
+                    <div className={styles.aiSection}>
+                      <Text strong>Related Patterns:</Text>
+                      <List
+                        size="small"
+                        style={{ marginTop: '8px' }}
+                        dataSource={devlog.aiContext.relatedPatterns}
+                        renderItem={(pattern) => (
+                          <List.Item className={styles.aiPatternItem}>
+                            <Space align="start">
+                              <ApartmentOutlined style={{ color: '#722ed1', marginTop: '2px' }} />
+                              <Text>{pattern}</Text>
+                            </Space>
+                          </List.Item>
+                        )}
+                      />
+                    </div>
+                  )}
+
+                <div>
+                  <Text type="secondary" className={styles.aiUpdateInfo}>
+                    Last AI Update:{' '}
+                    <span title={formatTimeAgoWithTooltip(devlog.aiContext.lastAIUpdate).fullDate}>
+                      {formatTimeAgoWithTooltip(devlog.aiContext.lastAIUpdate).timeAgo}
+                    </span>{' '}
+                    • Version: {devlog.aiContext.contextVersion}
+                  </Text>
+                </div>
+              </Card>
+            </div>
+          )}
 
         {devlog.externalReferences && devlog.externalReferences.length > 0 && (
           <div className={styles.externalRefSection}>

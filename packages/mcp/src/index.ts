@@ -60,8 +60,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case 'add_devlog_note':
         return await adapter.addDevlogNote(args as any);
 
-      case 'update_devlog_with_progress':
-        return await adapter.updateDevlogWithProgress(args as any);
+      case 'update_devlog_with_note':
+        return await adapter.updateDevlogWithNote(args as any);
 
       case 'add_decision':
         return await adapter.addDecision(args as any);

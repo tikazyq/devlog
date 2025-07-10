@@ -20,7 +20,7 @@ export const progressTools: Tool[] = [
         },
         category: {
           type: 'string',
-          enum: ['progress', 'issue', 'solution', 'idea', 'reminder'],
+          enum: ['progress', 'issue', 'solution', 'idea', 'reminder', 'feedback'],
           default: 'progress',
           description: 'Category of the note',
         },
@@ -38,8 +38,8 @@ export const progressTools: Tool[] = [
     },
   },
   {
-    name: 'update_devlog_with_progress',
-    description: 'Update devlog status/fields and add a progress note in one operation',
+    name: 'update_devlog_with_note',
+    description: 'Update devlog status/fields and add a note in one operation',
     inputSchema: {
       type: 'object',
       properties: {
@@ -52,9 +52,15 @@ export const progressTools: Tool[] = [
           enum: ['new', 'in-progress', 'in-review', 'blocked', 'testing', 'done', 'closed'],
           description: 'New status for the devlog entry',
         },
-        progress: {
+        note: {
           type: 'string',
-          description: 'Progress note content',
+          description: 'Note content to add',
+        },
+        category: {
+          type: 'string',
+          enum: ['progress', 'issue', 'solution', 'idea', 'reminder', 'feedback'],
+          default: 'progress',
+          description: 'Category of the note being added',
         },
         codeChanges: {
           type: 'string',
@@ -71,7 +77,7 @@ export const progressTools: Tool[] = [
           description: 'Updated priority level',
         },
       },
-      required: ['id', 'progress'],
+      required: ['id', 'note'],
     },
   },
   {

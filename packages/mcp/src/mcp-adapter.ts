@@ -4,7 +4,7 @@
 
 import * as crypto from 'crypto';
 import { DevlogManager } from '@devlog/core';
-import { CreateDevlogRequest, DevlogStatus, DevlogType, UpdateDevlogRequest, DevlogConfig } from '@devlog/types';
+import { CreateDevlogRequest, DevlogStatus, DevlogType, UpdateDevlogRequest, DevlogConfig, NoteCategory } from '@devlog/types';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 export class MCPDevlogAdapter {
@@ -449,11 +449,12 @@ export class MCPDevlogAdapter {
     };
   }
 
-  async updateDevlogWithProgress(args: {
+  async updateDevlogWithNote(args: {
     id: number;
-    progress: string;
+    note: string;
     status?: string;
     priority?: string;
+    category?: NoteCategory;
     codeChanges?: string;
     files?: string[];
   }): Promise<CallToolResult> {
@@ -466,9 +467,9 @@ export class MCPDevlogAdapter {
     const entry = await this.devlogManager.updateWithProgress(
       args.id,
       updates,
-      args.progress,
+      args.note,
       {
-        category: 'progress',
+        category: args.category || 'progress',
         files: args.files,
         codeChanges: args.codeChanges,
       }
@@ -478,7 +479,7 @@ export class MCPDevlogAdapter {
       content: [
         {
           type: 'text',
-          text: `Updated devlog '${entry.id}' and added progress note:\n${args.progress}\n\nStatus: ${entry.status}\nTotal notes: ${entry.notes.length}`,
+          text: `Updated devlog '${entry.id}' and added ${args.category || 'progress'} note:\n${args.note}\n\nStatus: ${entry.status}\nTotal notes: ${entry.notes.length}`,
         },
       ],
     };

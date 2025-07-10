@@ -8,7 +8,32 @@ export type DevlogStatus = 'new' | 'in-progress' | 'blocked' | 'in-review' | 'te
 
 export type DevlogPriority = 'low' | 'medium' | 'high' | 'critical';
 
-export type NoteCategory = 'progress' | 'issue' | 'solution' | 'idea' | 'reminder';
+/**
+ * Categories for devlog notes - used to classify and organize different types of information
+ * 
+ * @example
+ * ```typescript
+ * const note: DevlogNote = {
+ *   id: 'note-1',
+ *   timestamp: '2025-07-10T10:00:00Z',
+ *   category: 'feedback',
+ *   content: 'User reported that the save button is confusing'
+ * };
+ * ```
+ */
+export type NoteCategory = 
+  /** Work progress updates, milestones, and status changes */
+  | 'progress'
+  /** Problems encountered, bugs found, or obstacles discovered */
+  | 'issue'
+  /** Solutions implemented, fixes applied, or workarounds found */
+  | 'solution'
+  /** New ideas, suggestions, or potential improvements */
+  | 'idea'
+  /** Important reminders, action items, or follow-up tasks */
+  | 'reminder'
+  /** External feedback from users, customers, stakeholders, or usability testing */
+  | 'feedback';
 
 /**
  * ID type for devlog entries - integer only for clean, user-friendly references

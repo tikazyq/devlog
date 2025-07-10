@@ -431,8 +431,17 @@
       "priority": "critical",
       "createdAt": "2025-07-10T14:03:27.126Z",
       "updatedAt": "2025-07-10T14:05:22.947Z"
+    },
+    "79": {
+      "filename": "079-complete-test-isolation-fix-prevent-test-contamina.json",
+      "title": "Complete test isolation fix - prevent test contamination of real devlog data",
+      "status": "in-progress",
+      "type": "bugfix",
+      "priority": "high",
+      "createdAt": "2025-07-10T15:11:15.344Z",
+      "updatedAt": "2025-07-10T15:11:51.048Z"
     }
   },
-  "lastId": 51,
+  "lastId": 79,
   "version": "1.0.0"
 }

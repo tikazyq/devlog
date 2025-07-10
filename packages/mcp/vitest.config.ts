@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
@@ -13,7 +13,7 @@ export default defineConfig({
         'node_modules/',
         'build/',
         'src/test.ts', // Keep the old integration test file
-      ]
-    }
-  }
-})
+      ],
+    },
+  },
+});

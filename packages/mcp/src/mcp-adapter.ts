@@ -2,52 +2,36 @@
  * MCP adapter that uses the flexible storage architecture
  */
 
-import * as crypto from "crypto";
-import { DevlogManager, ConfigurationManager, type DevlogConfig } from "@devlog/core";
-import { DevlogEntry, DevlogStatus, DevlogType, CreateDevlogRequest, UpdateDevlogRequest } from "@devlog/types";
-import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import * as crypto from 'crypto';
+import { DevlogManager } from '@devlog/core';
+import { CreateDevlogRequest, DevlogStatus, DevlogType, UpdateDevlogRequest, DevlogConfig, NoteCategory } from '@devlog/types';
+import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 export class MCPDevlogAdapter {
   private devlogManager: DevlogManager;
-  private configManager: ConfigurationManager;
   private config: DevlogConfig | null = null;
 
-  constructor(workspaceRoot?: string) {
-    this.configManager = new ConfigurationManager(workspaceRoot);
+  constructor() {
     this.devlogManager = new DevlogManager();
-  }
-
-  // Helper function to parse string ID to number
-  private parseId(idStr: string): number {
-    const id = parseInt(idStr, 10);
-    if (isNaN(id)) {
-      throw new Error(`Invalid devlog ID "${idStr}". Must be a number.`);
-    }
-    return id;
   }
 
   /**
    * Initialize the adapter with appropriate storage configuration
    */
   async initialize(): Promise<void> {
-    this.config = await this.configManager.loadConfig();
-    this.devlogManager = new DevlogManager({
-      workspaceRoot: this.config.workspaceRoot,
-      storage: this.config.storage,
-      integrations: this.config.integrations
-    });
+    this.devlogManager = new DevlogManager();
     await this.devlogManager.initialize();
   }
 
   async createDevlog(args: CreateDevlogRequest): Promise<CallToolResult> {
     await this.ensureInitialized();
-    
-    const entry = await this.devlogManager.findOrCreateDevlog(args);
-    
+
+    const entry = await this.devlogManager.createDevlog(args);
+
     return {
       content: [
         {
-          type: "text",
+          type: 'text',
           text: `Created devlog entry: ${entry.id}\nTitle: ${entry.title}\nType: ${entry.type}\nPriority: ${entry.priority}\nStatus: ${entry.status}\n\nBusiness Context: ${entry.context.businessContext}\nTechnical Context: ${entry.context.technicalContext}`,
         },
       ],
@@ -56,30 +40,33 @@ export class MCPDevlogAdapter {
 
   async updateDevlog(args: UpdateDevlogRequest): Promise<CallToolResult> {
     await this.ensureInitialized();
-    
+
     const entry = await this.devlogManager.updateDevlog(args);
-    
+
+    // Check if AI context was updated
+    const aiFieldsProvided = !!(args.currentSummary || args.keyInsights || args.openQuestions || args.suggestedNextSteps);
+    const aiContextNote = aiFieldsProvided ? `\nAI Context Updated: ${entry.aiContext.lastAIUpdate}` : '';
+
     return {
       content: [
         {
-          type: "text",
-          text: `Updated devlog entry: ${entry.id}\nTitle: ${entry.title}\nStatus: ${entry.status}\nLast Updated: ${entry.updatedAt}\n\nTotal Notes: ${entry.notes.length}`,
+          type: 'text',
+          text: `Updated devlog entry: ${entry.id}\nTitle: ${entry.title}\nStatus: ${entry.status}\nLast Updated: ${entry.updatedAt}${aiContextNote}\n\nTotal Notes: ${entry.notes.length}`,
         },
       ],
     };
   }
 
-  async getDevlog(args: { id: string }): Promise<CallToolResult> {
+  async getDevlog(args: { id: number }): Promise<CallToolResult> {
     await this.ensureInitialized();
-    
-    const id = this.parseId(args.id);
-    const entry = await this.devlogManager.getDevlog(id);
-    
+
+    const entry = await this.devlogManager.getDevlog(args.id);
+
     if (!entry) {
       return {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: `Devlog entry '${args.id}' not found.`,
           },
         ],
@@ -90,7 +77,7 @@ export class MCPDevlogAdapter {
     return {
       content: [
         {
-          type: "text",
+          type: 'text',
           text: JSON.stringify(entry, null, 2),
         },
       ],
@@ -99,7 +86,7 @@ export class MCPDevlogAdapter {
 
   async listDevlogs(args: any = {}): Promise<CallToolResult> {
     await this.ensureInitialized();
-    
+
     const filter = {
       status: args.status ? [args.status] : undefined,
       type: args.type ? [args.type] : undefined,
@@ -107,26 +94,29 @@ export class MCPDevlogAdapter {
     };
 
     const entries = await this.devlogManager.listDevlogs(filter);
-    
+
     if (entries.length === 0) {
       return {
         content: [
           {
-            type: "text",
-            text: "No devlog entries found matching the criteria.",
+            type: 'text',
+            text: 'No devlog entries found matching the criteria.',
           },
         ],
       };
     }
 
-    const summary = entries.map(entry => 
-      `- [${entry.status}] ${entry.title} (${entry.type}, ${entry.priority}) - ${entry.id}`
-    ).join('\n');
+    const summary = entries
+      .map(
+        (entry) =>
+          `- [${entry.status}] ${entry.title} (${entry.type}, ${entry.priority}) - ${entry.id}`,
+      )
+      .join('\n');
 
     return {
       content: [
         {
-          type: "text",
+          type: 'text',
           text: `Found ${entries.length} devlog entries:\n\n${summary}`,
         },
       ],
@@ -135,61 +125,82 @@ export class MCPDevlogAdapter {
 
   async searchDevlogs(args: { query: string }): Promise<CallToolResult> {
     await this.ensureInitialized();
-    
+
     const entries = await this.devlogManager.searchDevlogs(args.query);
-    
+
     if (entries.length === 0) {
       return {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: `No devlog entries found matching query: "${args.query}"`,
           },
         ],
       };
     }
 
-    const summary = entries.map(entry => 
-      `- [${entry.status}] ${entry.title} (${entry.type}, ${entry.priority}) - ${entry.id}`
-    ).join('\n');
+    const summary = entries
+      .map(
+        (entry) =>
+          `- [${entry.status}] ${entry.title} (${entry.type}, ${entry.priority}) - ${entry.id}`,
+      )
+      .join('\n');
 
     return {
       content: [
         {
-          type: "text",
+          type: 'text',
           text: `Found ${entries.length} devlog entries matching "${args.query}":\n\n${summary}`,
         },
       ],
     };
   }
 
-  async addDevlogNote(args: { id: string; note: string; category?: string }): Promise<CallToolResult> {
+  async addDevlogNote(args: {
+    id: number;
+    note: string;
+    category?: string;
+    files?: string[];
+    codeChanges?: string;
+  }): Promise<CallToolResult> {
     await this.ensureInitialized();
-    
-    const id = this.parseId(args.id);
-    const category = args.category as any || "progress";
-    const entry = await this.devlogManager.addNote(id, args.note, category);
-    
+
+    const category = (args.category as any) || 'progress';
+    const entry = await this.devlogManager.addNote(
+      args.id, 
+      args.note, 
+      category,
+      {
+        files: args.files,
+        codeChanges: args.codeChanges,
+      }
+    );
+
     return {
       content: [
         {
-          type: "text",
+          type: 'text',
           text: `Added ${category} note to devlog '${entry.id}':\n${args.note}\n\nTotal notes: ${entry.notes.length}`,
         },
       ],
     };
   }
 
-  async addDecision(args: { id: string; decision: string; rationale: string; decisionMaker: string; alternatives?: string[] }): Promise<CallToolResult> {
+  async addDecision(args: {
+    id: number;
+    decision: string;
+    rationale: string;
+    decisionMaker: string;
+    alternatives?: string[];
+  }): Promise<CallToolResult> {
     await this.ensureInitialized();
-    
-    const id = this.parseId(args.id);
-    const entry = await this.devlogManager.getDevlog(id);
+
+    const entry = await this.devlogManager.getDevlog(args.id);
     if (!entry) {
       return {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: `Devlog entry '${args.id}' not found.`,
           },
         ],
@@ -203,38 +214,37 @@ export class MCPDevlogAdapter {
       decision: args.decision,
       rationale: args.rationale,
       alternatives: args.alternatives,
-      decisionMaker: args.decisionMaker
+      decisionMaker: args.decisionMaker,
     };
 
     entry.context.decisions.push(decision);
-    
+
     // Update the entry to trigger save
     const updated = await this.devlogManager.updateDevlog({
-      id: id,
+      id: args.id,
       // Use a field that exists in UpdateDevlogRequest to trigger save
-      tags: entry.tags
+      description: entry.description,
     });
 
     return {
       content: [
         {
-          type: "text",
+          type: 'text',
           text: `Added decision to devlog '${args.id}':\nDecision: ${args.decision}\nRationale: ${args.rationale}\nDecision Maker: ${args.decisionMaker}`,
         },
       ],
     };
   }
 
-  async completeDevlog(args: { id: string; summary?: string }): Promise<CallToolResult> {
+  async completeDevlog(args: { id: number; summary?: string }): Promise<CallToolResult> {
     await this.ensureInitialized();
-    
-    const id = this.parseId(args.id);
-    const entry = await this.devlogManager.completeDevlog(id, args.summary);
-    
+
+    const entry = await this.devlogManager.completeDevlog(args.id, args.summary);
+
     return {
       content: [
         {
-          type: "text",
+          type: 'text',
           text: `Completed devlog '${entry.id}': ${entry.title}\nStatus: ${entry.status}\nCompletion summary: ${args.summary || 'None provided'}`,
         },
       ],
@@ -243,55 +253,57 @@ export class MCPDevlogAdapter {
 
   async getActiveContext(args: { limit?: number } = {}): Promise<CallToolResult> {
     await this.ensureInitialized();
-    
+
     const filter = {
-      status: ["todo", "in-progress", "review", "testing"] as any[]
+      status: ['new', 'in-progress', 'blocked', 'in-review', 'testing'] as any[],
     };
-    
+
     const entries = await this.devlogManager.listDevlogs(filter);
     const limited = entries.slice(0, args.limit || 10);
-    
+
     if (limited.length === 0) {
       return {
         content: [
           {
-            type: "text",
-            text: "No active devlog entries found.",
+            type: 'text',
+            text: 'No active devlog entries found.',
           },
         ],
       };
     }
 
-    const summary = limited.map(entry => {
-      const recentNotes = entry.notes.slice(-2);
-      const notesText = recentNotes.length > 0 
-        ? `\n  Recent notes: ${recentNotes.map(n => n.content).join('; ')}`
-        : '';
-      
-      return `- [${entry.status}] ${entry.title} (${entry.type}, ${entry.priority})${notesText}`;
-    }).join('\n');
+    const summary = limited
+      .map((entry) => {
+        const recentNotes = entry.notes.slice(-2);
+        const notesText =
+          recentNotes.length > 0
+            ? `\n  Recent notes: ${recentNotes.map((n) => n.content).join('; ')}`
+            : '';
+
+        return `- [${entry.status}] ${entry.title} (${entry.type}, ${entry.priority})${notesText}`;
+      })
+      .join('\n');
 
     return {
       content: [
         {
-          type: "text",
+          type: 'text',
           text: `${limited.length} active devlog entries:\n\n${summary}`,
         },
       ],
     };
   }
 
-  async getContextForAI(args: { id: string }): Promise<CallToolResult> {
+  async getContextForAI(args: { id: number }): Promise<CallToolResult> {
     await this.ensureInitialized();
-    
-    const id = this.parseId(args.id);
-    const entry = await this.devlogManager.getContextForAI(id);
-    
+
+    const entry = await this.devlogManager.getContextForAI(args.id);
+
     if (!entry) {
       return {
         content: [
           {
-            type: "text",
+            type: 'text',
             text: `Devlog entry '${args.id}' not found.`,
           },
         ],
@@ -311,48 +323,47 @@ export class MCPDevlogAdapter {
       recentNotes: entry.notes.slice(-5),
       totalNotes: entry.notes.length,
       createdAt: entry.createdAt,
-      updatedAt: entry.updatedAt
+      updatedAt: entry.updatedAt,
     };
 
     return {
       content: [
         {
-          type: "text",
+          type: 'text',
           text: JSON.stringify(context, null, 2),
         },
       ],
     };
   }
 
-  async updateAIContext(args: { 
-    id: string; 
-    summary?: string; 
-    insights?: string[]; 
-    questions?: string[]; 
-    patterns?: string[]; 
-    nextSteps?: string[]; 
+  async updateAIContext(args: {
+    id: number;
+    summary?: string;
+    insights?: string[];
+    questions?: string[];
+    patterns?: string[];
+    nextSteps?: string[];
   }): Promise<CallToolResult> {
     await this.ensureInitialized();
-    
-    const id = this.parseId(args.id);
+
     const contextUpdate: any = {};
-    
+
     if (args.summary) contextUpdate.currentSummary = args.summary;
     if (args.insights) contextUpdate.keyInsights = args.insights;
     if (args.questions) contextUpdate.openQuestions = args.questions;
     if (args.patterns) contextUpdate.relatedPatterns = args.patterns;
     if (args.nextSteps) contextUpdate.suggestedNextSteps = args.nextSteps;
-    
+
     contextUpdate.lastAIUpdate = new Date().toISOString();
     contextUpdate.contextVersion = (contextUpdate.contextVersion || 0) + 1;
 
-    const entry = await this.devlogManager.updateAIContext(id, contextUpdate);
-    
+    const entry = await this.devlogManager.updateAIContext(args.id, contextUpdate);
+
     return {
       content: [
         {
-          type: "text",
-          text: `Updated AI context for devlog '${entry.id}':\n${JSON.stringify(contextUpdate, null, 2)}`,
+          type: 'text',
+          text: `[DEPRECATED] Updated AI context for devlog '${entry.id}'. Use update_devlog with AI context fields instead.\n\n${JSON.stringify(contextUpdate, null, 2)}`,
         },
       ],
     };
@@ -370,61 +381,105 @@ export class MCPDevlogAdapter {
     }
   }
 
-  async discoverRelatedDevlogs(args: { 
-    workDescription: string; 
-    workType: DevlogType; 
-    keywords?: string[]; 
-    scope?: string; 
+  async discoverRelatedDevlogs(args: {
+    workDescription: string;
+    workType: DevlogType;
+    keywords?: string[];
+    scope?: string;
   }): Promise<CallToolResult> {
     await this.ensureInitialized();
-    
+
     const discoveryResult = await this.devlogManager.discoverRelatedDevlogs(args);
-    
+
     if (discoveryResult.relatedEntries.length === 0) {
       return {
         content: [
           {
-            type: "text",
-            text: `No related devlog entries found for:\n` +
-                  `Work: ${args.workDescription}\n` +
-                  `Type: ${args.workType}\n` +
-                  `Keywords: ${args.keywords?.join(', ') || 'None'}\n` +
-                  `Scope: ${args.scope || 'N/A'}\n\n` +
-                  `✅ Safe to create a new devlog entry - no overlapping work detected.`,
+            type: 'text',
+            text:
+              `No related devlog entries found for:\n` +
+              `Work: ${args.workDescription}\n` +
+              `Type: ${args.workType}\n` +
+              `Keywords: ${args.keywords?.join(', ') || 'None'}\n` +
+              `Scope: ${args.scope || 'N/A'}\n\n` +
+              `✅ Safe to create a new devlog entry - no overlapping work detected.`,
           },
         ],
       };
     }
-    
+
     // Generate detailed analysis
-    const analysis = discoveryResult.relatedEntries.slice(0, 10).map(({ entry, relevance, matchedTerms }) => {
-      const statusEmoji: Record<DevlogStatus, string> = {
-        'todo': '📋',
-        'in-progress': '🔄',
-        'review': '👀',
-        'testing': '🧪',
-        'done': '✅',
-        'archived': '📦'
-      };
-      
-      return `${statusEmoji[entry.status]} **${entry.title}** (${entry.type})\n` +
-             `   ID: ${entry.id}\n` +
-             `   Status: ${entry.status} | Priority: ${entry.priority}\n` +
-             `   Relevance: ${relevance} (matched: ${matchedTerms.join(', ')})\n` +
-             `   Description: ${entry.description.substring(0, 150)}${entry.description.length > 150 ? '...' : ''}\n` +
-             `   Last Updated: ${new Date(entry.updatedAt).toLocaleDateString()}\n`;
-    }).join('\n');
-    
+    const analysis = discoveryResult.relatedEntries
+      .slice(0, 10)
+      .map(({ entry, relevance, matchedTerms }) => {
+        const statusEmoji: Record<DevlogStatus, string> = {
+          new: '🆕',
+          'in-progress': '🔄',
+          blocked: '🚫',
+          'in-review': '👀',
+          testing: '🧪',
+          done: '✅',
+          closed: '📦',
+        };
+
+        return (
+          `${statusEmoji[entry.status]} **${entry.title}** (${entry.type})\n` +
+          `   ID: ${entry.id}\n` +
+          `   Status: ${entry.status} | Priority: ${entry.priority}\n` +
+          `   Relevance: ${relevance} (matched: ${matchedTerms.join(', ')})\n` +
+          `   Description: ${entry.description.substring(0, 150)}${entry.description.length > 150 ? '...' : ''}\n` +
+          `   Last Updated: ${new Date(entry.updatedAt).toLocaleDateString()}\n`
+        );
+      })
+      .join('\n');
+
     return {
       content: [
         {
-          type: "text",
-          text: `## Discovery Analysis for: "${args.workDescription}"\n\n` +
-                `**Search Parameters:**\n` +
-                `- Type: ${args.workType}\n` +
-                `- Keywords: ${args.keywords?.join(', ') || 'None'}\n` +
-                `- Scope: ${args.scope || 'Not specified'}\n\n` +
-                `**Found ${discoveryResult.relatedEntries.length} related entries:**\n\n${analysis}\n\n${discoveryResult.recommendation}`,
+          type: 'text',
+          text:
+            `## Discovery Analysis for: "${args.workDescription}"\n\n` +
+            `**Search Parameters:**\n` +
+            `- Type: ${args.workType}\n` +
+            `- Keywords: ${args.keywords?.join(', ') || 'None'}\n` +
+            `- Scope: ${args.scope || 'Not specified'}\n\n` +
+            `**Found ${discoveryResult.relatedEntries.length} related entries:**\n\n${analysis}\n\n${discoveryResult.recommendation}`,
+        },
+      ],
+    };
+  }
+
+  async updateDevlogWithNote(args: {
+    id: number;
+    note: string;
+    status?: string;
+    priority?: string;
+    category?: NoteCategory;
+    codeChanges?: string;
+    files?: string[];
+  }): Promise<CallToolResult> {
+    await this.ensureInitialized();
+
+    const updates: any = {};
+    if (args.status) updates.status = args.status;
+    if (args.priority) updates.priority = args.priority;
+
+    const entry = await this.devlogManager.updateWithProgress(
+      args.id,
+      updates,
+      args.note,
+      {
+        category: args.category || 'progress',
+        files: args.files,
+        codeChanges: args.codeChanges,
+      }
+    );
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Updated devlog '${entry.id}' and added ${args.category || 'progress'} note:\n${args.note}\n\nStatus: ${entry.status}\nTotal notes: ${entry.notes.length}`,
         },
       ],
     };

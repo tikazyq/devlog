@@ -7,7 +7,7 @@ export default defineConfig({
     testTimeout: 30000,
     // Handle dynamic imports better
     deps: {
-      external: ['better-sqlite3']
-    }
+      external: ['better-sqlite3'],
+    },
   },
 });

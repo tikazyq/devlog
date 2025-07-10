@@ -1,0 +1,307 @@
+/* DevlogDetails Component Styles */
+
+.sectionIcon {
+  margin-right: 8px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.devlogDetailsHeader {
+  padding: 6px 24px;
+  height: 102px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #fff;
+}
+
+.devlogTitleWrapper {
+  height: 48px;
+  margin-bottom: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #d9d9d9 transparent;
+  display: flex;
+  align-items: center;
+
+  .devlogTitle {
+    margin: 0 !important;
+    text-wrap: nowrap;
+  }
+}
+
+.devlogInfo {
+  height: 32px;
+
+  .metaInfo {
+  }
+
+  .metaText {
+    font-size: 14px;
+  }
+
+  .infoItemWrapper {
+    gap: 16px;
+    margin-right: 16px;
+
+    .infoItem {
+      min-width: 120px;
+    }
+
+    .infoTag {
+      width: 100%;
+      font-size: 12px;
+      text-align: center;
+      padding: 4px 8px;
+    }
+  }
+}
+
+/* Changed Field Indicator */
+.fieldChanged {
+  position: relative;
+}
+
+.fieldChanged::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: #faad14;
+  border-radius: 2px;
+  z-index: 1;
+}
+
+.devlogDetailsActions {
+  margin-bottom: 24px;
+}
+
+.devlogDetailsContent {
+  margin-bottom: 24px;
+  padding: 12px 24px;
+}
+
+.devlogSection {
+  margin-bottom: 24px;
+}
+
+.devlogFormActions {
+  margin-top: 24px;
+}
+
+/* Inline editing styles - remove these as they're now in EditableField.module.css */
+
+.inlineForm {
+  width: 100%;
+}
+
+.emptyFieldText {
+  font-style: italic;
+  color: #999;
+  padding: 8px 0;
+}
+
+.sectionHeader {
+  position: sticky;
+  top: 102px; /* Account for the sticky devlog header */
+  background: #fff;
+  padding: 0;
+  z-index: 10;
+  transition: all 0.2s ease-in-out;
+}
+
+.editIcon {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: #999;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.sectionHeader:hover .editIcon {
+  opacity: 1;
+}
+
+.editIcon:hover {
+  color: #1890ff;
+}
+
+/* Section spacing */
+.descriptionSection {
+  margin-bottom: 24px;
+}
+
+.contextSection {
+  margin-bottom: 24px;
+}
+
+.criteriaSection {
+  margin-bottom: 24px;
+}
+
+.dependencySection {
+  margin-bottom: 24px;
+}
+
+.decisionSection {
+  margin-bottom: 24px;
+}
+
+.riskSection {
+  margin-bottom: 24px;
+}
+
+.fileSection {
+  margin-bottom: 24px;
+}
+
+.relatedSection {
+  margin-bottom: 24px;
+}
+
+.aiContextSection {
+  margin-bottom: 24px;
+}
+
+.externalRefSection {
+  margin-bottom: 24px;
+}
+
+.notesSection {
+  margin-bottom: 24px;
+}
+
+/* Hours display */
+.hoursRow {
+  margin-bottom: 16px;
+}
+
+.tagsSection {
+  margin-bottom: 16px;
+}
+
+.tagsLabel {
+  margin-right: 8px;
+}
+
+/* Decision timeline */
+.decisionItem {
+  margin-bottom: 8px;
+}
+
+.decisionContent {
+  margin-bottom: 8px;
+}
+
+.decisionAlternatives {
+  margin-bottom: 8px;
+}
+
+/* Dependency cards */
+.dependencyCard {
+  width: 100%;
+}
+
+.dependencyHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dependencyInfo {
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+/* Risk cards */
+.riskCard {
+  width: 100%;
+}
+
+.riskHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.riskMitigation {
+  margin-top: 8px;
+}
+
+/* File cards */
+.fileCard {
+  background: #f8f9fa;
+}
+
+/* AI Context sections */
+.aiSection {
+  margin-bottom: 16px;
+}
+
+.aiInsightItem {
+  padding: 4px 0;
+  border: none;
+}
+
+.aiQuestionItem {
+  padding: 4px 0;
+  border: none;
+}
+
+.aiStepItem {
+  padding: 4px 0;
+  border: none;
+}
+
+.aiPatterns {
+  margin-top: 8px;
+}
+
+.aiUpdateInfo {
+  font-size: 12px;
+}
+
+/* External references */
+.externalRefCard {
+  margin-bottom: 8px;
+}
+
+.externalRefHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.externalRefLink {
+  color: #1890ff;
+}
+
+.externalRefStatus {
+  margin-top: 4px;
+}
+
+.externalRefSync {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+/* Notes */
+.noteItem {
+  margin-bottom: 8px;
+}
+
+.noteTimestamp {
+  font-size: 12px;
+}
+
+/* Better spacing for mobile */
+@media (max-width: 576px) {
+  .devlogDetailsHeader {
+    margin-bottom: 16px;
+  }
+}

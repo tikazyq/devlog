@@ -1,6 +1,7 @@
 # @devlog/core
 
-Core functionality for the devlog system. This package provides the main `DevlogManager` class that handles creation, updating, querying, and management of development logs.
+Core functionality for the devlog system. This package provides the main `DevlogManager` class that handles creation,
+updating, querying, and management of development logs.
 
 ## Features
 
@@ -88,6 +89,7 @@ new DevlogManager(options?: DevlogManagerOptions)
 ```
 
 Options:
+
 - `workspaceRoot?: string` - Root directory of your project (defaults to `process.cwd()`)
 - `devlogDir?: string` - Custom directory for devlog storage (defaults to `{workspaceRoot}/.devlog`)
 
@@ -112,7 +114,7 @@ The core package supports multiple storage backends:
 
 - **SQLite**: Default for local development, provides good performance and full-text search
 - **PostgreSQL**: For production environments requiring multi-user access
-- **MySQL**: Alternative database option for web applications  
+- **MySQL**: Alternative database option for web applications
 - **Enterprise**: Integration with external systems like Jira, Azure DevOps, etc.
 
 Storage is configured through the `DevlogManager` constructor or environment variables.

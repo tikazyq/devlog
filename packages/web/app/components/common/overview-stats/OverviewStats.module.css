@@ -1,0 +1,169 @@
+/* overview-stats Component Styles */
+
+/* Base Stats Container Styles */
+.statCompact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 60px;
+}
+
+.statValue {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #1890ff;
+}
+
+.statValue.new {
+  color: #722ed1;
+}
+
+.statValue.inProgress {
+  color: #faad14;
+}
+
+.statValue.blocked {
+  color: #ff4d4f;
+}
+
+.statValue.inReview {
+  color: #fa8c16;
+}
+
+.statValue.testing {
+  color: #13c2c2;
+}
+
+.statValue.completed {
+  color: #52c41a;
+}
+
+.statValue.closed {
+  color: #595959;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: #8c8c8c;
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+/* Detailed Variant (Dashboard and DevlogList) */
+.dashboardStats {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Compact Variant (Sidebar) */
+.sidebarStats {
+  margin: 12px 16px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.sidebarStatsHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sidebarStatsTitle {
+  margin-bottom: 0 !important;
+  color: #6b7280;
+}
+
+.infoIcon {
+  color: #8c8c8c;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+.infoIcon:hover {
+  color: #1890ff;
+}
+
+.compactStats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 0;
+  border-radius: 6px;
+}
+
+.compactStats .statCompact {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  min-width: auto;
+  flex: 0 0 auto;
+}
+
+.compactStats .statIcon {
+  font-size: 14px;
+}
+
+.compactStats .statValue {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Popover Content */
+.popoverContent {
+  min-width: 200px;
+}
+
+.popoverStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.popoverStats .statCompact {
+  min-width: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sidebarStats {
+    padding: 16px 12px;
+  }
+
+  .dashboardStats {
+    gap: 16px;
+  }
+
+  .statCompact {
+    min-width: 50px;
+  }
+
+  .statValue {
+    font-size: 18px;
+  }
+
+  .statLabel {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboardStats {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .statCompact {
+    min-width: 45px;
+  }
+
+  .statValue {
+    font-size: 16px;
+  }
+}

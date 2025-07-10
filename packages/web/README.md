@@ -6,7 +6,7 @@ Web interface for devlog management - A modern dashboard for tracking developmen
 
 - 📊 **Dashboard** - Overview of development progress with statistics
 - 📝 **Devlog Management** - Create, edit, and delete development logs
-- 🔄 **Real-time Updates** - WebSocket connection for live updates
+- 🔄 **Real-time Updates** - Server-Sent Events (SSE) connection for live updates
 - 🎨 **Modern UI** - Built with React and Tailwind CSS
 - 📱 **Responsive Design** - Works on desktop and mobile devices
 
@@ -28,7 +28,8 @@ pnpm dev:client
 pnpm dev:server
 ```
 
-The client will be available at http://localhost:3000 and will proxy API requests to the server at http://localhost:3001.
+The client will be available at http://localhost:3000 and will proxy API requests to the server
+at http://localhost:3001.
 
 ### Production
 
@@ -45,11 +46,13 @@ pnpm start
 The web package consists of two main parts:
 
 ### Client (React App)
+
 - Built with React 18 and TypeScript
 - Styled with Tailwind CSS
 - Bundled with Vite for fast development
 
 ### Server (Express API)
+
 - RESTful API built with Express.js
 - WebSocket support for real-time updates
 - Integrates with `@devlog/core` for data management
@@ -64,11 +67,34 @@ The web package consists of two main parts:
 - `GET /api/devlogs/stats/overview` - Get overview statistics
 - `POST /api/devlogs/:id/notes` - Add note to devlog
 
-## WebSocket Events
+## Server-Sent Events (SSE)
 
-- `subscribe` - Subscribe to updates for a channel
-- `unsubscribe` - Unsubscribe from a channel
-- `update` - Broadcast when devlogs are updated
+Real-time updates are implemented using Server-Sent Events instead of WebSockets for better compatibility with Next.js App Router.
+
+### Events
+
+- `connected` - Client successfully connected to SSE stream
+- `devlog-created` - New devlog entry was created
+- `devlog-updated` - Existing devlog entry was updated  
+- `devlog-deleted` - Devlog entry was deleted
+
+### Usage
+
+```typescript
+import { useServerSentEvents } from '@/hooks/useServerSentEvents';
+
+function MyComponent() {
+  const { connected, subscribe } = useServerSentEvents();
+  
+  useEffect(() => {
+    subscribe('devlog-updated', (devlog) => {
+      console.log('Devlog updated:', devlog);
+    });
+  }, [subscribe]);
+  
+  return <div>Connected: {connected}</div>;
+}
+```
 
 ## Environment Variables
 
@@ -77,4 +103,5 @@ The web package consists of two main parts:
 
 ## Development Guidelines
 
-This package follows the project's dogfooding approach - use the devlog system to track development of the web interface itself!
+This package follows the project's dogfooding approach - use the devlog system to track development of the web interface
+itself!

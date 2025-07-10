@@ -2,7 +2,6 @@
   "name": "devlog",
   "version": "1.0.0",
   "description": "Monorepo for development logging tools and MCP server",
-  "private": true,
   "scripts": {
     "build": "pnpm -r build",
     "start": "pnpm --filter @devlog/mcp start",
@@ -18,7 +17,8 @@
     "build:types": "pnpm --filter @devlog/types build",
     "build:core": "pnpm --filter @devlog/core build",
     "build:web": "pnpm --filter @devlog/web build",
-    "dev:web": "pnpm --filter @devlog/web dev",
+    "dev:mcp": "concurrently --names \"TYPES,CORE,MCP\" --prefix-colors \"cyan,green,yellow\" \"pnpm --filter @devlog/types dev\" \"pnpm --filter @devlog/core dev\" \"pnpm --filter @devlog/mcp dev\"",
+    "dev:web": "concurrently --names \"TYPES,CORE,WEB\" --prefix-colors \"cyan,green,blue\" \"pnpm --filter @devlog/types dev\" \"pnpm --filter @devlog/core dev\" \"pnpm --filter @devlog/web dev\"",
     "start:web": "pnpm --filter @devlog/web start"
   },
   "keywords": [
@@ -33,6 +33,8 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "concurrently": "9.2.0",
+    "prettier": "3.6.1",
     "typescript": "^5.0.0"
   },
   "engines": {

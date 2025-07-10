@@ -17,7 +17,7 @@ MCP (Model Context Protocol) server that wraps the core functionality for AI ass
 
 - **Task Management**: Create and track features, bugfixes, tasks, refactoring, and documentation work
 - **Structured Notes**: Timestamped notes with categories (progress, issues, solutions, ideas, reminders)
-- **Status Tracking**: Track work through todo → in-progress → review → testing → done
+- **Status Tracking**: Track work through new → in-progress → blocked/in-review → testing → done
 - **Priority Management**: Assign and filter by priority levels (low, medium, high, critical)
 - **Search & Filter**: Find devlogs by keywords, status, type, or priority
 - **Active Context**: Get a summary of current work for AI context
@@ -234,7 +234,7 @@ Create a new devlog entry for a task, feature, or bugfix. Will fail if an entry 
 }
 ```
 
-#### `find_or_create_devlog`
+#### `create_devlog`
 Find an existing devlog entry by title or create a new one if it doesn't exist. This is the recommended way to create devlog entries as it prevents duplicates.
 
 ```json
@@ -373,18 +373,45 @@ To use this server with an MCP client, add it to your client configuration:
 
 ## Development
 
+This monorepo provides an enhanced development experience with automatic dependency building. When you run development scripts for application packages, the base packages (`@devlog/types` and `@devlog/core`) automatically rebuild when their source files change.
+
+### Quick Start
+
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
-# Build the project
-npm run build
+# Build all packages
+pnpm build
 
-# Run in development mode
-npm run dev
+# Start MCP server with auto-building dependencies
+pnpm dev:mcp
 
-# Start the server
-npm start
+# Start web app with auto-building dependencies  
+pnpm dev:web
+```
+
+### Enhanced Dev Scripts
+
+The following commands automatically watch and rebuild dependencies:
+
+- `pnpm dev:mcp` - MCP server with auto-building `types` and `core`
+- `pnpm dev:web` - Web app with auto-building `types` and `core`
+
+For more details, see [Development Guide](docs/guides/DEVELOPMENT.md).
+
+### Legacy Commands
+
+```bash
+# Build individual packages
+pnpm build:types
+pnpm build:core  
+pnpm build:mcp
+pnpm build:web
+
+# Run individual packages (no dependency watching)
+pnpm dev          # MCP server only
+pnpm --filter @devlog/web dev  # Web app only
 ```
 
 ## License

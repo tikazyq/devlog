@@ -367,6 +367,7 @@ export function DevlogDetails({
             placeholder="Enter description"
             emptyText="Click to add description..."
             className={isFieldChanged('description') ? styles.fieldChanged : ''}
+            borderless={false}
           >
             <MarkdownRenderer content={getCurrentValue('description')} />
           </EditableField>
@@ -384,6 +385,7 @@ export function DevlogDetails({
             placeholder="Why this work matters and what problem it solves"
             emptyText="Click to add business context..."
             className={isFieldChanged('context.businessContext') ? styles.fieldChanged : ''}
+            borderless={false}
           >
             <MarkdownRenderer content={getCurrentValue('context.businessContext')} />
           </EditableField>
@@ -401,6 +403,7 @@ export function DevlogDetails({
             placeholder="Architecture decisions, constraints, assumptions"
             emptyText="Click to add technical context..."
             className={isFieldChanged('context.technicalContext') ? styles.fieldChanged : ''}
+            borderless={false}
           >
             <MarkdownRenderer content={getCurrentValue('context.technicalContext')} />
           </EditableField>

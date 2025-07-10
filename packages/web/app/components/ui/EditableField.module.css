@@ -4,15 +4,19 @@
   position: relative;
   transition: all 0.2s ease-in-out;
   cursor: pointer;
-  border-radius: 6px;
-  border: 1px solid transparent;
-  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 8px 16px;
+}
+
+.editableField.borderless {
+  padding: 0;
+  border-color: transparent !important;
 }
 
 .editableField:hover:not(.editing) {
   background-color: rgba(0, 0, 0, 0.02);
-  border-color: rgba(0, 0, 0, 0.06);
-  border-style: dashed;
+  border-color: #1677ff;
 }
 
 .editableField.editing {
@@ -24,7 +28,6 @@
 
 .editableField.editing:hover {
   background-color: transparent;
-  /* Maintain consistent padding/margin on hover */
   padding: 4px;
 }
 

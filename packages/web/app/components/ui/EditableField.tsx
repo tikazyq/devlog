@@ -21,6 +21,7 @@ interface EditableFieldProps {
   className?: string;
   size?: 'small' | 'middle' | 'large';
   draftMode?: boolean; // When true, doesn't auto-save on blur
+  borderless?: boolean; // Use borderless style for input
   children: React.ReactNode;
 }
 
@@ -35,6 +36,7 @@ export function EditableField({
   className,
   size = 'small',
   draftMode = true,
+  borderless = true,
   children,
 }: EditableFieldProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -182,7 +184,7 @@ export function EditableField({
   return (
     <div
       ref={contentRef}
-      className={`${styles.editableField} ${isHovered ? styles.hovered : ''} ${className}`}
+      className={`${styles.editableField} ${isHovered ? styles.hovered : ''} ${className} ${borderless ? styles.borderless : ''}`}
       onClick={handleEnterEdit}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

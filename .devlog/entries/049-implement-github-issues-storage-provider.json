@@ -1,0 +1,60 @@
+{
+  "key": "implement-github-issues-storage-provider",
+  "title": "Implement GitHub Issues Storage Provider",
+  "type": "feature",
+  "description": "Implement a new storage type called 'github' that uses GitHub Issues as the storage backend for devlog entries. This will allow developers to store and manage devlog data directly in GitHub repositories using the GitHub API, providing seamless integration with existing GitHub workflows.",
+  "status": "in-progress",
+  "priority": "high",
+  "createdAt": "2025-07-10T13:32:52.345Z",
+  "updatedAt": "2025-07-10T13:36:14.127Z",
+  "notes": [
+    {
+      "id": "895da02e-cb30-4c78-80fc-c0015e58c8ca",
+      "timestamp": "2025-07-10T13:36:14.127Z",
+      "category": "progress",
+      "content": "Completed comprehensive design document for GitHub Issues Storage Provider. The design covers all aspects of implementation including:\n\n1. **Architecture Overview**: Clear separation between GitHub storage (primary backend) vs GitHub integration (sync service)\n2. **Data Mapping Strategy**: Detailed bidirectional mapping between DevlogEntry and GitHub Issues using structured issue body format\n3. **Type Definitions**: Complete TypeScript interfaces for GitHubStorageConfig and updates to existing types\n4. **Implementation Details**: Full class structure for GitHubStorageProvider, GitHub API client, rate limiter, and supporting utilities\n5. **Configuration Examples**: Sample configs and environment variable setup\n6. **Error Handling**: Comprehensive error handling for API errors, network issues, and data integrity\n7. **Performance Optimization**: Caching strategy, rate limiting, and memory management\n8. **Security Considerations**: Token management, permissions, and secure practices\n9. **Migration Strategy**: Plan for migrating from other storage types\n\nThe design is documented in `/docs/project/github-storage-design.md` and follows the established patterns in the codebase while providing a robust GitHub-native storage solution.",
+      "files": [
+        "docs/project/github-storage-design.md"
+      ]
+    }
+  ],
+  "files": [],
+  "relatedDevlogs": [],
+  "context": {
+    "businessContext": "GitHub is the most popular development platform, and many teams manage their work through GitHub Issues. By providing GitHub Issues as a storage backend, we enable developers to keep their devlog entries in the same system where they manage code, pull requests, and project planning. This creates a unified workflow and reduces tool fragmentation.",
+    "technicalContext": "The implementation will follow the existing StorageProvider interface pattern used by JSON, SQLite, MySQL, and PostgreSQL storage providers. It will use the GitHub REST API to manage issues as devlog entries, with proper mapping between devlog schema and GitHub issue fields. The implementation should handle authentication, rate limiting, and error recovery.",
+    "dependencies": [],
+    "decisions": [],
+    "acceptanceCriteria": [
+      "GitHub storage provider implements all StorageProvider interface methods",
+      "Configuration supports GitHub repository, token, and optional settings",
+      "Devlog entries map correctly to GitHub issues with proper metadata",
+      "Storage provider factory recognizes 'github' type",
+      "Error handling for API rate limits and network issues",
+      "Documentation and examples for GitHub storage setup",
+      "Integration tests covering CRUD operations"
+    ],
+    "risks": []
+  },
+  "aiContext": {
+    "currentSummary": "",
+    "keyInsights": [
+      "Existing GitHub integration service already has some GitHub API code we can leverage",
+      "Need to differentiate between GitHub integration (sync) vs GitHub storage (primary backend)",
+      "GitHub Issues have limited custom fields - may need to use labels and issue body for metadata",
+      "GitHub API has rate limiting that needs to be handled gracefully",
+      "Issue numbers are auto-generated so need mapping strategy for devlog IDs"
+    ],
+    "openQuestions": [],
+    "relatedPatterns": [
+      "Follow same pattern as existing storage providers (JSON, SQLite, etc.)",
+      "Use GitHub API similar to existing enterprise-sync integration",
+      "Configuration pattern should match other storage types",
+      "Error handling patterns from other API-based providers"
+    ],
+    "suggestedNextSteps": [],
+    "lastAIUpdate": "2025-07-10T13:32:52.345Z",
+    "contextVersion": 1
+  },
+  "id": 49
+}

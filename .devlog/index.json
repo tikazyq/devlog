@@ -386,8 +386,53 @@
       "priority": "low",
       "createdAt": "2025-07-10T09:53:21.609Z",
       "updatedAt": "2025-07-10T09:55:56.860Z"
+    },
+    "47": {
+      "filename": "047-fix-excessive-loading-logs-and-optimize-stats-fetc.json",
+      "title": "Fix excessive loading logs and optimize stats fetching in web application",
+      "status": "done",
+      "type": "bugfix",
+      "priority": "medium",
+      "createdAt": "2025-07-10T13:21:49.763Z",
+      "updatedAt": "2025-07-10T13:27:23.726Z"
+    },
+    "48": {
+      "filename": "048-implement-hierarchical-sticky-headings-ui-componen.json",
+      "title": "Implement hierarchical sticky headings UI component",
+      "status": "done",
+      "type": "feature",
+      "priority": "medium",
+      "createdAt": "2025-07-10T13:29:26.980Z",
+      "updatedAt": "2025-07-10T13:38:22.013Z"
+    },
+    "49": {
+      "filename": "049-implement-github-issues-storage-provider.json",
+      "title": "Implement GitHub Issues Storage Provider",
+      "status": "in-progress",
+      "type": "feature",
+      "priority": "high",
+      "createdAt": "2025-07-10T13:32:52.345Z",
+      "updatedAt": "2025-07-10T13:36:14.127Z"
+    },
+    "50": {
+      "filename": "050-fix-devlogdetails-sticky-headings-hierarchy-struct.json",
+      "title": "Fix DevlogDetails sticky headings hierarchy structure",
+      "status": "done",
+      "type": "refactor",
+      "priority": "medium",
+      "createdAt": "2025-07-10T13:48:05.958Z",
+      "updatedAt": "2025-07-10T13:57:34.319Z"
+    },
+    "51": {
+      "filename": "051-fix-ssr-error-caused-by-monaco-editor-direct-impor.json",
+      "title": "Fix SSR error caused by Monaco Editor direct import",
+      "status": "done",
+      "type": "bugfix",
+      "priority": "critical",
+      "createdAt": "2025-07-10T14:03:27.126Z",
+      "updatedAt": "2025-07-10T14:05:22.947Z"
     }
   },
-  "lastId": 46,
+  "lastId": 51,
   "version": "1.0.0"
 }

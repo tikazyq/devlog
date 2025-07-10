@@ -2,7 +2,6 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import styles from './MarkdownEditor.module.css';
 
 // Dynamically import Monaco Editor to avoid SSR issues
@@ -141,41 +140,45 @@ export function MarkdownEditor({
           function updateHeight() {
             const model = editor.getModel();
             if (!model || !editorRef.current) return;
-            const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
+            
+            // Import monaco dynamically to avoid SSR issues
+            import('monaco-editor/esm/vs/editor/editor.api').then((monaco) => {
+              const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
 
-            // Calculate the actual visual line count including wrapped lines
-            const actualLineCount = model.getLineCount();
-            let visualLineCount = 0;
+              // Calculate the actual visual line count including wrapped lines
+              const actualLineCount = model.getLineCount();
+              let visualLineCount = 0;
 
-            for (let i = 1; i <= actualLineCount; i++) {
-              const lineLength = model.getLineLength(i);
+              for (let i = 1; i <= actualLineCount; i++) {
+                const lineLength = model.getLineLength(i);
 
-              // Get the viewport width to calculate wrapping
-              const viewportWidth = editor.getLayoutInfo().contentWidth;
-              const charWidth = editor.getOption(
-                monaco.editor.EditorOption.fontInfo,
-              ).typicalHalfwidthCharacterWidth;
-              const maxCharsPerLine = Math.floor(viewportWidth / charWidth);
+                // Get the viewport width to calculate wrapping
+                const viewportWidth = editor.getLayoutInfo().contentWidth;
+                const charWidth = editor.getOption(
+                  monaco.editor.EditorOption.fontInfo,
+                ).typicalHalfwidthCharacterWidth;
+                const maxCharsPerLine = Math.floor(viewportWidth / charWidth);
 
-              if (lineLength === 0) {
-                // Empty line still takes 1 visual line
-                visualLineCount += 1;
-              } else if (maxCharsPerLine > 0) {
-                // Calculate wrapped lines for this line
-                visualLineCount += Math.ceil(lineLength / maxCharsPerLine);
-              } else {
-                // Fallback to 1 line if we can't calculate wrapping
-                visualLineCount += 1;
+                if (lineLength === 0) {
+                  // Empty line still takes 1 visual line
+                  visualLineCount += 1;
+                } else if (maxCharsPerLine > 0) {
+                  // Calculate wrapped lines for this line
+                  visualLineCount += Math.ceil(lineLength / maxCharsPerLine);
+                } else {
+                  // Fallback to 1 line if we can't calculate wrapping
+                  visualLineCount += 1;
+                }
               }
-            }
 
-            const height = Math.min(visualLineCount * lineHeight, 480);
+              const height = Math.min(visualLineCount * lineHeight, 480);
 
-            // Update the container height directly to avoid re-renders
-            if (editorRef.current) {
-              editorRef.current.style.height = height + 18 + 'px';
-            }
-            editor.layout();
+              // Update the container height directly to avoid re-renders
+              if (editorRef.current) {
+                editorRef.current.style.height = height + 18 + 'px';
+              }
+              editor.layout();
+            });
           }
 
           editor.onDidChangeModelContent(updateHeight);

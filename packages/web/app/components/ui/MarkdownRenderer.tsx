@@ -7,6 +7,7 @@ import rehypeHighlight from 'rehype-highlight';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import { Typography } from 'antd';
 import styles from './MarkdownRenderer.module.css';
+import { StickyHeadings } from './StickyHeadings';
 
 const { Text } = Typography;
 
@@ -54,6 +55,8 @@ interface MarkdownRendererProps {
   className?: string;
   preserveLineBreaks?: boolean; // If true, handles escaped newlines and converts single line breaks to paragraphs
   maxHeight?: number; // Optional max height for the content
+  enableStickyHeadings?: boolean; // Enable sticky headings feature
+  stickyHeadingsTopOffset?: number; // Top offset for sticky headings
 }
 
 export function MarkdownRenderer({
@@ -61,6 +64,8 @@ export function MarkdownRenderer({
   className,
   preserveLineBreaks = true,
   maxHeight = 480, // Default max height
+  enableStickyHeadings = false,
+  stickyHeadingsTopOffset = 48,
 }: MarkdownRendererProps) {
   if (!content || content.trim() === '') {
     return null;
@@ -69,10 +74,10 @@ export function MarkdownRenderer({
   // Preprocess content to handle single line breaks
   const processedContent = preserveLineBreaks ? preprocessContent(content) : content;
   const combinedClassName = `${styles.markdownRenderer} ${className || ''}`.trim();
-  const style: React.CSSProperties = maxHeight ? { maxHeight: `${maxHeight}px`, overflowY: 'auto', scrollbarWidth: 'thin', scrollbarColor: '#d9d9d9 transparent' } : {};
+  const wrapperClassName = maxHeight ? `${combinedClassName} ${styles.markdownRendererScrollable}` : combinedClassName;
 
-  return (
-    <div className={combinedClassName} style={style}>
+  const markdownContent = (
+    <div className={wrapperClassName}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[
@@ -158,4 +163,18 @@ export function MarkdownRenderer({
       </ReactMarkdown>
     </div>
   );
+
+  if (enableStickyHeadings) {
+    return (
+      <>
+        {markdownContent}
+        <StickyHeadings
+          headingSelector=".markdownRenderer h1, .markdownRenderer h2, .markdownRenderer h3, .markdownRenderer h4, .markdownRenderer h5, .markdownRenderer h6"
+          topOffset={stickyHeadingsTopOffset}
+        />
+      </>
+    );
+  }
+
+  return markdownContent;
 }

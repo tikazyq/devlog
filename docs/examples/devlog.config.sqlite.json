@@ -1,0 +1,6 @@
+{
+    "storage": {
+        "type": "sqlite",
+        "connectionString": "devlog.db"
+    }
+}

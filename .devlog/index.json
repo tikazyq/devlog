@@ -458,8 +458,26 @@
       "priority": "high",
       "createdAt": "2025-07-11T02:03:22.773Z",
       "updatedAt": "2025-07-11T04:12:09.129Z"
+    },
+    "81": {
+      "filename": "081-test-github-storage-with-codervisor-devlog-reposit.json",
+      "title": "Test GitHub Storage with codervisor/devlog Repository",
+      "status": "done",
+      "type": "task",
+      "priority": "high",
+      "createdAt": "2025-07-11T04:20:19.998Z",
+      "updatedAt": "2025-07-11T04:58:07.430Z"
+    },
+    "82": {
+      "filename": "082-github-storage-test-entry.json",
+      "title": "GitHub Storage Test Entry",
+      "status": "new",
+      "type": "task",
+      "priority": "medium",
+      "createdAt": "2025-07-11T04:21:36.286Z",
+      "updatedAt": "2025-07-11T04:21:36.286Z"
     }
   },
-  "lastId": 80,
+  "lastId": 82,
   "version": "1.0.0"
 }

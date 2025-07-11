@@ -84,11 +84,6 @@ export interface StorageConfig {
   options?: Record<string, any>;
 }
 
-export interface WorkspaceConfig {
-  workspaces?: Record<string, StorageConfig>;
-  defaultWorkspace?: string;
-}
-
 export interface GitSyncStatus {
   status: 'synced' | 'ahead' | 'behind' | 'diverged' | 'error';
   localCommits?: number;
@@ -169,7 +164,9 @@ export interface DevlogIndexEntry {
 
 // Configuration Types
 export interface DevlogConfig {
-  storage: StorageConfig;
+  // Traditional single workspace mode (backward compatibility)
+  storage?: StorageConfig;
+  
   // TODO: Uncomment when integrations are implemented
   // integrations?: EnterpriseIntegration;
   // syncStrategy?: SyncStrategy;
@@ -177,7 +174,8 @@ export interface DevlogConfig {
 
 export interface DevlogManagerOptions {
   workspaceRoot?: string;
-  storage?: StorageConfig;
+  workspace?: string; // Workspace name to use
+  storage?: StorageConfig; // Direct storage config (fallback for backward compatibility)
   // integrations?: EnterpriseIntegration;
   // syncStrategy?: SyncStrategy;
 }

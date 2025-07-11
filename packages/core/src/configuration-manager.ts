@@ -11,6 +11,11 @@ import { getWorkspaceRoot } from './utils/storage.js';
 export class ConfigurationManager {
   private workspaceRoot: string | null = null;
   private configPath: string | null = null;
+  private currentWorkspace: string | null = null;
+
+  constructor(workspace?: string) {
+    this.currentWorkspace = workspace || null;
+  }
 
   async initialize(): Promise<void> {
     this.workspaceRoot = getWorkspaceRoot();

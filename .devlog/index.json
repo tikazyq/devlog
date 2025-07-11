@@ -485,8 +485,17 @@
       "priority": "high",
       "createdAt": "2025-07-11T05:29:05.861Z",
       "updatedAt": "2025-07-11T05:36:09.063Z"
+    },
+    "84": {
+      "filename": "084-implement-workspace-feature-for-devlog-application.json",
+      "title": "Implement workspace feature for devlog application isolation",
+      "status": "in-progress",
+      "type": "feature",
+      "priority": "high",
+      "createdAt": "2025-07-11T05:50:17.797Z",
+      "updatedAt": "2025-07-11T05:59:33.921Z"
     }
   },
-  "lastId": 83,
+  "lastId": 84,
   "version": "1.0.0"
 }

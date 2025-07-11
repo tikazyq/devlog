@@ -1,5 +1,15 @@
 # GitHub Integration Setup Guide
 
+## ✨ New: Native GitHub Features Support
+
+The devlog GitHub integration now supports leveraging GitHub's native features for better integration. You can choose between:
+
+- **Native Integration**: Uses GitHub's built-in type field, state_reason, and standard labels
+- **Traditional Labels**: Uses custom prefixed labels (existing behavior)
+- **Hybrid Approach**: Mix and match features as needed
+
+See the [GitHub Native Features Guide](./GITHUB_NATIVE_FEATURES.md) for detailed configuration options.
+
 ## 🔑 Required Token Permissions
 
 Your GitHub Personal Access Token needs these permissions for full devlog integration:

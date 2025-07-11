@@ -9,11 +9,18 @@ export interface GitHubIssue {
   title: string;
   body: string | null;
   state: 'open' | 'closed';
+  state_reason?: 'completed' | 'not_planned' | 'reopened' | null;
   labels: Array<{ name: string; color: string }>;
   assignees: Array<{ login: string }>;
   created_at: string;
   updated_at: string;
   html_url: string;
+  milestone?: {
+    number: number;
+    title: string;
+    state: 'open' | 'closed';
+    due_on?: string;
+  } | null;
 }
 
 export interface GitHubRepository {
@@ -31,14 +38,19 @@ export interface CreateIssueRequest {
   body?: string;
   labels?: string[];
   assignees?: string[];
+  milestone?: number;
+  type?: string;
 }
 
 export interface UpdateIssueRequest {
   title?: string;
   body?: string;
   state?: 'open' | 'closed';
+  state_reason?: 'completed' | 'not_planned' | 'reopened' | null;
   labels?: string[];
   assignees?: string[];
+  milestone?: number | null;
+  type?: string | null;
 }
 
 export interface GitHubSearchResponse {
@@ -166,6 +178,12 @@ export class GitHubAPIClient {
       apiUrl: config.apiUrl || 'https://api.github.com',
       branch: config.branch || 'main',
       labelsPrefix: config.labelsPrefix || 'devlog',
+      mapping: {
+        useNativeType: true,
+        useNativeLabels: true,
+        useStateReason: true,
+        ...config.mapping,
+      },
       rateLimit: {
         requestsPerHour: 5000,
         retryDelay: 1000,

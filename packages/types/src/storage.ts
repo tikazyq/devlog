@@ -45,6 +45,20 @@ export interface GitHubStorageConfig {
   apiUrl?: string;         // For GitHub Enterprise (default: api.github.com)
   branch?: string;         // For repository-specific operations
   labelsPrefix?: string;   // Prefix for devlog labels (default: 'devlog')
+  
+  // Strategy for mapping devlog fields to GitHub features
+  mapping?: {
+    useNativeType?: boolean;      // Use GitHub's native 'type' field instead of labels (default: true)
+    useNativeLabels?: boolean;    // Prefer GitHub's default labels over custom prefixes (default: true)
+    useStateReason?: boolean;     // Use GitHub's state_reason for nuanced status (default: true)
+    projectId?: number;           // GitHub Projects v2 ID for organizing devlog entries
+    projectFieldMappings?: {      // Map devlog fields to project custom fields
+      priority?: string;          // Project field name for priority
+      status?: string;            // Project field name for status
+      type?: string;              // Project field name for type (if not using native)
+    };
+  };
+  
   rateLimit?: {
     requestsPerHour?: number;  // Default: 5000 (GitHub's limit)
     retryDelay?: number;       // Default: 1000ms

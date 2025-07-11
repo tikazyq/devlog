@@ -39,19 +39,55 @@ export class DevlogGitHubMapper {
   issueToDevlog(issue: GitHubIssue): DevlogEntry {
     const { userContent, metadata } = this.parseIssueBody(issue.body || '');
     
-    // Extract devlog data from labels
-    const typeLabel = issue.labels.find(l => l.name.startsWith(`${this.config.labelsPrefix}-type:`));
-    const statusLabel = issue.labels.find(l => l.name.startsWith(`${this.config.labelsPrefix}-status:`));
-    const priorityLabel = issue.labels.find(l => l.name.startsWith(`${this.config.labelsPrefix}-priority:`));
+    // Determine type - use native type field or fall back to labels
+    let type: DevlogType = 'task';
+    if (this.config.mapping.useNativeType && (issue as any).type) {
+      type = this.mapGitHubTypeToDevlogType((issue as any).type);
+    } else {
+      // Extract devlog data from labels (existing behavior)
+      const typeLabel = issue.labels.find(l => l.name.startsWith(`${this.config.labelsPrefix}-type:`));
+      if (typeLabel) {
+        type = this.extractEnumFromLabel(typeLabel.name, 'type') as DevlogType || 'task';
+      } else if (this.config.mapping.useNativeLabels) {
+        // Map from native GitHub labels
+        type = this.mapNativeLabelsToDevlogType(issue.labels.map(l => l.name));
+      }
+    }
+
+    // Determine status - use state_reason or fall back to labels/state
+    let status: DevlogStatus = 'new';
+    if (this.config.mapping.useStateReason) {
+      status = this.mapGitHubStateToDevlogStatus(issue.state, undefined, issue.state_reason);
+    } else {
+      const statusLabel = issue.labels.find(l => 
+        l.name.startsWith(`${this.config.labelsPrefix}-status:`) ||
+        l.name.startsWith('status:')
+      );
+      status = this.mapGitHubStateToDevlogStatus(issue.state, statusLabel?.name);
+    }
+
+    // Determine priority - from labels
+    let priority: DevlogPriority = 'medium';
+    const priorityLabel = issue.labels.find(l => 
+      l.name.startsWith(`${this.config.labelsPrefix}-priority:`) ||
+      l.name.startsWith('priority:')
+    );
+    if (priorityLabel) {
+      const extractedPriority = this.extractEnumFromLabel(priorityLabel.name, 'priority') ||
+                               priorityLabel.name.replace(/^priority:\s*/, '');
+      if (['low', 'medium', 'high', 'critical'].includes(extractedPriority)) {
+        priority = extractedPriority as DevlogPriority;
+      }
+    }
     
     return {
       id: issue.number,
       key: metadata?.devlogKey || this.titleToKey(issue.title),
       title: issue.title,
       description: userContent.description || '',
-      type: this.extractEnumFromLabel(typeLabel?.name, 'type') as DevlogType || 'task',
-      status: this.mapGitHubStateToDevlogStatus(issue.state, statusLabel?.name),
-      priority: this.extractEnumFromLabel(priorityLabel?.name, 'priority') as DevlogPriority || 'medium',
+      type,
+      status,
+      priority,
       assignee: issue.assignees[0]?.login,
       createdAt: issue.created_at,
       updatedAt: issue.updated_at,
@@ -85,13 +121,35 @@ export class DevlogGitHubMapper {
   devlogToIssue(entry: DevlogEntry): CreateIssueRequest | UpdateIssueRequest {
     const body = this.formatIssueBody(entry);
     const labels = this.generateLabels(entry);
-
-    return {
+    const issueData: CreateIssueRequest | UpdateIssueRequest = {
       title: entry.title,
       body,
       labels,
       assignees: entry.assignee ? [entry.assignee] : undefined,
     };
+
+    // Use native type field if configured
+    if (this.config.mapping.useNativeType) {
+      issueData.type = entry.type;
+    }
+
+    // Set state and state_reason based on devlog status
+    if (this.config.mapping.useStateReason) {
+      const { state, state_reason } = this.mapDevlogStatusToGitHubState(entry.status);
+      (issueData as UpdateIssueRequest).state = state;
+      if (state_reason) {
+        (issueData as UpdateIssueRequest).state_reason = state_reason;
+      }
+    }
+
+    // Add milestone if available (milestone is already supported in GitHub issues)
+    // This could be used for project/epic grouping
+    if (entry.relatedDevlogs?.length || entry.context?.businessContext) {
+      // For now, we don't set milestone automatically, but this is where it would go
+      // issueData.milestone = someMilestoneNumber;
+    }
+
+    return issueData;
   }
 
   /**
@@ -208,14 +266,63 @@ export class DevlogGitHubMapper {
    * Generate labels for the GitHub issue
    */
   private generateLabels(entry: DevlogEntry): string[] {
-    const labels: string[] = [
-      `${this.config.labelsPrefix}-type:${entry.type}`,
-      `${this.config.labelsPrefix}-priority:${entry.priority}`,
-    ];
+    const labels: string[] = [];
 
-    // Only add status label if not default
-    if (entry.status !== 'new') {
-      labels.push(`${this.config.labelsPrefix}-status:${entry.status}`);
+    // Use native labels or custom prefixed labels based on configuration
+    if (this.config.mapping.useNativeLabels) {
+      // Map devlog types to GitHub's native/common labels
+      switch (entry.type) {
+        case 'feature':
+          labels.push('enhancement');
+          break;
+        case 'bugfix':
+          labels.push('bug');
+          break;
+        case 'docs':
+          labels.push('documentation');
+          break;
+        case 'refactor':
+          labels.push('refactor');
+          break;
+        case 'task':
+          // No direct native equivalent, might use a generic label
+          labels.push('task');
+          break;
+        default:
+          labels.push(entry.type);
+      }
+
+      // Use standard priority labels if not using native type
+      if (!this.config.mapping.useNativeType) {
+        switch (entry.priority) {
+          case 'critical':
+            labels.push('priority: critical');
+            break;
+          case 'high':
+            labels.push('priority: high');
+            break;
+          case 'medium':
+            labels.push('priority: medium');
+            break;
+          case 'low':
+            labels.push('priority: low');
+            break;
+        }
+      }
+    } else {
+      // Use custom prefixed labels (existing behavior)
+      if (!this.config.mapping.useNativeType) {
+        labels.push(`${this.config.labelsPrefix}-type:${entry.type}`);
+      }
+      labels.push(`${this.config.labelsPrefix}-priority:${entry.priority}`);
+    }
+
+    // Only add status label if not using state_reason and not default status
+    if (!this.config.mapping.useStateReason && entry.status !== 'new') {
+      const statusLabel = this.config.mapping.useNativeLabels 
+        ? `status: ${entry.status}` 
+        : `${this.config.labelsPrefix}-status:${entry.status}`;
+      labels.push(statusLabel);
     }
 
     return labels;
@@ -233,19 +340,93 @@ export class DevlogGitHubMapper {
   /**
    * Map GitHub issue state and status label to devlog status
    */
-  private mapGitHubStateToDevlogStatus(state: 'open' | 'closed', statusLabel?: string): DevlogStatus {
+  private mapGitHubStateToDevlogStatus(state: 'open' | 'closed', statusLabel?: string, stateReason?: 'completed' | 'not_planned' | 'reopened' | null): DevlogStatus {
     if (state === 'closed') {
+      if (stateReason === 'not_planned') {
+        return 'closed';
+      }
       return 'done';
     }
 
     if (statusLabel) {
-      const status = this.extractEnumFromLabel(statusLabel, 'status');
-      if (status && ['new', 'in-progress', 'blocked', 'in-review', 'testing'].includes(status)) {
+      const status = this.extractEnumFromLabel(statusLabel, 'status') ||
+                     statusLabel.replace(/^status:\s*/, '');
+      if (['new', 'in-progress', 'blocked', 'in-review', 'testing'].includes(status)) {
         return status as DevlogStatus;
       }
     }
 
     return 'new';
+  }
+
+  /**
+   * Map devlog status to GitHub state and state_reason
+   */
+  private mapDevlogStatusToGitHubState(status: DevlogStatus): { state: 'open' | 'closed'; state_reason?: 'completed' | 'not_planned' | 'reopened' | null } {
+    switch (status) {
+      case 'done':
+        return { state: 'closed', state_reason: 'completed' };
+      case 'closed':
+        return { state: 'closed', state_reason: 'not_planned' };
+      case 'new':
+      case 'in-progress':
+      case 'blocked':
+      case 'in-review':
+      case 'testing':
+      default:
+        return { state: 'open', state_reason: null };
+    }
+  }
+
+  /**
+   * Map GitHub native type to devlog type
+   */
+  private mapGitHubTypeToDevlogType(githubType: string): DevlogType {
+    const normalizedType = githubType.toLowerCase();
+    switch (normalizedType) {
+      case 'bug':
+        return 'bugfix';
+      case 'enhancement':
+      case 'feature':
+        return 'feature';
+      case 'documentation':
+      case 'docs':
+        return 'docs';
+      case 'refactor':
+      case 'refactoring':
+        return 'refactor';
+      case 'task':
+      case 'chore':
+        return 'task';
+      default:
+        return 'task';
+    }
+  }
+
+  /**
+   * Map native GitHub labels to devlog type
+   */
+  private mapNativeLabelsToDevlogType(labels: string[]): DevlogType {
+    for (const label of labels) {
+      const normalizedLabel = label.toLowerCase();
+      switch (normalizedLabel) {
+        case 'bug':
+          return 'bugfix';
+        case 'enhancement':
+        case 'feature':
+          return 'feature';
+        case 'documentation':
+        case 'docs':
+          return 'docs';
+        case 'refactor':
+        case 'refactoring':
+          return 'refactor';
+        case 'task':
+        case 'chore':
+          return 'task';
+      }
+    }
+    return 'task'; // Default fallback
   }
 
   /**

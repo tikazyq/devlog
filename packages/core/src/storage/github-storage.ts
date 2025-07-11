@@ -244,33 +244,73 @@ export class GitHubStorageProvider implements StorageProvider {
   private buildSearchQuery(filter?: DevlogFilter): string {
     let query = `repo:${this.config.owner}/${this.config.repo} is:issue`;
 
-    // Add devlog type label to filter only devlog issues
-    query += ` label:"${this.config.labelsPrefix}-type"`;
+    // Add devlog identifier - use type field or labels depending on configuration
+    if (this.config.mapping.useNativeType) {
+      // When using native type, we need a different way to identify devlog issues
+      // We could use a specific label or rely on the structure
+      query += ` label:"${this.config.labelsPrefix}"`;
+    } else {
+      // Use the traditional type label approach
+      if (this.config.mapping.useNativeLabels) {
+        // When using native labels, we need to identify devlog issues differently
+        query += ` label:"${this.config.labelsPrefix}"`;
+      } else {
+        query += ` label:"${this.config.labelsPrefix}-type"`;
+      }
+    }
 
     if (filter?.status && filter.status.length > 0) {
       const statusQueries = filter.status.map((status) => {
         if (status === 'done') {
-          return 'is:closed';
+          return this.config.mapping.useStateReason ? 'is:closed state:completed' : 'is:closed';
+        } else if (status === 'closed') {
+          return this.config.mapping.useStateReason ? 'is:closed state:not_planned' : 'is:closed';
         } else if (status === 'new') {
-          return `is:open -label:"${this.config.labelsPrefix}-status"`;
+          if (this.config.mapping.useStateReason) {
+            return 'is:open';
+          } else {
+            const labelPrefix = this.config.mapping.useNativeLabels ? 'status:' : `${this.config.labelsPrefix}-status:`;
+            return `is:open -label:"${labelPrefix}"`;
+          }
         } else {
-          return `label:"${this.config.labelsPrefix}-status:${status}"`;
+          if (this.config.mapping.useStateReason) {
+            return 'is:open';  // Native state_reason doesn't distinguish these
+          } else {
+            const labelPrefix = this.config.mapping.useNativeLabels ? 'status:' : `${this.config.labelsPrefix}-status:`;
+            return `label:"${labelPrefix}${status}"`;
+          }
         }
       });
       query += ` (${statusQueries.join(' OR ')})`;
     }
 
     if (filter?.type && filter.type.length > 0) {
-      const typeQueries = filter.type.map(
-        (type) => `label:"${this.config.labelsPrefix}-type:${type}"`,
-      );
-      query += ` (${typeQueries.join(' OR ')})`;
+      if (this.config.mapping.useNativeType) {
+        // Use GitHub's native type field
+        const typeQueries = filter.type.map((type) => {
+          const githubType = this.mapDevlogTypeToGitHubType(type);
+          return `type:"${githubType}"`;
+        });
+        query += ` (${typeQueries.join(' OR ')})`;
+      } else {
+        // Use labels
+        const typeQueries = filter.type.map((type) => {
+          if (this.config.mapping.useNativeLabels) {
+            const githubLabel = this.mapDevlogTypeToGitHubLabel(type);
+            return `label:"${githubLabel}"`;
+          } else {
+            return `label:"${this.config.labelsPrefix}-type:${type}"`;
+          }
+        });
+        query += ` (${typeQueries.join(' OR ')})`;
+      }
     }
 
     if (filter?.priority && filter.priority.length > 0) {
-      const priorityQueries = filter.priority.map(
-        (priority) => `label:"${this.config.labelsPrefix}-priority:${priority}"`,
-      );
+      const priorityQueries = filter.priority.map((priority) => {
+        const labelPrefix = this.config.mapping.useNativeLabels ? 'priority:' : `${this.config.labelsPrefix}-priority:`;
+        return `label:"${labelPrefix}${priority}"`;
+      });
       query += ` (${priorityQueries.join(' OR ')})`;
     }
 
@@ -287,6 +327,28 @@ export class GitHubStorageProvider implements StorageProvider {
     }
 
     return query;
+  }
+
+  private mapDevlogTypeToGitHubType(devlogType: string): string {
+    switch (devlogType) {
+      case 'bugfix': return 'bug';
+      case 'feature': return 'enhancement';
+      case 'docs': return 'documentation';
+      case 'refactor': return 'refactor';
+      case 'task': return 'task';
+      default: return devlogType;
+    }
+  }
+
+  private mapDevlogTypeToGitHubLabel(devlogType: string): string {
+    switch (devlogType) {
+      case 'bugfix': return 'bug';
+      case 'feature': return 'enhancement';
+      case 'docs': return 'documentation';
+      case 'refactor': return 'refactor';
+      case 'task': return 'task';
+      default: return devlogType;
+    }
   }
 
   private isEmptyFilter(filter: DevlogFilter): boolean {
@@ -319,6 +381,12 @@ export class GitHubStorageProvider implements StorageProvider {
       apiUrl: config.apiUrl || 'https://api.github.com',
       branch: config.branch || 'main',
       labelsPrefix: config.labelsPrefix || 'devlog',
+      mapping: {
+        useNativeType: true,
+        useNativeLabels: true,
+        useStateReason: true,
+        ...config.mapping,
+      },
       rateLimit: {
         requestsPerHour: 5000,
         retryDelay: 1000,

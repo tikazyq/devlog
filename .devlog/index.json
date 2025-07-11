@@ -476,8 +476,17 @@
       "priority": "medium",
       "createdAt": "2025-07-11T04:21:36.286Z",
       "updatedAt": "2025-07-11T04:21:36.286Z"
+    },
+    "83": {
+      "filename": "083-enhance-github-issues-mapping-to-leverage-built-in.json",
+      "title": "Enhance GitHub Issues mapping to leverage built-in fields and features",
+      "status": "done",
+      "type": "feature",
+      "priority": "high",
+      "createdAt": "2025-07-11T05:29:05.861Z",
+      "updatedAt": "2025-07-11T05:36:09.063Z"
     }
   },
-  "lastId": 82,
+  "lastId": 83,
   "version": "1.0.0"
 }

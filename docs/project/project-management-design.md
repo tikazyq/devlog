@@ -30,8 +30,11 @@ The current devlog system excels at tracking individual tasks but lacks organiza
 
 - **Session-based tracking** instead of time estimates
 - **Complexity assessment** based on AI cognitive load and context requirements
-- **Knowledge dependency mapping** for prerequisite learning
-- **Context optimization** to minimize token costs between sessions
+- **Multi-modal effort measurement** supporting tokens, requests, and tool calls
+- **Universal effort units** for platform-agnostic AI work quantification
+- **Outcome-driven progress** tracking concrete deliverables and knowledge gained
+- **Iteration-based efficiency** measuring attempts and success patterns
+- **Context optimization** to minimize computational costs between sessions
 - **AI learning pattern recognition** for adaptive improvement
 
 ## AI-Native Architecture Design
@@ -56,8 +59,13 @@ export interface DevlogEntry {
   toolRequirements?: string[]; // Required AI tools
   uncertaintyLevel?: 'known' | 'exploratory' | 'research';
 
-  // AI context tracking
-  contextTokensUsed?: number; // Tokens consumed for context
+  // AI effort tracking (platform-agnostic)
+  effortUnits?: number; // Normalized effort measure (tokens/requests/tool-calls)
+  effortType?: 'tokens' | 'requests' | 'tool-calls' | 'hybrid';
+  contextEffort?: number; // Effort spent on understanding/context
+  workEffort?: number; // Effort spent on productive work
+  effortEfficiency?: number; // Work effort / total effort ratio
+  iterationCount?: number; // Number of attempts/iterations
   successProbability?: number; // AI confidence in success
 }
 ```
@@ -67,17 +75,30 @@ export interface DevlogEntry {
 ```typescript
 export interface SessionContext {
   requiredKnowledge: string[];
-  estimatedTokens: number;
+  estimatedEffort: number;         // In effort units (platform agnostic)
+  effortType: 'tokens' | 'requests' | 'tool-calls';
   toolsNeeded: string[];
   contextCost: number;
   knowledgeGaps: string[];
 }
 
+export interface SessionEffort {
+  totalEffort: number;             // Total effort units used
+  contextEffort: number;           // Effort for context/understanding
+  workEffort: number;              // Effort for productive output
+  effortType: 'tokens' | 'requests' | 'tool-calls' | 'hybrid';
+  iterationCount: number;
+  toolCallsCount: number;
+  outcomesAchieved: string[];
+}
+
 export interface AILearningPattern {
   patternType: string;
   contextSignature: string;
-  successRate: number;
+  effortEfficiency: number;        // Work effort / total effort
+  iterationsToSuccess: number;
   complexityFactors: string[];
+  platformAdaptations: PlatformSpecificData[];
 }
 ```
 
@@ -86,10 +107,13 @@ export interface AILearningPattern {
 ### Core Principles
 
 1. **Familiar terminology** (Project/Epic/Task) with AI-optimized internals
-2. **Session-based planning** instead of time-based estimates
-3. **Context management** as the primary constraint
-4. **Knowledge dependencies** replacing coordination dependencies
-5. **Complexity assessment** based on AI cognitive load
+2. **Universal effort tracking** supporting tokens, requests, and tool calls
+3. **Platform-agnostic metrics** using normalized effort units
+4. **Outcome-driven progress** measuring deliverables and knowledge gained
+5. **Iteration-based efficiency** replacing velocity with success rates
+6. **Context management** as the primary constraint
+7. **Knowledge dependencies** replacing coordination dependencies
+8. **Complexity assessment** based on AI cognitive load
 
 ### Essential MCP Tools
 
@@ -102,10 +126,11 @@ export interface AILearningPattern {
 
 ### Key Success Metrics
 
-- **Context Efficiency**: <30% of session time rebuilding context
+- **Context Efficiency**: <30% of effort units used for context rebuilding
+- **Iteration Accuracy**: ±1 iteration from complexity estimates
+- **Effort Efficiency**: >70% of effort units used for productive work
 - **Resolution Rate**: >80% success on first attempt
-- **Knowledge Reuse**: >70% context persistence between sessions
-- **Session Accuracy**: ±1 session from estimate
+- **Platform Adaptability**: Consistent metrics across token/request/tool-call systems
 
 ## Use Cases and Examples
 
@@ -173,18 +198,31 @@ Project: PostgreSQL Migration (complexity: research, sessions: 6-8, uncertainty:
 ## AI Success Metrics
 
 ### AI Agent Autonomy (Primary Goal)
-- **Human intervention rate** < 10% of total working time
+- **Human intervention rate** < 10% of total effort units requiring human assistance
 - **Autonomous task completion** > 90% success rate without human guidance
-- **Zero-touch operation time** - Measure continuous AI work periods without human attendance
+- **Zero-intervention operation** - Measure AI work completed without any human input
 
 ### AI Performance Indicators
-- **Context Efficiency**: <30% session time rebuilding context  
-- **Session Accuracy**: ±1 session from complexity estimates  
-- **Knowledge Reuse**: >70% context persistence between sessions  
+- **Context Efficiency**: <30% of effort units used for context rebuilding
+- **Iteration Accuracy**: ±1 iteration from complexity estimates  
+- **Effort Efficiency**: >70% of effort units used for productive work
 - **Resolution Rate**: >80% first-attempt success on complex tasks
+- **Platform Consistency**: Reliable metrics across different AI systems
 
 ### Objective
 The ideal objective is that the AI agent can work and deliver as expected with no human interaction at all - the AI agent is working autonomously. Human interventions should be measured and minimized as the primary success indicator.
+
+## Event Tracking Responsibilities
+
+### Automatic Tracking (80% of data)
+- **MCP Server**: Intercepts all tool calls to track effort units (tokens/requests/tool-calls), session boundaries, context rebuilding patterns, and iteration efficiency
+- **AI Agent**: Self-reports session outcomes, task completions, intervention requests, and complexity assessments
+
+### Manual Tracking (20% of data)  
+- **Human User**: Logs intervention context, effort complexity, decision reasoning, and quality assessments when stepping in to help
+
+### Implementation Strategy
+The MCP Server acts as the primary event collector by intercepting all AI tool calls, automatically detecting the available effort measurement type (tokens/requests/tool-calls) and normalizing to universal effort units. The AI Agent provides self-reporting for goals and outcomes. Humans only need to log context when they intervene, creating a mostly automated tracking system that works consistently across different AI platforms while capturing detailed autonomy metrics using reliable effort-based and outcome-based measures.
 
 ## Future AI Enhancements
 

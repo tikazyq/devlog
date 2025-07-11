@@ -449,8 +449,17 @@
       "priority": "high",
       "createdAt": "2025-07-10T15:11:15.344Z",
       "updatedAt": "2025-07-10T15:17:15.866Z"
+    },
+    "80": {
+      "filename": "080-design-human-intervention-and-ai-work-effort-track.json",
+      "title": "Design Human Intervention and AI Work Effort Tracking System",
+      "status": "in-progress",
+      "type": "feature",
+      "priority": "high",
+      "createdAt": "2025-07-11T02:03:22.773Z",
+      "updatedAt": "2025-07-11T04:12:09.129Z"
     }
   },
-  "lastId": 79,
+  "lastId": 80,
   "version": "1.0.0"
 }

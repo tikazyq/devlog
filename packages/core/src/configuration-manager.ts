@@ -23,12 +23,20 @@ export class ConfigurationManager {
   async loadConfig(): Promise<DevlogConfig> {
     await this.ensureInitialized();
     // Try to load from config file first
+    let configData;
     try {
-      const configData = await fs.readFile(this.configPath!, 'utf-8');
-      return JSON.parse(configData) as DevlogConfig;
-    } catch {
+      configData = await fs.readFile(this.configPath!, 'utf-8');
+    } catch (error: any) {
+      console.warn('Failed to load configuration from file:', error.message);
       // Config file doesn't exist, create default configuration
       return this.createDefaultConfig();
+    }
+    try {
+      const expandedConfigData = this.expandEnvironmentVariables(configData);
+      return JSON.parse(expandedConfigData) as DevlogConfig;
+    } catch (error: any) {
+      console.error('Failed to parse configuration:', error.message);
+      throw new Error(`Invalid configuration format: ${error.message}`);
     }
   }
 
@@ -72,5 +80,31 @@ export class ConfigurationManager {
     if (!this.workspaceRoot || !this.configPath) {
       await this.initialize();
     }
+  }
+
+  /**
+   * Expand environment variables in configuration string
+   * Supports ${VAR_NAME} and $VAR_NAME syntax
+   */
+  private expandEnvironmentVariables(configData: string): string {
+    // Replace ${VAR_NAME} syntax
+    let expanded = configData.replace(/\$\{([^}]+)\}/g, (match, varName) => {
+      const value = process.env[varName];
+      if (value === undefined) {
+        throw new Error(`Environment variable ${varName} is not defined`);
+      }
+      return value;
+    });
+
+    // Replace $VAR_NAME syntax (word boundaries)
+    expanded = expanded.replace(/\$([A-Z_][A-Z0-9_]*)/g, (match, varName) => {
+      const value = process.env[varName];
+      if (value === undefined) {
+        throw new Error(`Environment variable ${varName} is not defined`);
+      }
+      return value;
+    });
+
+    return expanded;
   }
 }

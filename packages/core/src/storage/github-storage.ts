@@ -2,8 +2,18 @@
  * GitHub Issues Storage Provider - Uses GitHub Issues as primary storage for devlog entries
  */
 
-import { StorageProvider, DevlogEntry, DevlogId, DevlogFilter, DevlogStats, GitHubStorageConfig, DevlogStatus, DevlogType, DevlogPriority } from '@devlog/types';
-import { GitHubAPIClient, GitHubAPIError } from '../utils/github-api.js';
+import {
+  StorageProvider,
+  DevlogEntry,
+  DevlogId,
+  DevlogFilter,
+  DevlogStats,
+  GitHubStorageConfig,
+  DevlogStatus,
+  DevlogType,
+  DevlogPriority,
+} from '@devlog/types';
+import { GitHubAPIClient, GitHubAPIError, GitHubIssue } from '../utils/github-api.js';
 import { RateLimiter } from '../utils/rate-limiter.js';
 import { LRUCache } from '../utils/lru-cache.js';
 import { DevlogGitHubMapper } from '../utils/github-mapper.js';
@@ -34,17 +44,17 @@ export class GitHubStorageProvider implements StorageProvider {
 
     // Verify API access
     await this.verifyAccess();
-    
+
     // Initialize required labels
     await this.labelManager.ensureRequiredLabels();
-    
+
     this.initialized = true;
   }
 
   async exists(id: DevlogId): Promise<boolean> {
-    const issueNumber = typeof id === 'number' ? id : parseInt(String(id), 10);
+    const issueNumber = id;
     if (isNaN(issueNumber)) return false;
-    
+
     try {
       await this.rateLimiter.executeWithRateLimit(async () => {
         await this.apiClient.getIssue(issueNumber);
@@ -61,16 +71,16 @@ export class GitHubStorageProvider implements StorageProvider {
     const cached = this.cache.get(cacheKey);
     if (cached) return cached;
 
-    const issueNumber = typeof id === 'number' ? id : parseInt(String(id), 10);
+    const issueNumber = id;
     if (isNaN(issueNumber)) return null;
 
     try {
       const issue = await this.rateLimiter.executeWithRateLimit(async () => {
         return await this.apiClient.getIssue(issueNumber);
       });
-      
+
       const devlogEntry = this.dataMapper.issueToDevlog(issue);
-      
+
       if (this.config.cache.enabled) {
         this.cache.set(cacheKey, devlogEntry);
       }
@@ -87,10 +97,10 @@ export class GitHubStorageProvider implements StorageProvider {
     }
 
     const issueData = this.dataMapper.devlogToIssue(entry);
-    
-    if (entry.id && await this.exists(entry.id)) {
+
+    if (entry.id && (await this.exists(entry.id))) {
       // Update existing issue
-      const issueNumber = typeof entry.id === 'number' ? entry.id : parseInt(String(entry.id), 10);
+      const issueNumber = entry.id;
       await this.rateLimiter.executeWithRateLimit(async () => {
         await this.apiClient.updateIssue(issueNumber, issueData as any);
       });
@@ -102,13 +112,13 @@ export class GitHubStorageProvider implements StorageProvider {
       // Update entry ID to match GitHub issue number
       entry.id = issue.number;
     }
-    
+
     // Invalidate cache
     this.cache.delete(`issue-${entry.id}`);
   }
 
   async delete(id: DevlogId): Promise<void> {
-    const issueNumber = typeof id === 'number' ? id : parseInt(String(id), 10);
+    const issueNumber = id;
     if (isNaN(issueNumber)) {
       throw new Error(`Invalid issue number: ${id}`);
     }
@@ -117,32 +127,49 @@ export class GitHubStorageProvider implements StorageProvider {
     await this.rateLimiter.executeWithRateLimit(async () => {
       await this.apiClient.updateIssue(issueNumber, {
         state: 'closed',
-        labels: [`${this.config.labelsPrefix}-deleted`]
+        labels: [`${this.config.labelsPrefix}-deleted`],
       });
     });
-    
+
     // Invalidate cache
     this.cache.delete(`issue-${id}`);
   }
 
   async list(filter?: DevlogFilter): Promise<DevlogEntry[]> {
     const searchQuery = this.buildSearchQuery(filter);
-    
+    console.debug('GitHub storage list query:', searchQuery);
+
     const issues = await this.rateLimiter.executeWithRateLimit(async () => {
       return await this.apiClient.searchIssues(searchQuery);
     });
-    
-    return issues.map(issue => this.dataMapper.issueToDevlog(issue));
+    console.debug('GitHub search results:', issues.length, 'issues found');
+
+    // If search returns empty and no specific filters are applied, try listing all issues
+    if (issues.length === 0 && (!filter || this.isEmptyFilter(filter))) {
+      console.debug('Search returned empty, trying listIssues fallback');
+      const allIssues = await this.rateLimiter.executeWithRateLimit(async () => {
+        return await this.apiClient.listIssues('all');
+      });
+      console.debug('listIssues fallback returned:', allIssues.length, 'issues');
+      
+      // Filter issues that look like devlog entries (have the right structure)
+      const devlogIssues = allIssues.filter(issue => this.looksLikeDevlogIssue(issue));
+      console.debug('Filtered devlog-like issues:', devlogIssues.length);
+      
+      return devlogIssues.map((issue) => this.dataMapper.issueToDevlog(issue));
+    }
+
+    return issues.map((issue) => this.dataMapper.issueToDevlog(issue));
   }
 
   async search(query: string): Promise<DevlogEntry[]> {
     const searchQuery = `repo:${this.config.owner}/${this.config.repo} is:issue ${query}`;
-    
+
     const issues = await this.rateLimiter.executeWithRateLimit(async () => {
       return await this.apiClient.searchIssues(searchQuery);
     });
-    
-    return issues.map(issue => this.dataMapper.issueToDevlog(issue));
+
+    return issues.map((issue) => this.dataMapper.issueToDevlog(issue));
   }
 
   async getStats(): Promise<DevlogStats> {
@@ -159,10 +186,18 @@ export class GitHubStorageProvider implements StorageProvider {
     const [total, open, inProgress, blocked, inReview, testing] = await Promise.all([
       this.rateLimiter.executeWithRateLimit(() => this.apiClient.searchIssuesCount(queries.total)),
       this.rateLimiter.executeWithRateLimit(() => this.apiClient.searchIssuesCount(queries.open)),
-      this.rateLimiter.executeWithRateLimit(() => this.apiClient.searchIssuesCount(queries.inProgress)),
-      this.rateLimiter.executeWithRateLimit(() => this.apiClient.searchIssuesCount(queries.blocked)),
-      this.rateLimiter.executeWithRateLimit(() => this.apiClient.searchIssuesCount(queries.inReview)),
-      this.rateLimiter.executeWithRateLimit(() => this.apiClient.searchIssuesCount(queries.testing)),
+      this.rateLimiter.executeWithRateLimit(() =>
+        this.apiClient.searchIssuesCount(queries.inProgress),
+      ),
+      this.rateLimiter.executeWithRateLimit(() =>
+        this.apiClient.searchIssuesCount(queries.blocked),
+      ),
+      this.rateLimiter.executeWithRateLimit(() =>
+        this.apiClient.searchIssuesCount(queries.inReview),
+      ),
+      this.rateLimiter.executeWithRateLimit(() =>
+        this.apiClient.searchIssuesCount(queries.testing),
+      ),
     ]);
 
     const done = total - open;
@@ -208,12 +243,12 @@ export class GitHubStorageProvider implements StorageProvider {
   // Helper methods
   private buildSearchQuery(filter?: DevlogFilter): string {
     let query = `repo:${this.config.owner}/${this.config.repo} is:issue`;
-    
+
     // Add devlog type label to filter only devlog issues
     query += ` label:"${this.config.labelsPrefix}-type"`;
-    
+
     if (filter?.status && filter.status.length > 0) {
-      const statusQueries = filter.status.map(status => {
+      const statusQueries = filter.status.map((status) => {
         if (status === 'done') {
           return 'is:closed';
         } else if (status === 'new') {
@@ -224,30 +259,58 @@ export class GitHubStorageProvider implements StorageProvider {
       });
       query += ` (${statusQueries.join(' OR ')})`;
     }
-    
+
     if (filter?.type && filter.type.length > 0) {
-      const typeQueries = filter.type.map(type => `label:"${this.config.labelsPrefix}-type:${type}"`);
+      const typeQueries = filter.type.map(
+        (type) => `label:"${this.config.labelsPrefix}-type:${type}"`,
+      );
       query += ` (${typeQueries.join(' OR ')})`;
     }
-    
+
     if (filter?.priority && filter.priority.length > 0) {
-      const priorityQueries = filter.priority.map(priority => `label:"${this.config.labelsPrefix}-priority:${priority}"`);
+      const priorityQueries = filter.priority.map(
+        (priority) => `label:"${this.config.labelsPrefix}-priority:${priority}"`,
+      );
       query += ` (${priorityQueries.join(' OR ')})`;
     }
-    
+
     if (filter?.assignee) {
       query += ` assignee:${filter.assignee}`;
     }
-    
+
     if (filter?.fromDate) {
       query += ` created:>=${filter.fromDate}`;
     }
-    
+
     if (filter?.toDate) {
       query += ` created:<=${filter.toDate}`;
     }
-    
+
     return query;
+  }
+
+  private isEmptyFilter(filter: DevlogFilter): boolean {
+    return !filter.status?.length &&
+           !filter.type?.length &&
+           !filter.priority?.length &&
+           !filter.assignee &&
+           !filter.fromDate &&
+           !filter.toDate;
+  }
+
+  private looksLikeDevlogIssue(issue: GitHubIssue): boolean {
+    // Check if issue has devlog-related labels or structure
+    const hasDevlogLabels = issue.labels.some((label: any) => 
+      label.name.startsWith(this.config.labelsPrefix)
+    );
+    
+    // Check if title/body suggests it's a devlog entry
+    const hasDevlogStructure = issue.title.toLowerCase().includes('devlog') ||
+                               (issue.body?.toLowerCase().includes('devlog') ?? false) ||
+                               (issue.body?.includes('## Business Context') ?? false) ||
+                               (issue.body?.includes('## Technical Context') ?? false);
+    
+    return hasDevlogLabels || hasDevlogStructure;
   }
 
   private normalizeConfig(config: GitHubStorageConfig): Required<GitHubStorageConfig> {
@@ -276,11 +339,10 @@ export class GitHubStorageProvider implements StorageProvider {
       await this.rateLimiter.executeWithRateLimit(async () => {
         await this.apiClient.getRepository();
       });
-      
     } catch (error: any) {
       throw new Error(
         `GitHub API access verification failed: ${error.message}. ` +
-        `Please check your token permissions and repository access.`
+          `Please check your token permissions and repository access.`,
       );
     }
   }

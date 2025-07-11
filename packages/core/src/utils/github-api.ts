@@ -78,6 +78,17 @@ export class GitHubAPIClient {
     return this.request(`/issues/${issueNumber}`, 'PATCH', issueData);
   }
 
+  async listIssues(state: 'open' | 'closed' | 'all' = 'all', per_page = 100, page = 1): Promise<GitHubIssue[]> {
+    const params = new URLSearchParams({
+      state,
+      per_page: per_page.toString(),
+      page: page.toString(),
+      sort: 'updated',
+      direction: 'desc'
+    });
+    return this.request(`/issues?${params}`);
+  }
+
   async searchIssues(query: string): Promise<GitHubIssue[]> {
     const response: GitHubSearchResponse = await this.request(
       `/search/issues?q=${encodeURIComponent(query)}`,
@@ -85,6 +96,7 @@ export class GitHubAPIClient {
       undefined,
       true,
     );
+    console.debug(response);
     return response.items;
   }
 
@@ -114,20 +126,26 @@ export class GitHubAPIClient {
     return this.request('/labels');
   }
 
-  async updateLabel(name: string, data: { new_name?: string; color?: string; description?: string }): Promise<void> {
+  async updateLabel(
+    name: string,
+    data: { new_name?: string; color?: string; description?: string },
+  ): Promise<void> {
     await this.request(`/labels/${encodeURIComponent(name)}`, 'PATCH', data);
   }
 
-  private async request(path: string, method = 'GET', body?: any, useSearchAPI = false): Promise<any> {
-    const url = useSearchAPI
-      ? `${this.config.apiUrl}${path}`
-      : `${this.baseURL}${path}`;
+  private async request(
+    path: string,
+    method = 'GET',
+    body?: any,
+    useSearchAPI = false,
+  ): Promise<any> {
+    const url = useSearchAPI ? `${this.config.apiUrl}${path}` : `${this.baseURL}${path}`;
 
     const response = await fetch(url, {
       method,
       headers: {
-        'Authorization': `token ${this.config.token}`,
-        'Accept': 'application/vnd.github.v3+json',
+        Authorization: `token ${this.config.token}`,
+        Accept: 'application/vnd.github.v3+json',
         'Content-Type': 'application/json',
         'User-Agent': 'devlog-github-storage/1.0.0',
       },
